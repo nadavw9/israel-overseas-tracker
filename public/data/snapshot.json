@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-19T10:50:15.671Z",
+  "generatedAt": "2026-07-19T10:56:36.882Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -27,7 +27,7 @@
       "source": {
         "provider": "espn-nba",
         "sourceUrl": "https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/4683021/overview",
-        "retrievedAt": "2026-07-19T10:50:15.671Z"
+        "retrievedAt": "2026-07-19T10:56:36.882Z"
       },
       "freshness": "fresh",
       "location": {
@@ -68,7 +68,7 @@
       "source": {
         "provider": "espn-nba",
         "sourceUrl": "https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/5242502/overview",
-        "retrievedAt": "2026-07-19T10:50:15.671Z"
+        "retrievedAt": "2026-07-19T10:56:36.882Z"
       },
       "freshness": "fresh",
       "location": {
@@ -111,6 +111,11 @@
         "country": "Netherlands",
         "lat": 52.3676,
         "lng": 4.9041
+      },
+      "image": {
+        "url": "https://english.ajax.nl/media/hvxfkhyf/gloukh_2526.png",
+        "sourceUrl": "https://english.ajax.nl/teams/ajax-1/oscar-gloukh",
+        "alt": "Oscar Gloukh in an Ajax player portrait"
       }
     }
   ]

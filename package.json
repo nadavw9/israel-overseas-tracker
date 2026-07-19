@@ -10,6 +10,7 @@
     "sync:data": "tsx scripts/sync-data.ts",
     "test": "vitest run",
     "test:watch": "vitest",
+    "validate:images": "tsx scripts/validate-images.ts",
     "preview": "vite preview"
   },
   "dependencies": {
