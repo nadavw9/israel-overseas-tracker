@@ -1,0 +1,37 @@
+{
+  "playerId": 8484798,
+  "playerSlug": "zeev-buium-8484798",
+  "fullTeamName": { "default": "Vancouver Canucks" },
+  "seasonTotals": [
+    {
+      "season": 20252026,
+      "gameTypeId": 2,
+      "leagueAbbrev": "NHL",
+      "teamName": { "default": "Minnesota Wild" },
+      "gamesPlayed": 31,
+      "goals": 3,
+      "assists": 11,
+      "points": 14
+    },
+    {
+      "season": 20252026,
+      "gameTypeId": 2,
+      "leagueAbbrev": "NHL",
+      "teamName": { "default": "Vancouver Canucks" },
+      "gamesPlayed": 45,
+      "goals": 3,
+      "assists": 9,
+      "points": 12
+    },
+    {
+      "season": 20242025,
+      "gameTypeId": 3,
+      "leagueAbbrev": "NHL",
+      "teamName": { "default": "Minnesota Wild" },
+      "gamesPlayed": 4,
+      "goals": 0,
+      "assists": 1,
+      "points": 1
+    }
+  ]
+}
