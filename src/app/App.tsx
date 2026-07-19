@@ -1,8 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { Athlete, AthleteSnapshot } from '../domain/athlete'
 import { AppHeader } from '../components/AppHeader'
 import { AthleteCard } from '../components/AthleteCard'
+import { AthleteDrawer } from '../components/AthleteDrawer'
+import { AthleteMap } from '../components/AthleteMap'
 import { FilterBar, type SportFilter } from '../components/FilterBar'
+import { Leaderboard } from '../components/Leaderboard'
+import { ViewNav, type TrackerView } from '../components/ViewNav'
 import './styles.css'
 
 type TrackerAppProps = {
@@ -28,6 +32,9 @@ function matchesQuery(athlete: Athlete, query: string): boolean {
 export function TrackerApp({ snapshot }: TrackerAppProps) {
   const [query, setQuery] = useState('')
   const [sport, setSport] = useState<SportFilter>('all')
+  const [view, setView] = useState<TrackerView>('athletes')
+  const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null)
+  const returnFocus = useRef<HTMLButtonElement | null>(null)
 
   const athletes = useMemo(
     () =>
@@ -68,14 +75,18 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
           </div>
         </section>
 
-        <section className="content" aria-labelledby="athletes-title">
-          <div className="section-heading">
-            <div>
-              <p className="section-heading__eyebrow">Verified directory</p>
-              <h2 id="athletes-title">Athletes abroad</h2>
+        <section className="content" aria-label="Tracker explorer">
+          <ViewNav view={view} onChange={setView} />
+
+          {view === 'athletes' && (
+            <div className="section-heading">
+              <div>
+                <p className="section-heading__eyebrow">Verified directory</p>
+                <h2 id="athletes-title">Athletes abroad</h2>
+              </div>
+              <p>{athletes.length} showing</p>
             </div>
-            <p>{athletes.length} showing</p>
-          </div>
+          )}
 
           <FilterBar
             query={query}
@@ -84,25 +95,38 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
             onSportChange={setSport}
           />
 
-          {athletes.length > 0 ? (
+          {view === 'athletes' && athletes.length > 0 ? (
             <div className="athlete-grid">
               {athletes.map((athlete, index) => (
                 <AthleteCard
                   key={athlete.id}
                   athlete={athlete}
                   rank={index + 1}
-                  onOpen={() => undefined}
+                  onOpen={() => {
+                    returnFocus.current = document.activeElement as HTMLButtonElement
+                    setSelectedAthlete(athlete)
+                  }}
                 />
               ))}
             </div>
-          ) : (
+          ) : view === 'athletes' ? (
             <div className="empty-state" role="status">
               <h3>No verified matches</h3>
               <p>Try another athlete, team, competition, or sport.</p>
             </div>
-          )}
+          ) : null}
+
+          {view === 'rankings' && <Leaderboard athletes={athletes} />}
+          {view === 'map' && <AthleteMap athletes={athletes} />}
         </section>
       </main>
+      {selectedAthlete && (
+        <AthleteDrawer
+          athlete={selectedAthlete}
+          onClose={() => setSelectedAthlete(null)}
+          returnFocus={returnFocus}
+        />
+      )}
     </div>
   )
 }
