@@ -3,7 +3,7 @@ import type { AthleteSnapshot } from '../../src/domain/athlete'
 import { publicRegistry } from '../../src/data/registry'
 import { buildSnapshot } from '../../src/services/snapshot'
 import deniFixture from '../../data/fixtures/nba-deni.json'
-import { fetchProviderRecord } from '../../scripts/sync-data'
+import { fetchProviderRecord, resolveSyncNow } from '../../scripts/sync-data'
 
 const previous: AthleteSnapshot = {
   generatedAt: '2026-07-18T12:00:00.000Z',
@@ -128,5 +128,13 @@ describe('fetchProviderRecord', () => {
         new Date('2026-07-19T12:00:00.000Z'),
       ),
     ).rejects.toThrow(/identity mismatch/i)
+  })
+})
+
+describe('sync clock resolution', () => {
+  it('bootstraps only an implicit clock to the migration watermark', () => {
+    const early = new Date('2026-07-22T00:00:00.000Z')
+    expect(resolveSyncNow(undefined, early).toISOString()).toBe('2026-07-23T08:00:00.000Z')
+    expect(resolveSyncNow(early, new Date('2026-07-24T00:00:00.000Z'))).toBe(early)
   })
 })

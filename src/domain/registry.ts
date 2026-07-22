@@ -219,23 +219,34 @@ const addDuplicateIdIssues = (
 }
 
 export type RegistryAsOf = Date | string
+/** Required provenance watermark for the normalized registry migration. */
+export const registryMigrationInstant = '2026-07-23T08:00:00.000Z'
+
+export function registryInstantMs(value: Date | string) {
+  const milliseconds = value instanceof Date ? value.getTime() : new Date(value).getTime()
+  if (!Number.isFinite(milliseconds)) throw new Error(`Invalid registry instant: ${String(value)}`)
+  return milliseconds
+}
 
 export function normalizeRegistryAsOf(asOf: RegistryAsOf) {
-  const instant = asOf instanceof Date
-    ? asOf.toISOString()
+  const input = asOf instanceof Date
+    ? asOf
     : z.iso.datetime().safeParse(asOf).success
       ? asOf
       : z.iso.date().safeParse(asOf).success
         ? `${asOf}T23:59:59.999Z`
         : undefined
-  if (instant === undefined || Number.isNaN(new Date(instant).getTime())) {
+  if (input === undefined) {
     throw new Error(`Invalid registry as-of instant: ${String(asOf)}`)
   }
-  return { instant, date: instant.slice(0, 10) }
+  const milliseconds = registryInstantMs(input)
+  const instant = new Date(milliseconds).toISOString()
+  return { instant, date: instant.slice(0, 10), milliseconds }
 }
 
 export function createRegistryBundleSchema(asOf: RegistryAsOf) {
-  const { date: asOfDate, instant: asOfInstant } = normalizeRegistryAsOf(asOf)
+  const { date: asOfDate, milliseconds: asOfMilliseconds } = normalizeRegistryAsOf(asOf)
+  const atOrBeforeAsOf = (instant: string) => registryInstantMs(instant) <= asOfMilliseconds
 
   return z
   .object({
@@ -329,7 +340,7 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
       if (athlete.visibility !== 'public') return
 
       const hasVerifiedEligibility = bundle.evidence.some(
-        (claim) => claim.athleteId === athlete.id && claim.status === 'verified' && claim.retrievedAt <= asOfInstant,
+        (claim) => claim.athleteId === athlete.id && claim.status === 'verified' && atOrBeforeAsOf(claim.retrievedAt),
       )
       if (!hasVerifiedEligibility) {
         context.addIssue({
@@ -343,7 +354,8 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
         (affiliation) =>
           affiliation.athleteId === athlete.id &&
           affiliation.primary &&
-          affiliation.countsAsOverseas,
+          affiliation.countsAsOverseas &&
+          atOrBeforeAsOf(affiliation.source.retrievedAt),
       )
       const currentPrimaryOverseasAffiliations = primaryOverseasAffiliations.filter(
         (affiliation) =>
@@ -401,7 +413,7 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
         (binding) =>
           binding.athleteId === athlete.id &&
           binding.status === 'verified' &&
-          binding.verifiedAt <= asOfInstant &&
+          atOrBeforeAsOf(binding.verifiedAt) &&
           binding.competition === qualifyingCompetition &&
           bindingMatchesAthleteAndProvider(binding),
       )
@@ -416,7 +428,7 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
   })
 }
 
-export const registryBundleSchema = createRegistryBundleSchema('2026-07-23T08:00:00.000Z')
+export const registryBundleSchema = createRegistryBundleSchema(registryMigrationInstant)
 
 const candidateSignalSchema = z.object({
   sourceUrl: httpsUrlSchema,

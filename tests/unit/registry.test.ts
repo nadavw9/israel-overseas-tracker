@@ -110,4 +110,32 @@ describe('injectable registry compiler', () => {
     mismatch.providerBindings[0].competition = 'EuroLeague'
     expect(() => compileRegistryBundle(mismatch, '2026-07-23T08:00:00.000Z')).toThrow(/binding/i)
   })
+
+  it('treats equivalent instants equally and rejects fractional-second future provenance', () => {
+    const bundle = structuredClone(registryBundleFixture)
+    bundle.athletes[0].sport = 'basketball'
+    bundle.affiliations[0].competition = 'NBA'
+    bundle.providerBindings[0].provider = 'espn-nba'
+    bundle.providerBindings[0].sport = 'basketball'
+    bundle.providerBindings[0].competition = 'NBA'
+    bundle.evidence[0].retrievedAt = '2026-07-23T08:00:00Z'
+    bundle.providerBindings[0].verifiedAt = '2026-07-23T08:00:00Z'
+    bundle.affiliations[0].source.retrievedAt = '2026-07-23T08:00:00Z'
+
+    expect(compileRegistryBundle(bundle, '2026-07-23T08:00:00.000Z')).toHaveLength(1)
+    bundle.evidence[0].retrievedAt = '2026-07-23T08:00:00.500Z'
+    expect(() => compileRegistryBundle(bundle, '2026-07-23T08:00:00Z')).toThrow(/eligibility/i)
+  })
+
+  it('rejects a future-sourced affiliation', () => {
+    const bundle = structuredClone(registryBundleFixture)
+    bundle.athletes[0].sport = 'basketball'
+    bundle.affiliations[0].competition = 'NBA'
+    bundle.providerBindings[0].provider = 'espn-nba'
+    bundle.providerBindings[0].sport = 'basketball'
+    bundle.providerBindings[0].competition = 'NBA'
+    bundle.affiliations[0].source.retrievedAt = '2026-07-23T08:00:00.500Z'
+
+    expect(() => compileRegistryBundle(bundle, '2026-07-23T08:00:00Z')).toThrow(/affiliation/i)
+  })
 })

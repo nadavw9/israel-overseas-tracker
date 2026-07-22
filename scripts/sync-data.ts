@@ -5,6 +5,7 @@ import { parseNbaFixture } from './providers/nba'
 import { parseNhlFixture } from './providers/nhl'
 import type { ProviderResult } from './providers/types'
 import { compilePublicRegistry, type RegistryAthlete } from '../src/data/registry'
+import { registryMigrationInstant } from '../src/domain/registry'
 import { snapshotSchema, type AthleteSnapshot } from '../src/domain/athlete'
 import { buildSnapshot } from '../src/services/snapshot'
 
@@ -128,14 +129,22 @@ async function readPreviousSnapshot(): Promise<AthleteSnapshot> {
   }
 }
 
-export async function syncData(now: Date = new Date()): Promise<AthleteSnapshot> {
+export function resolveSyncNow(explicitNow: Date | undefined, systemNow: Date): Date {
+  if (explicitNow !== undefined) return explicitNow
+  const migrationMilliseconds = new Date(registryMigrationInstant).getTime()
+  return systemNow.getTime() < migrationMilliseconds ? new Date(migrationMilliseconds) : systemNow
+}
+
+export async function syncData(now?: Date): Promise<AthleteSnapshot> {
+  // The initial data is deliberately watermarked; only implicit CLI runs bootstrap to it.
+  const effectiveNow = resolveSyncNow(now, new Date())
   const previous = await readPreviousSnapshot()
-  const entries = compilePublicRegistry(now)
+  const entries = compilePublicRegistry(effectiveNow)
   const next = await buildSnapshot({
     entries,
     previous,
-    fetchRecord: (entry) => fetchProviderRecord(entry, fetch, now),
-    now,
+    fetchRecord: (entry) => fetchProviderRecord(entry, fetch, effectiveNow),
+    now: effectiveNow,
   })
 
   await mkdir(new URL('../public/data/', import.meta.url), { recursive: true })

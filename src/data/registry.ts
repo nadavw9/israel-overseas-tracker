@@ -6,6 +6,8 @@ import providerBindingsJson from '../../data/registry/provider-bindings.json'
 import {
   createRegistryBundleSchema,
   normalizeRegistryAsOf,
+  registryInstantMs,
+  registryMigrationInstant,
   type RegistryAsOf,
   type RegistryBundle,
 } from '../domain/registry'
@@ -59,9 +61,9 @@ function current(record: Affiliation, asOfDate: string) {
 }
 function newest<T extends { id: string }>(records: readonly T[], timestamp: keyof T, description: string, athleteId: string): T {
   const selected = [...records].sort((left, right) => {
-    const leftTimestamp = String(left[timestamp])
-    const rightTimestamp = String(right[timestamp])
-    if (leftTimestamp !== rightTimestamp) return leftTimestamp < rightTimestamp ? 1 : -1
+    const leftTimestamp = registryInstantMs(String(left[timestamp]))
+    const rightTimestamp = registryInstantMs(String(right[timestamp]))
+    if (leftTimestamp !== rightTimestamp) return rightTimestamp - leftTimestamp
     return left.id === right.id ? 0 : left.id < right.id ? -1 : 1
   })[0]
   if (selected === undefined) throw new Error(`Missing ${description} for ${athleteId}`)
@@ -79,8 +81,8 @@ function releaseCutoff(asOfDate: string) {
   return date.toISOString().slice(0, 10)
 }
 
-function selectAffiliation(bundle: RegistryBundle, athlete: AthleteIdentity, asOfDate: string): Affiliation {
-  const primaryOverseas = bundle.affiliations.filter((record) => record.athleteId === athlete.id && record.primary && record.countsAsOverseas)
+function selectAffiliation(bundle: RegistryBundle, athlete: AthleteIdentity, asOfDate: string, asOfMilliseconds: number): Affiliation {
+  const primaryOverseas = bundle.affiliations.filter((record) => record.athleteId === athlete.id && record.primary && record.countsAsOverseas && registryInstantMs(record.source.retrievedAt) <= asOfMilliseconds)
   if (athlete.lifecycleStatus === 'active' || athlete.lifecycleStatus === 'injured') {
     return exactly(primaryOverseas.filter((record) => current(record, asOfDate) && record.rosterStatus === 'active'), 'current primary active overseas affiliation', athlete.id)
   }
@@ -92,14 +94,14 @@ function selectAffiliation(bundle: RegistryBundle, athlete: AthleteIdentity, asO
 }
 
 export function compileRegistryBundle(input: unknown, asOf: RegistryAsOf): RegistryAthlete[] {
-  const { date: asOfDate, instant: asOfInstant } = normalizeRegistryAsOf(asOf)
+  const { date: asOfDate, instant: asOfInstant, milliseconds: asOfMilliseconds } = normalizeRegistryAsOf(asOf)
   const bundle = createRegistryBundleSchema(asOfInstant).parse(input)
   return bundle.athletes.filter((athlete) => athlete.visibility === 'public').map((athlete) => {
     if (!isSnapshotSport(athlete.sport)) throw new Error(`Unsupported public snapshot sport for ${athlete.id}: ${athlete.sport}`)
-    const affiliation = selectAffiliation(bundle, athlete, asOfDate)
-    const eligibility = newest(bundle.evidence.filter((claim): claim is VerifiedEligibility => claim.athleteId === athlete.id && isVerifiedEligibility(claim) && claim.retrievedAt <= asOfInstant), 'retrievedAt', 'verified eligibility claim', athlete.id)
-    const binding = newest(bundle.providerBindings.filter((record): record is VerifiedBinding => record.athleteId === athlete.id && isVerifiedBinding(record) && record.verifiedAt <= asOfInstant && record.competition === affiliation.competition), 'verifiedAt', 'verified provider binding matching affiliation competition', athlete.id)
-    const approved = bundle.media.filter((record): record is ApprovedMedia => record.athleteId === athlete.id && isApprovedMedia(record) && record.retrievedAt <= asOfInstant)
+    const affiliation = selectAffiliation(bundle, athlete, asOfDate, asOfMilliseconds)
+    const eligibility = newest(bundle.evidence.filter((claim): claim is VerifiedEligibility => claim.athleteId === athlete.id && isVerifiedEligibility(claim) && registryInstantMs(claim.retrievedAt) <= asOfMilliseconds), 'retrievedAt', 'verified eligibility claim', athlete.id)
+    const binding = newest(bundle.providerBindings.filter((record): record is VerifiedBinding => record.athleteId === athlete.id && isVerifiedBinding(record) && registryInstantMs(record.verifiedAt) <= asOfMilliseconds && record.competition === affiliation.competition), 'verifiedAt', 'verified provider binding matching affiliation competition', athlete.id)
+    const approved = bundle.media.filter((record): record is ApprovedMedia => record.athleteId === athlete.id && isApprovedMedia(record) && registryInstantMs(record.retrievedAt) <= asOfMilliseconds)
     const image = approved.length === 0 ? undefined : newest(approved, 'retrievedAt', 'approved media', athlete.id)
     return { ...athlete, sport: athlete.sport, eligibility, affiliation, binding, ...(image === undefined ? {} : { image }), competition: affiliation.competition, team: affiliation.organization.name, season: affiliation.season, provider: binding.provider, providerId: binding.externalId, ...(affiliation.location === undefined ? {} : { location: affiliation.location }) }
   })
@@ -109,4 +111,4 @@ export function compilePublicRegistry(asOf: RegistryAsOf): RegistryAthlete[] {
   return compileRegistryBundle(bundledData, asOf)
 }
 
-export const publicRegistry = compilePublicRegistry('2026-07-23T08:00:00.000Z')
+export const publicRegistry = compilePublicRegistry(registryMigrationInstant)
