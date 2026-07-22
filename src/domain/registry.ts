@@ -307,21 +307,21 @@ const candidateSignalSchema = z.object({
 })
 
 export const candidateSchema = z.object({
-  id: recordIdSchema,
+  id: z.string().regex(/^[a-z0-9-]+$/),
   name: localizedNameSchema,
   sport: sportSchema,
   tier: athleteTierSchema,
   genderCategory: genderCategorySchema,
   state: candidateStateSchema,
-  signals: z.array(candidateSignalSchema),
+  signals: z.array(candidateSignalSchema).min(1),
   proposedAffiliation: z
     .object({
-      organization: organizationSchema,
+      organization: nonEmptyStringSchema,
       competition: nonEmptyStringSchema,
-      season: nonEmptyStringSchema,
+      season: z.string().trim().min(4),
     })
     .optional(),
-  reviewerNote: nonEmptyStringSchema.optional(),
+  reviewerNote: nonEmptyStringSchema,
 })
 
 export const candidateQueueSchema = z.array(candidateSchema)
