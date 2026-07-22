@@ -36,7 +36,7 @@ function statItems(stats: AthleteStats | null) {
 }
 
 export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
-  const stats = statItems(athlete.stats)
+  const stats = statItems(athlete.performance.stats)
   const { locale, messages } = useI18n()
   const displayName = athlete.name[locale]
 
@@ -53,7 +53,11 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
         </span>
         <div className="athlete-card__visual">
           <AthletePhoto athlete={athlete} />
-          <span className="athlete-card__sport">{messages.sports[athlete.sport]}</span>
+          <span className="athlete-card__sport">
+            {athlete.sport in messages.sports
+              ? messages.sports[athlete.sport as keyof typeof messages.sports]
+              : athlete.sport}
+          </span>
         </div>
         <div className="athlete-card__body">
           <div className="athlete-card__identity">
@@ -66,8 +70,8 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
             <ArrowUpRight size={20} aria-hidden="true" />
           </div>
           <p className="athlete-card__club">
-            <strong>{athlete.team}</strong>
-            <span>{athlete.competition} · {athlete.season}</span>
+            <strong>{athlete.affiliation.organization.name}</strong>
+            <span>{athlete.affiliation.competition} · {athlete.affiliation.season}</span>
           </p>
           {stats.length > 0 ? (
             <dl className="stat-grid">
@@ -81,12 +85,12 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
           ) : (
             <div className="stats-unavailable">{messages.statsPending}</div>
           )}
-          <FreshnessBadge freshness={athlete.freshness} source={athlete.source} />
+          <FreshnessBadge performance={athlete.performance} />
         </div>
       </button>
       <a
         className="athlete-card__source"
-        href={athlete.source.sourceUrl}
+        href={athlete.performance.source.sourceUrl}
         target="_blank"
         rel="noreferrer"
       >

@@ -21,6 +21,8 @@ describe('NBA provider', () => {
       reboundsPerGame: 6.9,
       assistsPerGame: 6.7,
     })
+    expect(result.state).toBe('final')
+    expect(result.observedOrganization).toBeUndefined()
   })
 
   it('rejects a payload that omits a required field', () => {
@@ -47,7 +49,8 @@ describe('NHL provider', () => {
       retrievedAt: '2026-07-19T08:00:00.000Z',
     })
 
-    expect(result.team).toBe('Vancouver Canucks')
+    expect(result.observedOrganization).toBe('Vancouver Canucks')
+    expect(result.state).toBe('final')
     expect(result.stats).toEqual({
       kind: 'hockey',
       games: 76,
@@ -77,5 +80,6 @@ describe('curated provider', () => {
     })
 
     expect(result.stats).toBeNull()
+    expect(result.state).toBe('final')
   })
 })

@@ -43,7 +43,8 @@ export function parseNhlFixture(
 
   return {
     athleteId: options.athleteId,
-    team: payload.fullTeamName.default,
+    observedOrganization: payload.fullTeamName.default,
+    state: 'final',
     stats: {
       kind: 'hockey',
       games: sum('gamesPlayed'),

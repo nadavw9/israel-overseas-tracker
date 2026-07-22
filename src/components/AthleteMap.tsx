@@ -9,7 +9,7 @@ type AthleteMapProps = {
 }
 
 export function AthleteMap({ athletes, onOpen }: AthleteMapProps) {
-  const located = athletes.filter((athlete) => athlete.location)
+  const located = athletes.filter((athlete) => athlete.affiliation.location)
   const { locale, messages } = useI18n()
 
   return (
@@ -30,7 +30,7 @@ export function AthleteMap({ athletes, onOpen }: AthleteMapProps) {
             aria-label={messages.openMapAthlete(athlete.name[locale])}
           >
             <strong>{athlete.name[locale]}</strong>
-            <span>{athlete.location!.city}</span>
+            <span>{athlete.affiliation.location!.city}</span>
           </button>
         ))}
       </div>
@@ -43,15 +43,15 @@ export function AthleteMap({ athletes, onOpen }: AthleteMapProps) {
           {located.map((athlete) => (
             <CircleMarker
               key={athlete.id}
-              center={[athlete.location!.lat, athlete.location!.lng]}
+              center={[athlete.affiliation.location!.lat, athlete.affiliation.location!.lng]}
               radius={9}
               pathOptions={{ color: '#070708', weight: 3, fillColor: '#f5d878', fillOpacity: 1 }}
             >
               <Popup>
                 <div dir={locale === 'he' ? 'rtl' : 'ltr'}>
                   <strong>{athlete.name[locale]}</strong><br />
-                  {athlete.team}<br />
-                  {athlete.location!.city}, {athlete.location!.country}
+                  {athlete.affiliation.organization.name}<br />
+                  {athlete.affiliation.location!.city}, {athlete.affiliation.location!.country}
                 </div>
               </Popup>
             </CircleMarker>

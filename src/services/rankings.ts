@@ -1,7 +1,7 @@
 import type { Athlete } from '../domain/athlete'
 
 export function primaryMetric(athlete: Athlete): number {
-  const stats = athlete.stats
+  const stats = athlete.performance.stats
   if (!stats) return Number.NEGATIVE_INFINITY
   if (stats.kind === 'basketball') return stats.pointsPerGame
   if (stats.kind === 'football') return stats.goals
@@ -13,9 +13,8 @@ export function rankAthletes(athletes: Athlete[]): Athlete[] {
     .filter(
       (athlete) =>
         athlete.visibility === 'public' &&
-        athlete.statsStatus === 'verified' &&
-        athlete.stats !== null &&
-        (athlete.freshness === 'fresh' || athlete.freshness === 'stale'),
+        athlete.performance.status === 'available' &&
+        athlete.performance.stats !== null,
     )
     .toSorted((left, right) => primaryMetric(right) - primaryMetric(left))
 }

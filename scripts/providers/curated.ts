@@ -17,6 +17,7 @@ export function parseCuratedRecord(
   return {
     athleteId,
     stats: record.stats,
+    state: 'final',
     sourceUrl: record.sourceUrl,
     retrievedAt: record.retrievedAt,
   }

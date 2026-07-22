@@ -19,10 +19,10 @@ function matchesQuery(athlete: Athlete, query: string): boolean {
   const haystack = [
     athlete.name.en,
     athlete.name.he,
-    athlete.team,
-    athlete.competition,
-    athlete.location?.city,
-    athlete.location?.country,
+    athlete.affiliation.organization.name,
+    athlete.affiliation.competition,
+    athlete.affiliation.location?.city,
+    athlete.affiliation.location?.country,
   ]
     .filter(Boolean)
     .join(' ')

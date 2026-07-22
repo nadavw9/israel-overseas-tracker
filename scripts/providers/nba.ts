@@ -60,6 +60,7 @@ export function parseNbaFixture(
   return {
     athleteId: options.athleteId,
     stats: { kind: 'basketball', ...parsed },
+    state: 'final',
     sourceUrl: options.sourceUrl,
     retrievedAt: options.retrievedAt,
   }

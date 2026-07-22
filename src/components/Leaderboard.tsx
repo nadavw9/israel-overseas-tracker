@@ -4,8 +4,8 @@ import { primaryMetric, rankAthletes } from '../services/rankings'
 import { useI18n } from '../i18n/context'
 
 function metricLabel(athlete: Athlete) {
-  if (athlete.stats?.kind === 'basketball') return 'PPG'
-  if (athlete.stats?.kind === 'football') return 'Goals'
+  if (athlete.performance.stats?.kind === 'basketball') return 'PPG'
+  if (athlete.performance.stats?.kind === 'football') return 'Goals'
   return 'Points'
 }
 
@@ -31,13 +31,13 @@ export function Leaderboard({ athletes }: { athletes: Athlete[] }) {
             <span className="leaderboard__rank">{String(index + 1).padStart(2, '0')}</span>
             <span className="leaderboard__name">
               <strong>{athlete.name[locale]}</strong>
-              <small>{athlete.team} · {athlete.competition}</small>
+              <small>{athlete.affiliation.organization.name} · {athlete.affiliation.competition}</small>
             </span>
             <span className="leaderboard__metric">
               <strong>{primaryMetric(athlete)}</strong>
               <small>{metricLabel(athlete)}</small>
             </span>
-            <a href={athlete.source.sourceUrl} target="_blank" rel="noreferrer" aria-label={messages.rankingSource(athlete.name[locale])}>
+            <a href={athlete.performance.source.sourceUrl} target="_blank" rel="noreferrer" aria-label={messages.rankingSource(athlete.name[locale])}>
               <ArrowUpRight size={18} aria-hidden="true" />
             </a>
           </li>

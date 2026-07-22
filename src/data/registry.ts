@@ -32,12 +32,6 @@ export type RegistryAthlete = Omit<AthleteIdentity, 'sport'> & {
   affiliation: Affiliation
   binding: VerifiedBinding
   image?: ApprovedMedia
-  competition: string
-  team: string
-  season: string
-  provider: Binding['provider']
-  providerId: string
-  location?: Affiliation['location']
 }
 
 const bundledData = {
@@ -103,7 +97,7 @@ export function compileRegistryBundle(input: unknown, asOf: RegistryAsOf): Regis
     const binding = newest(bundle.providerBindings.filter((record): record is VerifiedBinding => record.athleteId === athlete.id && isVerifiedBinding(record) && registryInstantMs(record.verifiedAt) <= asOfMilliseconds && record.competition === affiliation.competition), 'verifiedAt', 'verified provider binding matching affiliation competition', athlete.id)
     const approved = bundle.media.filter((record): record is ApprovedMedia => record.athleteId === athlete.id && isApprovedMedia(record) && registryInstantMs(record.retrievedAt) <= asOfMilliseconds)
     const image = approved.length === 0 ? undefined : newest(approved, 'retrievedAt', 'approved media', athlete.id)
-    return { ...athlete, sport: athlete.sport, eligibility, affiliation, binding, ...(image === undefined ? {} : { image }), competition: affiliation.competition, team: affiliation.organization.name, season: affiliation.season, provider: binding.provider, providerId: binding.externalId, ...(affiliation.location === undefined ? {} : { location: affiliation.location }) }
+    return { ...athlete, sport: athlete.sport, eligibility, affiliation, binding, ...(image === undefined ? {} : { image }) }
   })
 }
 
