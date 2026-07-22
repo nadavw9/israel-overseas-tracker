@@ -28,7 +28,6 @@
       "sourceType": "primary-verification",
       "cadence": "weekly",
       "lastAttemptAt": "2026-07-23T08:00:00.000Z",
-      "lastSuccessAt": "2026-07-23T08:00:00.000Z",
       "health": "partial",
       "limitations": [
         "The roster has not been scanned or reconciled against overseas club affiliations and eligibility, so it is not a comprehensive overseas-Israeli census."
@@ -44,7 +43,6 @@
       "sourceType": "primary-verification",
       "cadence": "weekly",
       "lastAttemptAt": "2026-07-23T08:00:00.000Z",
-      "lastSuccessAt": "2026-07-23T08:00:00.000Z",
       "health": "partial",
       "limitations": [
         "Current foreign clubs have not been reconciled to eligibility, and this roster is not a census of all overseas Israelis or a comprehensive coverage claim."
@@ -60,7 +58,6 @@
       "sourceType": "primary-verification",
       "cadence": "weekly",
       "lastAttemptAt": "2026-07-23T08:00:00.000Z",
-      "lastSuccessAt": "2026-07-23T08:00:00.000Z",
       "health": "partial",
       "limitations": [
         "Senior, youth, women, and club seasons have not been separated and reconciled to overseas affiliations, so this is not a universal or comprehensive coverage claim."

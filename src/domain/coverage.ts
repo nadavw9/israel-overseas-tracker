@@ -4,6 +4,14 @@ import { athleteTierSchema, genderCategorySchema, sportSchema } from './taxonomy
 
 const nonEmptyStringSchema = z.string().trim().min(1)
 const timestampSchema = z.iso.datetime()
+const coverageIdSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+const limitationSchema = z
+  .string()
+  .trim()
+  .min(12)
+  .refine((value) => !['n/a', 'none', 'unknown', 'tbd', 'todo', '-'].includes(value.toLowerCase()), {
+    message: 'Limitations must describe a meaningful coverage constraint',
+  })
 
 export const coverageHealthSchema = z.enum([
   'healthy',
@@ -20,29 +28,55 @@ export const coverageSourceTypeSchema = z.enum([
   'media',
 ])
 
-const coverageCountsSchema = z.object({
-  observed: z.number().int().nonnegative(),
-  matched: z.number().int().nonnegative(),
-  newCandidates: z.number().int().nonnegative(),
-  conflicts: z.number().int().nonnegative(),
-})
+export const coverageCadenceSchema = z.enum(['daily', 'weekly', 'monthly', 'manual'])
+
+const coverageCountsSchema = z
+  .object({
+    observed: z.number().int().nonnegative(),
+    matched: z.number().int().nonnegative(),
+    newCandidates: z.number().int().nonnegative(),
+    conflicts: z.number().int().nonnegative(),
+  })
+  .strict()
+  .superRefine((counts, context) => {
+    const classifications = ['matched', 'newCandidates', 'conflicts'] as const
+
+    classifications.forEach((field) => {
+      if (counts[field] > counts.observed) {
+        context.addIssue({
+          code: 'custom',
+          message: `${field} cannot exceed observed`,
+          path: [field],
+        })
+      }
+    })
+
+    if (counts.matched + counts.newCandidates + counts.conflicts !== counts.observed) {
+      context.addIssue({
+        code: 'custom',
+        message: 'matched, newCandidates, and conflicts must classify every observed record',
+        path: ['observed'],
+      })
+    }
+  })
 
 export const coverageEntrySchema = z
   .object({
-    id: nonEmptyStringSchema,
+    id: coverageIdSchema,
     sport: sportSchema,
     genderCategory: genderCategorySchema,
     tier: athleteTierSchema,
     universe: nonEmptyStringSchema,
     sourceUrl: httpsUrlSchema,
     sourceType: coverageSourceTypeSchema,
-    cadence: nonEmptyStringSchema,
+    cadence: coverageCadenceSchema,
     lastAttemptAt: timestampSchema,
     lastSuccessAt: timestampSchema.optional(),
     health: coverageHealthSchema,
     counts: coverageCountsSchema.optional(),
-    limitations: z.array(nonEmptyStringSchema).default([]),
+    limitations: z.array(limitationSchema).default([]),
   })
+  .strict()
   .superRefine((entry, context) => {
     if (entry.health !== 'healthy' && entry.limitations.length === 0) {
       context.addIssue({
@@ -59,6 +93,22 @@ export const coverageEntrySchema = z
         path: ['lastSuccessAt'],
       })
     }
+
+    if (entry.health === 'healthy' && !entry.lastSuccessAt) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Healthy coverage entries require a successful scan timestamp',
+        path: ['lastSuccessAt'],
+      })
+    }
+
+    if (entry.health === 'healthy' && !entry.counts) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Healthy coverage entries require classification counts',
+        path: ['counts'],
+      })
+    }
   })
 
 export const coverageLedgerSchema = z
@@ -66,6 +116,7 @@ export const coverageLedgerSchema = z
     generatedAt: timestampSchema,
     entries: z.array(coverageEntrySchema),
   })
+  .strict()
   .superRefine((ledger, context) => {
     const seen = new Set<string>()
     const generatedAt = new Date(ledger.generatedAt)
@@ -95,13 +146,32 @@ export const coverageLedgerSchema = z
           path: ['entries', index, 'lastSuccessAt'],
         })
       }
+
+      if (entry.health === 'healthy' && entry.lastSuccessAt && entry.cadence !== 'manual') {
+        const maxAgeMilliseconds = {
+          daily: 24 * 60 * 60 * 1000,
+          weekly: 7 * 24 * 60 * 60 * 1000,
+          monthly: 31 * 24 * 60 * 60 * 1000,
+        } as const
+        const ageMilliseconds = generatedAt.getTime() - new Date(entry.lastSuccessAt).getTime()
+
+        if (ageMilliseconds > maxAgeMilliseconds[entry.cadence]) {
+          context.addIssue({
+            code: 'custom',
+            message: `Healthy ${entry.cadence} coverage cannot be older than its cadence`,
+            path: ['entries', index, 'health'],
+          })
+        }
+      }
     })
   })
 
 export type CoverageLedger = z.output<typeof coverageLedgerSchema>
 
-export function summarizeCoverageLedger(ledger: CoverageLedger) {
+export function summarizeCoverage(ledger: CoverageLedger) {
   const required = ledger.entries.length
   const healthy = ledger.entries.filter((entry) => entry.health === 'healthy').length
   return { required, healthy, complete: required > 0 && required === healthy }
 }
+
+export const summarizeCoverageLedger = summarizeCoverage

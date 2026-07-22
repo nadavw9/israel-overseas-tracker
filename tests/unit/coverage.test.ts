@@ -5,7 +5,8 @@ import {
   coverageHealthSchema,
   coverageLedgerSchema,
   coverageSourceTypeSchema,
-  summarizeCoverageLedger,
+  coverageCadenceSchema,
+  summarizeCoverage,
 } from '../../src/domain/coverage'
 
 const timestamp = '2026-07-23T08:00:00.000Z'
@@ -32,7 +33,7 @@ describe('coverage ledger schema', () => {
   it('accepts a healthy ATP Israel coverage entry and summarizes it exactly', () => {
     const ledger = coverageLedgerSchema.parse(healthyLedger)
 
-    expect(summarizeCoverageLedger(ledger)).toEqual({ required: 1, healthy: 1, complete: true })
+    expect(summarizeCoverage(ledger)).toEqual({ required: 1, healthy: 1, complete: true })
   })
 
   it('does not report a partial ledger as complete', () => {
@@ -41,13 +42,13 @@ describe('coverage ledger schema', () => {
       entries: [{ ...healthyEntry, health: 'partial' }],
     })
 
-    expect(summarizeCoverageLedger(ledger).complete).toBe(false)
+    expect(summarizeCoverage(ledger).complete).toBe(false)
   })
 
   it('does not report an empty ledger as complete', () => {
     const ledger = coverageLedgerSchema.parse({ generatedAt: timestamp, entries: [] })
 
-    expect(summarizeCoverageLedger(ledger)).toEqual({ required: 0, healthy: 0, complete: false })
+    expect(summarizeCoverage(ledger)).toEqual({ required: 0, healthy: 0, complete: false })
   })
 
   it.each(['healthy', 'partial', 'stale', 'blocked', 'not-configured'] as const)(
@@ -64,6 +65,13 @@ describe('coverage ledger schema', () => {
     },
   )
 
+  it.each(['daily', 'weekly', 'monthly', 'manual'] as const)(
+    'accepts the %s cadence',
+    (cadence) => {
+      expect(coverageCadenceSchema.parse(cadence)).toBe(cadence)
+    },
+  )
+
   it.each([-1, 1.5])('rejects invalid observed count %s', (observed) => {
     expect(
       coverageEntrySchema.safeParse({ ...healthyEntry, counts: { ...healthyEntry.counts, observed } }).success,
@@ -75,6 +83,27 @@ describe('coverage ledger schema', () => {
     expect(coverageEntrySchema.safeParse({ ...healthyEntry, counts: incompleteCounts }).success).toBe(false)
   })
 
+  it('requires count classifications to be exhaustive and bounded by observed', () => {
+    expect(
+      coverageEntrySchema.safeParse({
+        ...healthyEntry,
+        counts: { observed: 8, matched: 9, newCandidates: 0, conflicts: 0 },
+      }).success,
+    ).toBe(false)
+    expect(
+      coverageEntrySchema.safeParse({
+        ...healthyEntry,
+        counts: { observed: 8, matched: 1, newCandidates: 2, conflicts: 3 },
+      }).success,
+    ).toBe(false)
+    expect(
+      coverageEntrySchema.safeParse({
+        ...healthyEntry,
+        counts: { observed: 8, matched: 4, newCandidates: 4, conflicts: 1 },
+      }).success,
+    ).toBe(false)
+  })
+
   it('rejects insecure URLs and invalid timestamps', () => {
     expect(coverageEntrySchema.safeParse({ ...healthyEntry, sourceUrl: 'http://example.com' }).success).toBe(false)
     expect(coverageEntrySchema.safeParse({ ...healthyEntry, lastAttemptAt: 'not-a-timestamp' }).success).toBe(false)
@@ -84,8 +113,58 @@ describe('coverage ledger schema', () => {
     expect(coverageEntrySchema.safeParse({ ...healthyEntry, health: 'blocked', limitations: [] }).success).toBe(false)
   })
 
+  it('requires a healthy entry to have success and complete counts', () => {
+    const { lastSuccessAt: _, ...withoutSuccess } = healthyEntry
+    const { counts: __, ...withoutCounts } = healthyEntry
+
+    expect(coverageEntrySchema.safeParse(withoutSuccess).success).toBe(false)
+    expect(coverageEntrySchema.safeParse(withoutCounts).success).toBe(false)
+  })
+
+  it('allows partial and stale entries to omit success and counts when limitations explain the gap', () => {
+    const { lastSuccessAt: _, counts: __, ...unscanned } = healthyEntry
+
+    expect(coverageEntrySchema.safeParse({ ...unscanned, health: 'partial' }).success).toBe(true)
+    expect(coverageEntrySchema.safeParse({ ...unscanned, health: 'stale' }).success).toBe(true)
+  })
+
+  it('rejects healthy entries whose success is older than their weekly cadence', () => {
+    expect(
+      coverageLedgerSchema.safeParse({
+        generatedAt: '2026-07-31T08:00:00.001Z',
+        entries: [{ ...healthyEntry, lastAttemptAt: '2026-07-31T08:00:00.001Z' }],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('allows a healthy entry exactly at its weekly freshness boundary', () => {
+    expect(
+      coverageLedgerSchema.safeParse({
+        generatedAt: '2026-07-30T08:00:00.000Z',
+        entries: [{ ...healthyEntry, lastAttemptAt: '2026-07-30T08:00:00.000Z' }],
+      }).success,
+    ).toBe(true)
+  })
+
   it('rejects duplicate entry IDs', () => {
     expect(coverageLedgerSchema.safeParse({ ...healthyLedger, entries: [healthyEntry, healthyEntry] }).success).toBe(false)
+  })
+
+  it('rejects unknown keys in counts, entries, and ledgers', () => {
+    expect(
+      coverageEntrySchema.safeParse({
+        ...healthyEntry,
+        counts: { ...healthyEntry.counts, count: 8 },
+      }).success,
+    ).toBe(false)
+    expect(coverageEntrySchema.safeParse({ ...healthyEntry, lastSuccesAt: timestamp }).success).toBe(false)
+    expect(coverageLedgerSchema.safeParse({ ...healthyLedger, generated: timestamp }).success).toBe(false)
+  })
+
+  it('requires slug IDs and meaningful limitation text', () => {
+    expect(coverageEntrySchema.safeParse({ ...healthyEntry, id: 'ATP Israel' }).success).toBe(false)
+    expect(coverageEntrySchema.safeParse({ ...healthyEntry, limitations: ['   '] }).success).toBe(false)
+    expect(coverageEntrySchema.safeParse({ ...healthyEntry, limitations: ['tbd'] }).success).toBe(false)
   })
 
   it('rejects success after an attempt or after ledger generation', () => {
@@ -103,13 +182,36 @@ describe('coverage ledger schema', () => {
     ).toBe(false)
   })
 
+  it('compares equivalent timestamp precisions by instant', () => {
+    expect(
+      coverageLedgerSchema.safeParse({
+        generatedAt: timestamp,
+        entries: [{ ...healthyEntry, lastAttemptAt: '2026-07-23T08:00:00Z', lastSuccessAt: '2026-07-23T08:00:00Z' }],
+      }).success,
+    ).toBe(true)
+    expect(
+      coverageLedgerSchema.safeParse({
+        generatedAt: timestamp,
+        entries: [{ ...healthyEntry, lastAttemptAt: '2026-07-23T08:00:00.500Z', lastSuccessAt: timestamp }],
+      }).success,
+    ).toBe(false)
+  })
+
   it('parses the seeded partial ledger without claiming comprehensive coverage', () => {
     const ledger = coverageLedgerSchema.parse(
       JSON.parse(readFileSync('data/coverage/ledger.json', 'utf8')),
     )
 
-    expect(summarizeCoverageLedger(ledger)).toEqual({ required: 4, healthy: 0, complete: false })
+    expect(summarizeCoverage(ledger)).toEqual({ required: 4, healthy: 0, complete: false })
+    expect(ledger.entries.map((entry) => entry.id)).toEqual([
+      'atp-isr-men',
+      'iihf-isr-senior-men-2026',
+      'ifa-isr-senior-men-2026',
+      'fiba-isr-competition-rosters',
+    ])
     expect(ledger.entries.every((entry) => entry.health === 'partial')).toBe(true)
+    expect(ledger.entries[0]?.counts).toEqual({ observed: 8, matched: 0, newCandidates: 8, conflicts: 0 })
+    expect(ledger.entries.slice(1).every((entry) => entry.counts === undefined && entry.lastSuccessAt === undefined)).toBe(true)
     expect(ledger.entries.every((entry) => entry.limitations.some((limitation) => /reconcil/i.test(limitation)))).toBe(true)
   })
 })
