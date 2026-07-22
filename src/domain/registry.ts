@@ -1,12 +1,27 @@
 import { z } from 'zod'
-import { httpsUrlSchema } from './athlete'
 import {
   athleteTierSchema,
+  eligibilityBasisSchema,
   genderCategorySchema,
+  httpsUrlSchema,
   lifecycleStatusSchema,
+  mediaLicenseSchema,
+  mediaUsageSchema,
+  organizationTypeSchema,
+  providerSchema,
+  rosterStatusSchema,
   sportSchema,
   verificationStatusSchema,
   visibilitySchema,
+} from './taxonomy'
+
+export {
+  eligibilityBasisSchema,
+  mediaLicenseSchema,
+  mediaUsageSchema,
+  organizationTypeSchema,
+  providerSchema,
+  rosterStatusSchema,
 } from './taxonomy'
 
 const nonEmptyStringSchema = z.string().trim().min(1)
@@ -18,30 +33,6 @@ export const localizedNameSchema = z.object({
   he: nonEmptyStringSchema,
 })
 
-export const eligibilityBasisSchema = z.enum(['citizenship', 'represents-israel'])
-
-export const organizationTypeSchema = z.enum([
-  'club',
-  'college',
-  'academy',
-  'national-team',
-  'racing-team',
-  'cycling-team',
-  'tour-membership',
-])
-
-export const rosterStatusSchema = z.enum([
-  'active',
-  'loan',
-  'reserve',
-  'injured',
-  'suspended',
-  'released',
-  'unknown',
-])
-
-export const providerSchema = z.enum(['espn-nba', 'nhl', 'curated'])
-
 export const identityMatchFieldSchema = z.enum([
   'name',
   'birth-date',
@@ -51,21 +42,6 @@ export const identityMatchFieldSchema = z.enum([
 ])
 
 export const mediaRightsStatusSchema = z.enum(['approved', 'review', 'expired'])
-
-export const mediaLicenseSchema = z.enum([
-  'provider-terms',
-  'club-permission',
-  'player-permission',
-  'cc-by',
-  'cc-by-sa',
-  'public-domain',
-])
-
-export const mediaUsageSchema = z.enum([
-  'editorial-display',
-  'remote-editorial-display',
-  'commercial-display',
-])
 
 export const candidateStateSchema = z.enum([
   'new',

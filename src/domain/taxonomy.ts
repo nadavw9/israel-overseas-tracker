@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+export const httpsUrlSchema = z.url().refine(
+  (value) => new URL(value).protocol === 'https:',
+  { message: 'Expected an HTTPS URL' },
+)
+
 export const sportSchema = z.enum([
   'football',
   'basketball',
@@ -57,6 +62,45 @@ export const observationStateSchema = z.enum([
   'corrected',
   'stale',
   'unavailable',
+])
+
+export const eligibilityBasisSchema = z.enum(['citizenship', 'represents-israel'])
+
+export const organizationTypeSchema = z.enum([
+  'club',
+  'college',
+  'academy',
+  'national-team',
+  'racing-team',
+  'cycling-team',
+  'tour-membership',
+])
+
+export const rosterStatusSchema = z.enum([
+  'active',
+  'loan',
+  'reserve',
+  'injured',
+  'suspended',
+  'released',
+  'unknown',
+])
+
+export const providerSchema = z.enum(['espn-nba', 'nhl', 'curated'])
+
+export const mediaLicenseSchema = z.enum([
+  'provider-terms',
+  'club-permission',
+  'player-permission',
+  'cc-by',
+  'cc-by-sa',
+  'public-domain',
+])
+
+export const mediaUsageSchema = z.enum([
+  'editorial-display',
+  'remote-editorial-display',
+  'commercial-display',
 ])
 
 export type Sport = z.infer<typeof sportSchema>

@@ -1,6 +1,5 @@
 import { z } from 'zod'
-import { httpsUrlSchema } from './athlete'
-import { athleteTierSchema, genderCategorySchema, sportSchema } from './taxonomy'
+import { athleteTierSchema, genderCategorySchema, httpsUrlSchema, sportSchema } from './taxonomy'
 
 const nonEmptyStringSchema = z.string().trim().min(1)
 const timestampSchema = z.iso.datetime()
@@ -165,10 +164,38 @@ export const coverageLedgerSchema = z
 
 export type CoverageLedger = z.output<typeof coverageLedgerSchema>
 
+export const coverageSummarySchema = z
+  .object({
+    required: z.number().int().nonnegative(),
+    healthy: z.number().int().nonnegative(),
+    complete: z.boolean(),
+  })
+  .strict()
+  .superRefine((summary, context) => {
+    if (summary.healthy > summary.required) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Coverage healthy count cannot exceed required count',
+        path: ['healthy'],
+      })
+    }
+
+    const complete = summary.required > 0 && summary.healthy === summary.required
+    if (summary.complete !== complete) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Coverage complete flag does not match required and healthy counts',
+        path: ['complete'],
+      })
+    }
+  })
+
+export type CoverageSummary = z.output<typeof coverageSummarySchema>
+
 export function summarizeCoverage(ledger: CoverageLedger) {
   const required = ledger.entries.length
   const healthy = ledger.entries.filter((entry) => entry.health === 'healthy').length
-  return { required, healthy, complete: required > 0 && required === healthy }
+  return coverageSummarySchema.parse({ required, healthy, complete: required > 0 && required === healthy })
 }
 
 export const summarizeCoverageLedger = summarizeCoverage
