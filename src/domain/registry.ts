@@ -110,6 +110,13 @@ export const organizationSchema = z.object({
   country: nonEmptyStringSchema,
 })
 
+export const locationSchema = z.object({
+  city: nonEmptyStringSchema,
+  country: nonEmptyStringSchema,
+  lat: z.number().gte(-90).lte(90),
+  lng: z.number().gte(-180).lte(180),
+})
+
 const sourceSchema = z.object({
   publisher: nonEmptyStringSchema,
   sourceUrl: httpsUrlSchema,
@@ -129,14 +136,7 @@ export const affiliationSchema = z
     rosterStatus: rosterStatusSchema,
     countsAsOverseas: z.boolean(),
     source: sourceSchema,
-    location: z
-      .object({
-        city: nonEmptyStringSchema,
-        country: nonEmptyStringSchema,
-        lat: z.number().gte(-90).lte(90),
-        lng: z.number().gte(-180).lte(180),
-      })
-      .optional(),
+    location: locationSchema.optional(),
   })
   .superRefine((affiliation, context) => {
     if (affiliation.endDate && affiliation.endDate < affiliation.startDate) {
@@ -218,7 +218,12 @@ const addDuplicateIdIssues = (
   })
 }
 
-export const registryBundleSchema = z
+export function createRegistryBundleSchema(asOfDate: string) {
+  if (!z.iso.date().safeParse(asOfDate).success) {
+    throw new Error(`Invalid registry as-of date: ${asOfDate}`)
+  }
+
+  return z
   .object({
     athletes: z.array(athleteIdentitySchema),
     evidence: z.array(eligibilityEvidenceSchema),
@@ -227,7 +232,6 @@ export const registryBundleSchema = z
     media: z.array(mediaAssetSchema),
   })
   .superRefine((bundle, context) => {
-    const asOfDate = new Date().toISOString().slice(0, 10)
     const recentReleaseCutoff = new Date(`${asOfDate}T00:00:00.000Z`)
     recentReleaseCutoff.setUTCDate(recentReleaseCutoff.getUTCDate() - 90)
     const recentReleaseCutoffDate = recentReleaseCutoff.toISOString().slice(0, 10)
@@ -391,6 +395,14 @@ export const registryBundleSchema = z
       }
     })
   })
+}
+
+const todayLocalIsoDate = () => {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+}
+
+export const registryBundleSchema = createRegistryBundleSchema(todayLocalIsoDate())
 
 const candidateSignalSchema = z.object({
   sourceUrl: httpsUrlSchema,
@@ -414,8 +426,9 @@ export const candidateSchema = z.object({
       season: z.string().trim().min(4),
     })
     .optional(),
+  location: locationSchema.optional(),
   reviewerNote: nonEmptyStringSchema,
-})
+}).strict()
 
 export const candidateQueueSchema = z.array(candidateSchema).superRefine((candidates, context) => {
   const seen = new Set<string>()

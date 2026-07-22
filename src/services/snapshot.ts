@@ -43,7 +43,7 @@ function normalizeRecord(
     },
     freshness: hasStats ? 'fresh' : 'identity-only',
     location: entry.location,
-    image: entry.image,
+    ...(entry.image === undefined ? {} : { image: entry.image }),
   }
 }
 
@@ -72,7 +72,12 @@ export async function buildSnapshot({
       throw new Error(`No verified data available for ${entry.id}: ${reason}`)
     }
 
-    return { ...previousRecord, freshness: 'stale' as const }
+    const { image: _, ...previousWithoutImage } = previousRecord
+    return {
+      ...previousWithoutImage,
+      ...(entry.image === undefined ? {} : { image: entry.image }),
+      freshness: 'stale' as const,
+    }
   })
 
   return snapshotSchema.parse({ generatedAt: now.toISOString(), athletes })

@@ -35,11 +35,6 @@
         "country": "United States",
         "lat": 45.5152,
         "lng": -122.6784
-      },
-      "image": {
-        "url": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630166.png",
-        "sourceUrl": "https://www.nba.com/player/1630166/deni-avdija",
-        "alt": "Deni Avdija in a Portland Trail Blazers uniform"
       }
     },
     {
@@ -76,11 +71,6 @@
         "country": "United States",
         "lat": 40.6782,
         "lng": -73.9442
-      },
-      "image": {
-        "url": "https://cdn.nba.com/headshots/nba/latest/1040x760/1642879.png",
-        "sourceUrl": "https://gleague.nba.com/player/1642879/ben-saraf",
-        "alt": "Ben Saraf in a Brooklyn Nets uniform"
       }
     },
     {
@@ -111,11 +101,6 @@
         "country": "Netherlands",
         "lat": 52.3676,
         "lng": 4.9041
-      },
-      "image": {
-        "url": "https://english.ajax.nl/media/hvxfkhyf/gloukh_2526.png",
-        "sourceUrl": "https://english.ajax.nl/teams/ajax-1/oscar-gloukh",
-        "alt": "Oscar Gloukh in an Ajax player portrait"
       }
     }
   ]

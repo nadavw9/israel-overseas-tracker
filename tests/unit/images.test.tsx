@@ -4,10 +4,17 @@ import { AthletePhoto } from '../../src/components/AthletePhoto'
 import { publicRegistry } from '../../src/data/registry'
 import type { Athlete } from '../../src/domain/athlete'
 import { validateImages } from '../../scripts/validate-images'
+import snapshot from '../../public/data/snapshot.json'
+import manifest from '../../public/images/athletes/manifest.json'
 
 describe('athlete imagery', () => {
   it('omits media assets that do not have approved reuse rights', () => {
     expect(publicRegistry.every((athlete) => athlete.image === undefined)).toBe(true)
+  })
+
+  it('ships no unapproved image artifacts', () => {
+    expect(snapshot.athletes.every((athlete) => athlete.image === undefined)).toBe(true)
+    expect(manifest).toEqual({})
   })
 
   it('renders an accessible fallback when a record has no image', () => {

@@ -51,6 +51,7 @@ describe('buildSnapshot', () => {
 
     expect(next.athletes[0].stats).toEqual(previous.athletes[0].stats)
     expect(next.athletes[0].freshness).toBe('stale')
+    expect(next.athletes[0].image).toBeUndefined()
   })
 
   it('fails closed when neither fresh nor previous verified data exists', async () => {

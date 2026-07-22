@@ -1,17 +1,1 @@
-{
-  "deni-avdija": {
-    "url": "https://cdn.nba.com/headshots/nba/latest/1040x760/1630166.png",
-    "sourceUrl": "https://www.nba.com/player/1630166/deni-avdija",
-    "alt": "Deni Avdija in a Portland Trail Blazers uniform"
-  },
-  "ben-saraf": {
-    "url": "https://cdn.nba.com/headshots/nba/latest/1040x760/1642879.png",
-    "sourceUrl": "https://gleague.nba.com/player/1642879/ben-saraf",
-    "alt": "Ben Saraf in a Brooklyn Nets uniform"
-  },
-  "oscar-gloukh": {
-    "url": "https://english.ajax.nl/media/hvxfkhyf/gloukh_2526.png",
-    "sourceUrl": "https://english.ajax.nl/teams/ajax-1/oscar-gloukh",
-    "alt": "Oscar Gloukh in an Ajax player portrait"
-  }
-}
+{}

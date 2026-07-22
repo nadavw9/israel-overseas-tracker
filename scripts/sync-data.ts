@@ -4,7 +4,7 @@ import { parseCuratedRecord } from './providers/curated'
 import { parseNbaFixture } from './providers/nba'
 import { parseNhlFixture } from './providers/nhl'
 import type { ProviderResult } from './providers/types'
-import { publicRegistry, type RegistryAthlete } from '../src/data/registry'
+import { compilePublicRegistry, type RegistryAthlete } from '../src/data/registry'
 import { snapshotSchema, type AthleteSnapshot } from '../src/domain/athlete'
 import { buildSnapshot } from '../src/services/snapshot'
 
@@ -130,8 +130,9 @@ async function readPreviousSnapshot(): Promise<AthleteSnapshot> {
 
 export async function syncData(now: Date = new Date()): Promise<AthleteSnapshot> {
   const previous = await readPreviousSnapshot()
+  const entries = compilePublicRegistry(now.toISOString().slice(0, 10))
   const next = await buildSnapshot({
-    entries: publicRegistry,
+    entries,
     previous,
     fetchRecord: (entry) => fetchProviderRecord(entry, fetch, now),
     now,

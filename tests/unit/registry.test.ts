@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { candidateQueueSchema } from '../../src/domain/registry'
-import { publicRegistry } from '../../src/data/registry'
+import { compileRegistryBundle, publicRegistry } from '../../src/data/registry'
+import { registryBundleFixture } from '../fixtures/registry'
 
 describe('registry compiler', () => {
   it('compiles the verified public athletes in source order', () => {
@@ -51,5 +52,40 @@ describe('candidate queue', () => {
     expect(zeev?.signals[0]?.note).toContain('lifecycle status remains unknown')
     expect(candidates.every((candidate) => candidate.signals.some((signal) => signal.note.includes('pending represents-israel')))).toBe(true)
     expect(zeev?.name.he).toBe('זאב ביום')
+    expect(danny?.location).toEqual({ city: 'Brooklyn', country: 'United States', lat: 40.6782, lng: -73.9442 })
+    expect(zeev?.location).toEqual({ city: 'Vancouver', country: 'Canada', lat: 49.2827, lng: -123.1207 })
+  })
+})
+
+describe('injectable registry compiler', () => {
+  it('compiles a recent free agent using its released affiliation', () => {
+    const bundle = structuredClone(registryBundleFixture)
+    bundle.athletes[0].sport = 'basketball'
+    bundle.athletes[0].lifecycleStatus = 'free-agent'
+    bundle.affiliations[0].competition = 'NBA'
+    bundle.affiliations[0].rosterStatus = 'released'
+    bundle.affiliations[0].endDate = '2026-07-01'
+    bundle.providerBindings[0].provider = 'espn-nba'
+    bundle.providerBindings[0].sport = 'basketball'
+    bundle.providerBindings[0].competition = 'NBA'
+
+    expect(compileRegistryBundle(bundle, '2026-07-23')[0]?.affiliation.rosterStatus).toBe('released')
+  })
+
+  it('selects the newest evidence, matching binding, and approved media deterministically', () => {
+    const bundle = structuredClone(registryBundleFixture)
+    bundle.athletes[0].sport = 'basketball'
+    bundle.affiliations[0].competition = 'NBA'
+    bundle.providerBindings[0].provider = 'espn-nba'
+    bundle.providerBindings[0].sport = 'basketball'
+    bundle.providerBindings[0].competition = 'NBA'
+    bundle.evidence.push({ ...bundle.evidence[0], id: 'evidence-new', retrievedAt: '2026-07-24T08:00:00.000Z' })
+    bundle.providerBindings.push({ ...bundle.providerBindings[0], id: 'binding-new', externalId: 'new', verifiedAt: '2026-07-24T08:00:00.000Z' })
+    bundle.media.push({ ...bundle.media[0], id: 'media-new', retrievedAt: '2026-07-24T08:00:00.000Z' })
+
+    const athlete = compileRegistryBundle(bundle, '2026-07-23')[0]
+    expect(athlete?.eligibility.id).toBe('evidence-new')
+    expect(athlete?.binding.id).toBe('binding-new')
+    expect(athlete?.image?.id).toBe('media-new')
   })
 })
