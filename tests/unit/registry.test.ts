@@ -49,6 +49,7 @@ describe('candidate queue', () => {
     expect(zeev?.signals[0]?.note).toContain('nhl provider identity 8484798')
     expect(danny?.signals[0]?.note).toContain('lifecycle status remains unknown')
     expect(zeev?.signals[0]?.note).toContain('lifecycle status remains unknown')
+    expect(candidates.every((candidate) => candidate.signals.some((signal) => signal.note.includes('pending represents-israel')))).toBe(true)
     expect(zeev?.name.he).toBe('זאב ביום')
   })
 })
