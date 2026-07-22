@@ -1,56 +1,130 @@
-import { z } from 'zod'
-import registryJson from '../../data/athletes.registry.json'
-import { httpsUrlSchema } from '../domain/athlete'
+import affiliationsJson from '../../data/registry/affiliations.json'
+import athletesJson from '../../data/registry/athletes.json'
+import evidenceJson from '../../data/registry/evidence.json'
+import mediaJson from '../../data/registry/media.json'
+import providerBindingsJson from '../../data/registry/provider-bindings.json'
+import { registryBundleSchema, type RegistryBundle } from '../domain/registry'
 
-const registryEntrySchema = z.object({
-  id: z.string().regex(/^[a-z0-9-]+$/),
-  name: z.object({ en: z.string().min(1), he: z.string().min(1) }),
-  sport: z.enum(['basketball', 'football', 'hockey']),
-  competition: z.string().min(1),
-  team: z.string().min(1),
-  season: z.string().min(4),
-  provider: z.enum(['espn-nba', 'nhl', 'curated']),
-  providerId: z.string().min(1),
-  eligibility: z.object({
-    status: z.enum(['verified', 'pending']),
-    sourceUrl: httpsUrlSchema,
-  }),
-  location: z.object({
-    city: z.string().min(1),
-    country: z.string().min(1),
-    lat: z.number().gte(-90).lte(90),
-    lng: z.number().gte(-180).lte(180),
-  }),
-  image: z
-    .object({
-      url: httpsUrlSchema,
-      sourceUrl: httpsUrlSchema,
-      alt: z.string().min(1),
-    })
-    .optional(),
+type AthleteIdentity = RegistryBundle['athletes'][number]
+type Eligibility = RegistryBundle['evidence'][number]
+type Affiliation = RegistryBundle['affiliations'][number]
+type Binding = RegistryBundle['providerBindings'][number]
+type Media = RegistryBundle['media'][number]
+type SnapshotSport = 'basketball' | 'football' | 'hockey'
+type VerifiedEligibility = Eligibility & { status: 'verified' }
+type VerifiedBinding = Binding & { status: 'verified' }
+
+export type RegistryAthlete = Omit<AthleteIdentity, 'sport'> & {
+  sport: SnapshotSport
+  eligibility: VerifiedEligibility
+  affiliation: Affiliation
+  binding: VerifiedBinding
+  image?: Media
+  competition: string
+  team: string
+  season: string
+  provider: Binding['provider']
+  providerId: string
+  location?: Affiliation['location']
+}
+
+const registryBundle = registryBundleSchema.parse({
+  athletes: athletesJson,
+  evidence: evidenceJson,
+  affiliations: affiliationsJson,
+  providerBindings: providerBindingsJson,
+  media: mediaJson,
 })
 
-const registrySchema = z.array(registryEntrySchema).superRefine((entries, context) => {
-  const ids = new Set<string>()
+const asOfDate = new Date().toISOString().slice(0, 10)
 
-  entries.forEach((entry, index) => {
-    if (ids.has(entry.id)) {
-      context.addIssue({
-        code: 'custom',
-        message: `Duplicate registry id: ${entry.id}`,
-        path: [index, 'id'],
-      })
-    }
-    ids.add(entry.id)
-  })
-})
+function currentAffiliation(affiliation: Affiliation): boolean {
+  return (
+    affiliation.startDate <= asOfDate &&
+    (affiliation.endDate === undefined || affiliation.endDate >= asOfDate)
+  )
+}
 
-export type RegistryAthlete = z.infer<typeof registryEntrySchema>
+function isSnapshotSport(sport: AthleteIdentity['sport']): sport is SnapshotSport {
+  return sport === 'basketball' || sport === 'football' || sport === 'hockey'
+}
 
-export const athleteRegistry = registrySchema.parse(registryJson)
-export const publicRegistry = athleteRegistry.filter(
-  (athlete) => athlete.eligibility.status === 'verified',
-)
-export const reviewRegistry = athleteRegistry.filter(
-  (athlete) => athlete.eligibility.status === 'pending',
-)
+function isVerifiedEligibility(claim: Eligibility): claim is VerifiedEligibility {
+  return claim.status === 'verified'
+}
+
+function isVerifiedBinding(binding: Binding): binding is VerifiedBinding {
+  return binding.status === 'verified'
+}
+
+function exactlyOne<T>(records: readonly T[], description: string, athleteId: string): T {
+  if (records.length !== 1) {
+    throw new Error(`Expected exactly one ${description} for ${athleteId}, found ${records.length}`)
+  }
+
+  const [record] = records
+  if (record === undefined) {
+    throw new Error(`Missing ${description} for ${athleteId}`)
+  }
+  return record
+}
+
+function compilePublicAthlete(athlete: AthleteIdentity): RegistryAthlete {
+  if (!isSnapshotSport(athlete.sport)) {
+    throw new Error(`Unsupported public snapshot sport for ${athlete.id}: ${athlete.sport}`)
+  }
+
+  const eligibility = exactlyOne(
+    registryBundle.evidence.filter(
+      (claim): claim is VerifiedEligibility =>
+        claim.athleteId === athlete.id && isVerifiedEligibility(claim),
+    ),
+    'verified eligibility claim',
+    athlete.id,
+  )
+  const affiliation = exactlyOne(
+    registryBundle.affiliations.filter(
+      (record) =>
+        record.athleteId === athlete.id &&
+        record.primary &&
+        record.rosterStatus === 'active' &&
+        record.countsAsOverseas &&
+        currentAffiliation(record),
+    ),
+    'current primary active overseas affiliation',
+    athlete.id,
+  )
+  const binding = exactlyOne(
+    registryBundle.providerBindings.filter(
+      (record): record is VerifiedBinding =>
+        record.athleteId === athlete.id && isVerifiedBinding(record),
+    ),
+    'verified provider binding',
+    athlete.id,
+  )
+  const approvedMedia = registryBundle.media.filter(
+    (record) => record.athleteId === athlete.id && record.rightsStatus === 'approved',
+  )
+  if (approvedMedia.length > 1) {
+    throw new Error(`Expected at most one approved media asset for ${athlete.id}`)
+  }
+
+  return {
+    ...athlete,
+    sport: athlete.sport,
+    eligibility,
+    affiliation,
+    binding,
+    ...(approvedMedia[0] === undefined ? {} : { image: approvedMedia[0] }),
+    competition: affiliation.competition,
+    team: affiliation.organization.name,
+    season: affiliation.season,
+    provider: binding.provider,
+    providerId: binding.externalId,
+    ...(affiliation.location === undefined ? {} : { location: affiliation.location }),
+  }
+}
+
+export const publicRegistry = registryBundle.athletes
+  .filter((athlete) => athlete.visibility === 'public')
+  .map(compilePublicAthlete)

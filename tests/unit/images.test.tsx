@@ -6,11 +6,8 @@ import type { Athlete } from '../../src/domain/athlete'
 import { validateImages } from '../../scripts/validate-images'
 
 describe('athlete imagery', () => {
-  it('provides a sourced image for every public athlete', () => {
-    expect(publicRegistry.every((athlete) => athlete.image)).toBe(true)
-    expect(new Set(publicRegistry.map((athlete) => athlete.image?.url)).size).toBe(
-      publicRegistry.length,
-    )
+  it('omits media assets that do not have approved reuse rights', () => {
+    expect(publicRegistry.every((athlete) => athlete.image === undefined)).toBe(true)
   })
 
   it('renders an accessible fallback when a record has no image', () => {

@@ -1,0 +1,5 @@
+[
+  {"id":"deni-avdija","name":{"en":"Deni Avdija","he":"דני אבדיה"},"aliases":[],"sport":"basketball","genderCategory":"men","tier":"senior-professional","lifecycleStatus":"active","visibility":"public"},
+  {"id":"ben-saraf","name":{"en":"Ben Saraf","he":"בן שרף"},"aliases":[],"sport":"basketball","genderCategory":"men","tier":"development","lifecycleStatus":"active","visibility":"public"},
+  {"id":"oscar-gloukh","name":{"en":"Oscar Gloukh","he":"אוסקר גלוך"},"aliases":[],"sport":"football","genderCategory":"men","tier":"senior-professional","lifecycleStatus":"active","visibility":"public"}
+]

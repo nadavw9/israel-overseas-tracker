@@ -1,0 +1,5 @@
+[
+  {"id":"deni-avdija-citizenship","athleteId":"deni-avdija","basis":"citizenship","status":"verified","publisher":"NBA","sourceUrl":"https://www.nba.com/player/1630166/deni-avdija","retrievedAt":"2026-07-23T08:00:00.000Z","matchedOn":["name","team"]},
+  {"id":"ben-saraf-represents-israel","athleteId":"ben-saraf","basis":"represents-israel","status":"verified","publisher":"FIBA","sourceUrl":"https://reports.fiba.basketball/reports/2025/FIBA%20U19%20Basketball%20World%20Cup/rosters.pdf","retrievedAt":"2026-07-23T08:00:00.000Z","matchedOn":["name","governing-body-identity"]},
+  {"id":"oscar-gloukh-citizenship","athleteId":"oscar-gloukh","basis":"citizenship","status":"verified","publisher":"Ajax","sourceUrl":"https://english.ajax.nl/teams/ajax-1/oscar-gloukh","retrievedAt":"2026-07-23T08:00:00.000Z","matchedOn":["name","team"]}
+]
