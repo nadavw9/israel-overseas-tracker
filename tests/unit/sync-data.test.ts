@@ -65,13 +65,38 @@ describe('buildSnapshot', () => {
       }),
     ).rejects.toThrow(/No verified data available/)
   })
+
+  it('rejects a provider result for a different registry athlete', async () => {
+    await expect(
+      buildSnapshot({
+        entries: [publicRegistry[0]],
+        previous,
+        fetchRecord: async () => ({
+          athleteId: 'ben-saraf',
+          stats: previous.athletes[0].stats,
+          sourceUrl: 'https://example.com/wrong-athlete',
+          retrievedAt: '2026-07-19T12:00:00.000Z',
+        }),
+        now: new Date('2026-07-19T12:00:00.000Z'),
+      }),
+    ).rejects.toThrow(/provider identity mismatch/i)
+  })
 })
 
 describe('fetchProviderRecord', () => {
-  it('requests the configured ESPN athlete id and parses the response', async () => {
-    let requestedUrl = ''
+  it('verifies the configured ESPN athlete identity before parsing stats', async () => {
+    const requestedUrls: string[] = []
     const fakeFetch: typeof fetch = async (input) => {
-      requestedUrl = String(input)
+      const requestedUrl = String(input)
+      requestedUrls.push(requestedUrl)
+
+      if (requestedUrl.includes('espn.com/nba/player/_/id/')) {
+        return new Response(
+          '<meta property="og:title" content="Deni Avdija - Portland Trail Blazers Forward - ESPN"><link rel="canonical" href="https://www.espn.com/nba/player/_/id/4683021/deni-avdija">',
+          { status: 200, headers: { 'content-type': 'text/html' } },
+        )
+      }
+
       return new Response(JSON.stringify(deniFixture), { status: 200 })
     }
 
@@ -81,7 +106,26 @@ describe('fetchProviderRecord', () => {
       new Date('2026-07-19T12:00:00.000Z'),
     )
 
-    expect(requestedUrl).toContain('/athletes/4683021/overview')
+    expect(requestedUrls).toEqual([
+      'https://www.espn.com/nba/player/_/id/4683021',
+      'https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/4683021/overview',
+    ])
     expect(result.stats).toMatchObject({ pointsPerGame: 24.2 })
+  })
+
+  it('rejects ESPN stats when the provider id resolves to another athlete', async () => {
+    const fakeFetch: typeof fetch = async () =>
+      new Response(
+        '<meta property="og:title" content="Another Player - Example Team - ESPN"><link rel="canonical" href="https://www.espn.com/nba/player/_/id/4683021/another-player">',
+        { status: 200, headers: { 'content-type': 'text/html' } },
+      )
+
+    await expect(
+      fetchProviderRecord(
+        publicRegistry[0],
+        fakeFetch,
+        new Date('2026-07-19T12:00:00.000Z'),
+      ),
+    ).rejects.toThrow(/identity mismatch/i)
   })
 })

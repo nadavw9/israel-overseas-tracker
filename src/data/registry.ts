@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import registryJson from '../../data/athletes.registry.json'
+import { httpsUrlSchema } from '../domain/athlete'
 
 const registryEntrySchema = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
@@ -12,7 +13,7 @@ const registryEntrySchema = z.object({
   providerId: z.string().min(1),
   eligibility: z.object({
     status: z.enum(['verified', 'pending']),
-    sourceUrl: z.url(),
+    sourceUrl: httpsUrlSchema,
   }),
   location: z.object({
     city: z.string().min(1),
@@ -22,8 +23,8 @@ const registryEntrySchema = z.object({
   }),
   image: z
     .object({
-      url: z.url(),
-      sourceUrl: z.url(),
+      url: httpsUrlSchema,
+      sourceUrl: httpsUrlSchema,
       alt: z.string().min(1),
     })
     .optional(),

@@ -17,6 +17,12 @@ function normalizeRecord(
   entry: RegistryAthlete,
   result: ProviderResult,
 ): Athlete {
+  if (result.athleteId !== entry.id) {
+    throw new Error(
+      `Provider identity mismatch: expected ${entry.id}, received ${result.athleteId}`,
+    )
+  }
+
   const hasStats = result.stats !== null
 
   return {

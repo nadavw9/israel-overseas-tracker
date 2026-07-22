@@ -1,9 +1,9 @@
 import { z } from 'zod'
-import { athleteStatsSchema } from '../../src/domain/athlete'
+import { athleteStatsSchema, httpsUrlSchema } from '../../src/domain/athlete'
 import type { ProviderResult } from './types'
 
 const curatedRecordSchema = z.object({
-  sourceUrl: z.url(),
+  sourceUrl: httpsUrlSchema,
   retrievedAt: z.iso.datetime(),
   stats: athleteStatsSchema.nullable(),
 })

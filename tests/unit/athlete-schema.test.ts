@@ -63,6 +63,26 @@ describe('athleteSchema', () => {
   it('rejects a public record without a source', () => {
     expect(() => athleteSchema.parse({ ...validAthlete, source: undefined })).toThrow()
   })
+
+  it('rejects non-HTTPS external source and image URLs', () => {
+    expect(() =>
+      athleteSchema.parse({
+        ...validAthlete,
+        source: { ...validAthlete.source, sourceUrl: 'javascript:alert(1)' },
+      }),
+    ).toThrow(/HTTPS/i)
+
+    expect(() =>
+      athleteSchema.parse({
+        ...validAthlete,
+        image: {
+          url: 'data:image/svg+xml,<svg></svg>',
+          sourceUrl: 'https://example.com/photo',
+          alt: 'Example',
+        },
+      }),
+    ).toThrow(/HTTPS/i)
+  })
 })
 
 describe('snapshotSchema', () => {

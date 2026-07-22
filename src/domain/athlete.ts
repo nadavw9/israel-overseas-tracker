@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+export const httpsUrlSchema = z.url().refine(
+  (value) => new URL(value).protocol === 'https:',
+  { message: 'Expected an HTTPS URL' },
+)
+
 const basketballStatsSchema = z.object({
   kind: z.literal('basketball'),
   games: z.number().int().nonnegative(),
@@ -41,7 +46,7 @@ export const athleteSchema = z
     team: z.string().trim().min(1),
     eligibility: z.object({
       status: z.enum(['verified', 'pending']),
-      sourceUrl: z.url(),
+      sourceUrl: httpsUrlSchema,
     }),
     visibility: z.enum(['public', 'review']),
     season: z.string().trim().min(4),
@@ -49,7 +54,7 @@ export const athleteSchema = z
     stats: athleteStatsSchema.nullable(),
     source: z.object({
       provider: z.string().trim().min(1),
-      sourceUrl: z.url(),
+      sourceUrl: httpsUrlSchema,
       retrievedAt: z.iso.datetime(),
     }),
     freshness: z.enum(['fresh', 'stale', 'identity-only']),
@@ -63,8 +68,8 @@ export const athleteSchema = z
       .optional(),
     image: z
       .object({
-        url: z.url(),
-        sourceUrl: z.url(),
+        url: httpsUrlSchema,
+        sourceUrl: httpsUrlSchema,
         alt: z.string().trim().min(1),
       })
       .optional(),

@@ -11,6 +11,62 @@ import { buildSnapshot } from '../src/services/snapshot'
 const snapshotUrl = new URL('../public/data/snapshot.json', import.meta.url)
 const curatedDataUrl = new URL('../data/curated-stats.json', import.meta.url)
 
+function htmlAttribute(
+  html: string,
+  tagName: 'link' | 'meta',
+  matchAttribute: string,
+  matchValue: string,
+  valueAttribute: string,
+): string | undefined {
+  const tags = html.match(new RegExp(`<${tagName}\\b[^>]*>`, 'gi')) ?? []
+
+  for (const tag of tags) {
+    const attributes = Object.fromEntries(
+      [...tag.matchAll(/([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)].map(
+        (match) => [match[1].toLowerCase(), match[2] ?? match[3]],
+      ),
+    )
+
+    if (attributes[matchAttribute]?.toLowerCase() === matchValue) {
+      return attributes[valueAttribute]
+    }
+  }
+}
+
+function normalizedIdentity(value: string): string {
+  return value
+    .normalize('NFKD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLocaleLowerCase('en')
+    .replace(/[^a-z0-9]/g, '')
+}
+
+function verifyEspnIdentity(entry: RegistryAthlete, html: string): void {
+  const title = htmlAttribute(html, 'meta', 'property', 'og:title', 'content')
+  const canonical = htmlAttribute(html, 'link', 'rel', 'canonical', 'href')
+
+  if (!title || !canonical) {
+    throw new Error(`ESPN identity metadata missing for ${entry.id}`)
+  }
+
+  const canonicalUrl = new URL(canonical)
+  const expectedPath = `/nba/player/_/id/${entry.providerId}`
+  const upstreamName = title.split(' - ')[0]
+  const identityMatches =
+    canonicalUrl.protocol === 'https:' &&
+    (canonicalUrl.hostname === 'espn.com' ||
+      canonicalUrl.hostname.endsWith('.espn.com')) &&
+    (canonicalUrl.pathname === expectedPath ||
+      canonicalUrl.pathname.startsWith(`${expectedPath}/`)) &&
+    normalizedIdentity(upstreamName) === normalizedIdentity(entry.name.en)
+
+  if (!identityMatches) {
+    throw new Error(
+      `ESPN identity mismatch for ${entry.id}: received ${upstreamName || 'unknown athlete'}`,
+    )
+  }
+}
+
 export async function fetchProviderRecord(
   entry: RegistryAthlete,
   fetcher: typeof fetch = fetch,
@@ -27,6 +83,15 @@ export async function fetchProviderRecord(
   }
 
   if (entry.provider === 'espn-nba') {
+    const identityUrl = `https://www.espn.com/nba/player/_/id/${entry.providerId}`
+    const identityResponse = await fetcher(identityUrl)
+    if (!identityResponse.ok) {
+      throw new Error(
+        `ESPN identity check returned HTTP ${identityResponse.status} for ${entry.id}`,
+      )
+    }
+    verifyEspnIdentity(entry, await identityResponse.text())
+
     const sourceUrl = `https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/${entry.providerId}/overview`
     const response = await fetcher(sourceUrl)
     if (!response.ok) {

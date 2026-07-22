@@ -1,10 +1,11 @@
 import { readFile } from 'node:fs/promises'
 import { pathToFileURL } from 'node:url'
 import { z } from 'zod'
+import { httpsUrlSchema } from '../src/domain/athlete'
 
 const imageSchema = z.object({
-  url: z.url(),
-  sourceUrl: z.url(),
+  url: httpsUrlSchema,
+  sourceUrl: httpsUrlSchema,
   alt: z.string().trim().min(1),
 })
 
