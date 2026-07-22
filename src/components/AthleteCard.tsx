@@ -2,6 +2,7 @@ import { ArrowUpRight } from 'lucide-react'
 import type { Athlete, AthleteStats } from '../domain/athlete'
 import { AthletePhoto } from './AthletePhoto'
 import { FreshnessBadge } from './FreshnessBadge'
+import { useI18n } from '../i18n/context'
 
 type AthleteCardProps = {
   athlete: Athlete
@@ -36,13 +37,15 @@ function statItems(stats: AthleteStats | null) {
 
 export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
   const stats = statItems(athlete.stats)
+  const { locale, messages } = useI18n()
+  const displayName = athlete.name[locale]
 
   return (
     <article className={`athlete-card athlete-card--${athlete.sport}`}>
       <button
         type="button"
         className="athlete-card__open"
-        aria-label={`Open ${athlete.name.en}`}
+        aria-label={messages.openAthlete(displayName)}
         onClick={onOpen}
       >
         <span className="athlete-card__rank" aria-hidden="true">
@@ -50,13 +53,15 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
         </span>
         <div className="athlete-card__visual">
           <AthletePhoto athlete={athlete} />
-          <span className="athlete-card__sport">{athlete.sport}</span>
+          <span className="athlete-card__sport">{messages.sports[athlete.sport]}</span>
         </div>
         <div className="athlete-card__body">
           <div className="athlete-card__identity">
             <div>
-              <h3>{athlete.name.en}</h3>
-              <p lang="he" dir="rtl">{athlete.name.he}</p>
+              <h3>{displayName}</h3>
+              <p lang={locale === 'en' ? 'he' : 'en'} dir={locale === 'en' ? 'rtl' : 'ltr'}>
+                {athlete.name[locale === 'en' ? 'he' : 'en']}
+              </p>
             </div>
             <ArrowUpRight size={20} aria-hidden="true" />
           </div>
@@ -74,7 +79,7 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
               ))}
             </dl>
           ) : (
-            <div className="stats-unavailable">Stats source pending</div>
+            <div className="stats-unavailable">{messages.statsPending}</div>
           )}
           <FreshnessBadge freshness={athlete.freshness} source={athlete.source} />
         </div>
@@ -85,7 +90,7 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
         target="_blank"
         rel="noreferrer"
       >
-        View data source <ArrowUpRight size={14} aria-hidden="true" />
+        {messages.viewSource} <ArrowUpRight size={14} aria-hidden="true" />
       </a>
     </article>
   )

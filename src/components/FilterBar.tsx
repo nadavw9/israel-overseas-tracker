@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react'
+import { useI18n } from '../i18n/context'
 
 export type SportFilter = 'all' | 'basketball' | 'football' | 'hockey'
 
@@ -9,12 +10,7 @@ type FilterBarProps = {
   onSportChange: (sport: SportFilter) => void
 }
 
-const filters: Array<{ value: SportFilter; label: string }> = [
-  { value: 'all', label: 'All sports' },
-  { value: 'basketball', label: 'Basketball' },
-  { value: 'football', label: 'Football' },
-  { value: 'hockey', label: 'Hockey' },
-]
+const filters: SportFilter[] = ['all', 'basketball', 'football', 'hockey']
 
 export function FilterBar({
   query,
@@ -22,28 +18,30 @@ export function FilterBar({
   sport,
   onSportChange,
 }: FilterBarProps) {
+  const { messages } = useI18n()
+
   return (
     <div className="filter-bar">
       <label className="search-field">
         <Search size={18} aria-hidden="true" />
-        <span className="sr-only">Search athletes</span>
+        <span className="sr-only">{messages.searchLabel}</span>
         <input
           type="search"
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          placeholder="Search athletes, teams, competitions…"
-          aria-label="Search athletes"
+          placeholder={messages.searchPlaceholder}
+          aria-label={messages.searchLabel}
         />
       </label>
-      <div className="sport-filters" aria-label="Filter by sport">
+      <div className="sport-filters" aria-label={messages.filterSport}>
         {filters.map((filter) => (
           <button
-            key={filter.value}
+            key={filter}
             type="button"
-            aria-pressed={sport === filter.value}
-            onClick={() => onSportChange(filter.value)}
+            aria-pressed={sport === filter}
+            onClick={() => onSportChange(filter)}
           >
-            {filter.label}
+            {messages.sports[filter]}
           </button>
         ))}
       </div>

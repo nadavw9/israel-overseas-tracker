@@ -1,10 +1,12 @@
 import { BadgeCheck, Clock3 } from 'lucide-react'
 import type { Athlete } from '../domain/athlete'
+import { useI18n } from '../i18n/context'
 
 type FreshnessBadgeProps = Pick<Athlete, 'freshness' | 'source'>
 
 export function FreshnessBadge({ freshness, source }: FreshnessBadgeProps) {
-  const checked = new Intl.DateTimeFormat('en-GB', {
+  const { messages } = useI18n()
+  const checked = new Intl.DateTimeFormat(messages.locale, {
     day: '2-digit',
     month: 'short',
     timeZone: 'UTC',
@@ -17,7 +19,7 @@ export function FreshnessBadge({ freshness, source }: FreshnessBadgeProps) {
       ) : (
         <BadgeCheck size={14} aria-hidden="true" />
       )}
-      {freshness === 'stale' ? 'Last verified' : 'Source checked'} {checked}
+      {freshness === 'stale' ? messages.lastVerified : messages.sourceChecked} {checked}
     </span>
   )
 }

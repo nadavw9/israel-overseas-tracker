@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Athlete, AthleteSnapshot } from '../domain/athlete'
 import { AppHeader } from '../components/AppHeader'
 import { AthleteCard } from '../components/AthleteCard'
@@ -7,6 +7,8 @@ import { AthleteMap } from '../components/AthleteMap'
 import { FilterBar, type SportFilter } from '../components/FilterBar'
 import { Leaderboard } from '../components/Leaderboard'
 import { ViewNav, type TrackerView } from '../components/ViewNav'
+import { I18nContext } from '../i18n/context'
+import { messages, type Locale } from '../i18n/messages'
 import './styles.css'
 
 type TrackerAppProps = {
@@ -34,7 +36,20 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
   const [sport, setSport] = useState<SportFilter>('all')
   const [view, setView] = useState<TrackerView>('athletes')
   const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null)
+  const [locale, setLocale] = useState<Locale>('en')
   const returnFocus = useRef<HTMLButtonElement | null>(null)
+  const copy = messages[locale]
+
+  useEffect(() => {
+    const previousLang = document.documentElement.lang
+    const previousDirection = document.documentElement.dir
+    document.documentElement.lang = locale
+    document.documentElement.dir = locale === 'he' ? 'rtl' : 'ltr'
+    return () => {
+      document.documentElement.lang = previousLang
+      document.documentElement.dir = previousDirection
+    }
+  }, [locale])
 
   const athletes = useMemo(
     () =>
@@ -46,45 +61,51 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
     [query, snapshot.athletes, sport],
   )
 
-  const updated = new Intl.DateTimeFormat('en-GB', {
+  const updated = new Intl.DateTimeFormat(copy.locale, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(snapshot.generatedAt))
 
+  const openAthlete = (athlete: Athlete) => {
+    const activeElement = document.activeElement
+    returnFocus.current =
+      activeElement instanceof HTMLButtonElement ? activeElement : null
+    setSelectedAthlete(athlete)
+  }
+
   return (
+    <I18nContext.Provider value={{ locale, messages: copy }}>
     <div className="tracker-shell">
-      <AppHeader />
+      <AppHeader onToggleLocale={() => setLocale(locale === 'en' ? 'he' : 'en')} />
       <main>
         <section className="hero" aria-labelledby="tracker-title">
           <div className="hero__glow" aria-hidden="true" />
           <div className="hero__content">
-            <p className="hero__kicker">Season 2025–26 · verified registry</p>
+            <p className="hero__kicker">{copy.seasonKicker}</p>
             <h1 id="tracker-title">
-              Israel <span>Overseas</span>
+              {copy.titleFirst} <span>{copy.titleSecond}</span>
             </h1>
-            <p className="hero__lede">
-              A focused, source-backed view of Israeli athletes competing abroad.
-            </p>
-            <div className="hero__proof" aria-label="Snapshot status">
-              <strong>{snapshot.athletes.length} verified athletes</strong>
-              <span>Updated {updated}</span>
-              <span>No invented records</span>
+            <p className="hero__lede">{copy.heroLede}</p>
+            <div className="hero__proof" aria-label={copy.snapshotStatus}>
+              <strong>{copy.verifiedAthletes(snapshot.athletes.length)}</strong>
+              <span>{copy.snapshotGenerated} {updated}</span>
+              <span>{copy.noInvented}</span>
             </div>
           </div>
         </section>
 
-        <section className="content" aria-label="Tracker explorer">
+        <section className="content" aria-label={copy.explorer}>
           <ViewNav view={view} onChange={setView} />
 
           {view === 'athletes' && (
             <div className="section-heading">
               <div>
-                <p className="section-heading__eyebrow">Verified directory</p>
-                <h2 id="athletes-title">Athletes abroad</h2>
+                <p className="section-heading__eyebrow">{copy.directory}</p>
+                <h2 id="athletes-title">{copy.athletesAbroad}</h2>
               </div>
-              <p>{athletes.length} showing</p>
+              <p>{copy.showing(athletes.length)}</p>
             </div>
           )}
 
@@ -102,22 +123,21 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
                   key={athlete.id}
                   athlete={athlete}
                   rank={index + 1}
-                  onOpen={() => {
-                    returnFocus.current = document.activeElement as HTMLButtonElement
-                    setSelectedAthlete(athlete)
-                  }}
+                  onOpen={() => openAthlete(athlete)}
                 />
               ))}
             </div>
           ) : view === 'athletes' ? (
             <div className="empty-state" role="status">
-              <h3>No verified matches</h3>
-              <p>Try another athlete, team, competition, or sport.</p>
+              <h3>{copy.noMatches}</h3>
+              <p>{copy.noMatchesHint}</p>
             </div>
           ) : null}
 
           {view === 'rankings' && <Leaderboard athletes={athletes} />}
-          {view === 'map' && <AthleteMap athletes={athletes} />}
+          {view === 'map' && (
+            <AthleteMap athletes={athletes} onOpen={openAthlete} />
+          )}
         </section>
       </main>
       {selectedAthlete && (
@@ -128,5 +148,6 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
         />
       )}
     </div>
+    </I18nContext.Provider>
   )
 }

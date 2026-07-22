@@ -10,9 +10,17 @@ const snapshot = snapshotSchema.parse(snapshotJson)
 describe('verified athlete list', () => {
   it('shows the verified count and honest source freshness', () => {
     render(<TrackerApp snapshot={snapshot} />)
+    const generatedDate = new Intl.DateTimeFormat('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(snapshot.generatedAt))
 
     expect(screen.getByText('3 verified athletes')).toBeInTheDocument()
-    expect(screen.getByText(/updated 19 jul 2026/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(`Snapshot generated ${generatedDate}`),
+    ).toBeInTheDocument()
     expect(screen.queryByText(/^live$/i)).not.toBeInTheDocument()
     expect(screen.getAllByText(/source checked/i)).toHaveLength(3)
   })

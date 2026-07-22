@@ -3,6 +3,7 @@ import { ArrowUpRight, MapPin, ShieldCheck, X } from 'lucide-react'
 import type { Athlete } from '../domain/athlete'
 import { AthletePhoto } from './AthletePhoto'
 import { FreshnessBadge } from './FreshnessBadge'
+import { useI18n } from '../i18n/context'
 
 type AthleteDrawerProps = {
   athlete: Athlete
@@ -10,67 +11,126 @@ type AthleteDrawerProps = {
   returnFocus: RefObject<HTMLButtonElement | null>
 }
 
-function statRows(athlete: Athlete) {
+type StatLabels = {
+  games: string
+  pointsPerGame: string
+  reboundsPerGame: string
+  assistsPerGame: string
+  appearances: string
+  goals: string
+  assists: string
+  points: string
+}
+
+function statRows(athlete: Athlete, labels: StatLabels) {
   const stats = athlete.stats
   if (!stats) return []
   if (stats.kind === 'basketball') {
     return [
-      ['Games', stats.games],
-      ['Points / game', stats.pointsPerGame],
-      ['Rebounds / game', stats.reboundsPerGame],
-      ['Assists / game', stats.assistsPerGame],
+      [labels.games, stats.games],
+      [labels.pointsPerGame, stats.pointsPerGame],
+      [labels.reboundsPerGame, stats.reboundsPerGame],
+      [labels.assistsPerGame, stats.assistsPerGame],
     ]
   }
   if (stats.kind === 'football') {
-    return [['Appearances', stats.appearances], ['Goals', stats.goals], ['Assists', stats.assists]]
+    return [[labels.appearances, stats.appearances], [labels.goals, stats.goals], [labels.assists, stats.assists]]
   }
-  return [['Games', stats.games], ['Goals', stats.goals], ['Assists', stats.assists], ['Points', stats.points]]
+  return [[labels.games, stats.games], [labels.goals, stats.goals], [labels.assists, stats.assists], [labels.points, stats.points]]
 }
 
 export function AthleteDrawer({ athlete, onClose, returnFocus }: AthleteDrawerProps) {
   const closeButton = useRef<HTMLButtonElement>(null)
+  const drawer = useRef<HTMLElement>(null)
+  const { locale, messages } = useI18n()
+  const displayName = athlete.name[locale]
 
   useEffect(() => {
+    const returnTarget = returnFocus.current
+    const previousOverflow = document.body.style.overflow
+    const background = [
+      ...document.querySelectorAll<HTMLElement>(
+        '.tracker-shell > header, .tracker-shell > main',
+      ),
+    ].map((element) => ({
+      element,
+      hadInert: element.hasAttribute('inert'),
+      ariaHidden: element.getAttribute('aria-hidden'),
+    }))
+
+    background.forEach(({ element }) => {
+      element.setAttribute('inert', '')
+      element.setAttribute('aria-hidden', 'true')
+    })
+
     closeButton.current?.focus()
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') {
+        onClose()
+        return
+      }
+
+      if (event.key !== 'Tab' || !drawer.current) return
+
+      const focusable = [
+        ...drawer.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ]
+      if (focusable.length === 0) return
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
     }
     document.addEventListener('keydown', onKeyDown)
     document.body.style.overflow = 'hidden'
     return () => {
       document.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = ''
-      returnFocus.current?.focus()
+      document.body.style.overflow = previousOverflow
+      background.forEach(({ element, hadInert, ariaHidden }) => {
+        if (!hadInert) element.removeAttribute('inert')
+        if (ariaHidden === null) element.removeAttribute('aria-hidden')
+        else element.setAttribute('aria-hidden', ariaHidden)
+      })
+      returnTarget?.focus()
     }
   }, [onClose, returnFocus])
 
   return (
     <div className="drawer-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <aside
+        ref={drawer}
         className="drawer"
         role="dialog"
         aria-modal="true"
         aria-labelledby="athlete-dialog-title"
       >
-        <button ref={closeButton} type="button" className="drawer__close" onClick={onClose} aria-label={`Close ${athlete.name.en} details`}>
+        <button ref={closeButton} type="button" className="drawer__close" onClick={onClose} aria-label={messages.closeDetails(displayName)}>
           <X aria-hidden="true" />
         </button>
         <div className="drawer__visual"><AthletePhoto athlete={athlete} /></div>
         <div className="drawer__content">
-          <p className="section-heading__eyebrow">Verified athlete profile</p>
-          <h2 id="athlete-dialog-title">{athlete.name.en}</h2>
-          <p className="drawer__hebrew" lang="he" dir="rtl">{athlete.name.he}</p>
+          <p className="section-heading__eyebrow">{messages.profileKicker}</p>
+          <h2 id="athlete-dialog-title">{displayName}</h2>
+          <p className="drawer__hebrew" lang={locale === 'en' ? 'he' : 'en'} dir={locale === 'en' ? 'rtl' : 'ltr'}>{athlete.name[locale === 'en' ? 'he' : 'en']}</p>
           <p className="drawer__club">{athlete.team}<span>{athlete.competition} · {athlete.season}</span></p>
           {athlete.location && <p className="drawer__location"><MapPin size={16} aria-hidden="true" /> {athlete.location.city}, {athlete.location.country}</p>}
           {athlete.stats ? (
             <dl className="drawer__stats">
-              {statRows(athlete).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
+              {statRows(athlete, messages.statLabels).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
             </dl>
-          ) : <div className="stats-unavailable">Stats source pending</div>}
+          ) : <div className="stats-unavailable">{messages.statsPending}</div>}
           <FreshnessBadge freshness={athlete.freshness} source={athlete.source} />
           <div className="drawer__sources">
-            <a href={athlete.eligibility.sourceUrl} target="_blank" rel="noreferrer"><ShieldCheck size={16} aria-hidden="true" /> Eligibility source <ArrowUpRight size={14} aria-hidden="true" /></a>
-            <a href={athlete.source.sourceUrl} target="_blank" rel="noreferrer">Season data source <ArrowUpRight size={14} aria-hidden="true" /></a>
+            <a href={athlete.eligibility.sourceUrl} target="_blank" rel="noreferrer"><ShieldCheck size={16} aria-hidden="true" /> {messages.eligibilitySource} <ArrowUpRight size={14} aria-hidden="true" /></a>
+            <a href={athlete.source.sourceUrl} target="_blank" rel="noreferrer">{messages.seasonSource} <ArrowUpRight size={14} aria-hidden="true" /></a>
           </div>
         </div>
       </aside>

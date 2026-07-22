@@ -24,6 +24,29 @@ describe('athlete details', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(trigger).toHaveFocus()
   })
+
+  it('contains keyboard focus and makes the background inert while open', async () => {
+    const user = userEvent.setup()
+    render(<TrackerApp snapshot={snapshot} />)
+
+    await user.click(screen.getByRole('button', { name: /open deni avdija/i }))
+
+    const main = document.querySelector('main')
+    const close = screen.getByRole('button', { name: /close deni avdija details/i })
+    const seasonSource = screen.getByRole('link', { name: /season data source/i })
+
+    expect(main).toHaveAttribute('inert')
+    expect(close).toHaveFocus()
+
+    await user.tab({ shift: true })
+    expect(seasonSource).toHaveFocus()
+
+    await user.tab()
+    expect(close).toHaveFocus()
+
+    await user.keyboard('{Escape}')
+    expect(main).not.toHaveAttribute('inert')
+  })
 })
 
 describe('rankings', () => {
@@ -55,6 +78,20 @@ describe('rankings', () => {
     await user.click(screen.getByRole('button', { name: 'Map' }))
     expect(
       screen.getByRole('region', { name: /athlete locations/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('offers a keyboard-accessible map location list that opens details', async () => {
+    const user = userEvent.setup()
+    render(<TrackerApp snapshot={snapshot} />)
+
+    await user.click(screen.getByRole('button', { name: 'Map' }))
+    await user.click(
+      screen.getByRole('button', { name: /open deni avdija from map/i }),
+    )
+
+    expect(
+      screen.getByRole('dialog', { name: /deni avdija/i }),
     ).toBeInTheDocument()
   })
 })
