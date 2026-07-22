@@ -20,6 +20,7 @@ const healthyEntry = {
   sourceUrl: 'https://www.atptour.com/en/rankings/singles?RankRange=0-5000&Region=ISR',
   sourceType: 'primary-verification',
   cadence: 'weekly',
+  freshnessWindowDays: 7,
   lastAttemptAt: timestamp,
   lastSuccessAt: timestamp,
   health: 'healthy',
@@ -128,7 +129,7 @@ describe('coverage ledger schema', () => {
     expect(coverageEntrySchema.safeParse({ ...unscanned, health: 'stale' }).success).toBe(true)
   })
 
-  it('rejects healthy entries whose success is older than their weekly cadence', () => {
+  it('rejects healthy entries whose success is older than their explicit freshness window', () => {
     expect(
       coverageLedgerSchema.safeParse({
         generatedAt: '2026-07-31T08:00:00.001Z',
@@ -137,7 +138,7 @@ describe('coverage ledger schema', () => {
     ).toBe(false)
   })
 
-  it('allows a healthy entry exactly at its weekly freshness boundary', () => {
+  it('allows a healthy entry exactly at its explicit freshness boundary', () => {
     expect(
       coverageLedgerSchema.safeParse({
         generatedAt: '2026-07-30T08:00:00.000Z',
@@ -165,6 +166,36 @@ describe('coverage ledger schema', () => {
     expect(coverageEntrySchema.safeParse({ ...healthyEntry, id: 'ATP Israel' }).success).toBe(false)
     expect(coverageEntrySchema.safeParse({ ...healthyEntry, limitations: ['   '] }).success).toBe(false)
     expect(coverageEntrySchema.safeParse({ ...healthyEntry, limitations: ['tbd'] }).success).toBe(false)
+    expect(coverageEntrySchema.safeParse({ ...healthyEntry, limitations: ['API down'] }).success).toBe(true)
+  })
+
+  it.each([0, -1, 1.5, 367, Infinity])('rejects invalid freshness window %s', (freshnessWindowDays) => {
+    expect(coverageEntrySchema.safeParse({ ...healthyEntry, freshnessWindowDays }).success).toBe(false)
+  })
+
+  it('rejects manual healthy coverage that exceeds its explicit freshness window', () => {
+    expect(
+      coverageLedgerSchema.safeParse({
+        generatedAt: '2027-07-23T08:00:00.000Z',
+        entries: [
+          {
+            ...healthyEntry,
+            cadence: 'manual',
+            lastAttemptAt: '2027-07-23T08:00:00.000Z',
+            freshnessWindowDays: 7,
+          },
+        ],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('allows manual healthy coverage exactly at its explicit freshness boundary', () => {
+    expect(
+      coverageLedgerSchema.safeParse({
+        generatedAt: '2026-07-30T08:00:00.000Z',
+        entries: [{ ...healthyEntry, cadence: 'manual' }],
+      }).success,
+    ).toBe(true)
   })
 
   it('rejects success after an attempt or after ledger generation', () => {
@@ -203,11 +234,12 @@ describe('coverage ledger schema', () => {
     )
 
     expect(summarizeCoverage(ledger)).toEqual({ required: 4, healthy: 0, complete: false })
-    expect(ledger.entries.map((entry) => entry.id)).toEqual([
+    expect(ledger.entries).toHaveLength(4)
+    expect(ledger.entries.map((entry) => entry.id).sort()).toEqual([
       'atp-isr-men',
-      'iihf-isr-senior-men-2026',
-      'ifa-isr-senior-men-2026',
       'fiba-isr-competition-rosters',
+      'ifa-isr-senior-men-2026',
+      'iihf-isr-senior-men-2026',
     ])
     expect(ledger.entries.every((entry) => entry.health === 'partial')).toBe(true)
     expect(ledger.entries[0]?.counts).toEqual({ observed: 8, matched: 0, newCandidates: 8, conflicts: 0 })

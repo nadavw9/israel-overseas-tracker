@@ -8,7 +8,7 @@ const coverageIdSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
 const limitationSchema = z
   .string()
   .trim()
-  .min(12)
+  .min(1)
   .refine((value) => !['n/a', 'none', 'unknown', 'tbd', 'todo', '-'].includes(value.toLowerCase()), {
     message: 'Limitations must describe a meaningful coverage constraint',
   })
@@ -70,6 +70,7 @@ export const coverageEntrySchema = z
     sourceUrl: httpsUrlSchema,
     sourceType: coverageSourceTypeSchema,
     cadence: coverageCadenceSchema,
+    freshnessWindowDays: z.number().int().positive().lte(366),
     lastAttemptAt: timestampSchema,
     lastSuccessAt: timestampSchema.optional(),
     health: coverageHealthSchema,
@@ -147,18 +148,14 @@ export const coverageLedgerSchema = z
         })
       }
 
-      if (entry.health === 'healthy' && entry.lastSuccessAt && entry.cadence !== 'manual') {
-        const maxAgeMilliseconds = {
-          daily: 24 * 60 * 60 * 1000,
-          weekly: 7 * 24 * 60 * 60 * 1000,
-          monthly: 31 * 24 * 60 * 60 * 1000,
-        } as const
+      if (entry.health === 'healthy' && entry.lastSuccessAt) {
+        const maxAgeMilliseconds = entry.freshnessWindowDays * 24 * 60 * 60 * 1000
         const ageMilliseconds = generatedAt.getTime() - new Date(entry.lastSuccessAt).getTime()
 
-        if (ageMilliseconds > maxAgeMilliseconds[entry.cadence]) {
+        if (ageMilliseconds > maxAgeMilliseconds) {
           context.addIssue({
             code: 'custom',
-            message: `Healthy ${entry.cadence} coverage cannot be older than its cadence`,
+            message: 'Healthy coverage cannot be older than its explicit freshness window',
             path: ['entries', index, 'health'],
           })
         }

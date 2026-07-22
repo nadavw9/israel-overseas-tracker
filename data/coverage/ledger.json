@@ -10,6 +10,7 @@
       "sourceUrl": "https://www.atptour.com/en/rankings/singles?RankRange=0-5000&Region=ISR",
       "sourceType": "primary-verification",
       "cadence": "weekly",
+      "freshnessWindowDays": 7,
       "lastAttemptAt": "2026-07-23T08:00:00.000Z",
       "lastSuccessAt": "2026-07-23T08:00:00.000Z",
       "health": "partial",
@@ -27,6 +28,7 @@
       "sourceUrl": "https://www.iihf.com/en/events/2026/wmiib/teams/roster/68052/israel",
       "sourceType": "primary-verification",
       "cadence": "weekly",
+      "freshnessWindowDays": 7,
       "lastAttemptAt": "2026-07-23T08:00:00.000Z",
       "health": "partial",
       "limitations": [
@@ -42,6 +44,7 @@
       "sourceUrl": "https://www.football.org.il/national-team/national-team-players.aspx?national_team_id=558",
       "sourceType": "primary-verification",
       "cadence": "weekly",
+      "freshnessWindowDays": 7,
       "lastAttemptAt": "2026-07-23T08:00:00.000Z",
       "health": "partial",
       "limitations": [
@@ -57,6 +60,7 @@
       "sourceUrl": "https://www.fiba.basketball/en/teams/82-israel",
       "sourceType": "primary-verification",
       "cadence": "weekly",
+      "freshnessWindowDays": 7,
       "lastAttemptAt": "2026-07-23T08:00:00.000Z",
       "health": "partial",
       "limitations": [
