@@ -37,4 +37,18 @@ describe('candidate queue', () => {
     expect(candidates.every((candidate) => candidate.state === 'needs-evidence')).toBe(true)
     expect(candidates.every((candidate) => !publicRegistry.some((athlete) => athlete.id === candidate.id))).toBe(true)
   })
+
+  it('retains private discovery identifiers and lifecycle uncertainty', () => {
+    const candidates = candidateQueueSchema.parse(
+      JSON.parse(readFileSync('data/review/candidates.json', 'utf8')),
+    )
+    const danny = candidates.find((candidate) => candidate.id === 'danny-wolf')
+    const zeev = candidates.find((candidate) => candidate.id === 'zeev-buium')
+
+    expect(danny?.signals[0]?.note).toContain('espn-nba provider identity 5107173')
+    expect(zeev?.signals[0]?.note).toContain('nhl provider identity 8484798')
+    expect(danny?.signals[0]?.note).toContain('lifecycle status remains unknown')
+    expect(zeev?.signals[0]?.note).toContain('lifecycle status remains unknown')
+    expect(zeev?.name.he).toBe('זאב ביום')
+  })
 })
