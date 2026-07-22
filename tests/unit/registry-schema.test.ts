@@ -1,11 +1,27 @@
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import type { RegistryBundleInput } from '../../src/domain/registry'
 import { registryBundleFixture } from '../fixtures/registry'
 import {
+  affiliationSchema,
   athleteIdentitySchema,
+  candidateQueueSchema,
   candidateSchema,
   registryBundleSchema,
 } from '../../src/domain/registry'
 import { athleteTierSchema } from '../../src/domain/taxonomy'
+
+const asOfTimestamp = '2026-07-23T08:00:00.000Z'
+
+beforeAll(() => {
+  vi.useFakeTimers()
+  vi.setSystemTime(new Date(asOfTimestamp))
+})
+
+afterAll(() => {
+  vi.useRealTimers()
+})
+
+const cloneRegistryFixture = (): RegistryBundleInput => structuredClone(registryBundleFixture)
 
 const candidateFixture = {
   id: 'candidate-one',
@@ -106,6 +122,122 @@ describe('normalized registry schemas', () => {
     expect(registryBundleSchema.safeParse(withoutVerifiedEligibility).success).toBe(false)
   })
 
+  it('rejects an affiliation whose end date precedes its start date', () => {
+    const reversedInterval = {
+      ...registryBundleFixture.affiliations[0],
+      startDate: '2026-07-23',
+      endDate: '2026-07-22',
+    }
+
+    expect(affiliationSchema.safeParse(reversedInterval).success).toBe(false)
+  })
+
+  it('does not treat a future affiliation as current', () => {
+    const futureAffiliation = cloneRegistryFixture()
+    futureAffiliation.affiliations[0].startDate = '2026-07-24'
+
+    expect(registryBundleSchema.safeParse(futureAffiliation).success).toBe(false)
+  })
+
+  it('accepts a current affiliation with a bounded interval', () => {
+    const boundedCurrentAffiliation = cloneRegistryFixture()
+    boundedCurrentAffiliation.affiliations[0].endDate = '2026-07-23'
+
+    expect(registryBundleSchema.safeParse(boundedCurrentAffiliation).success).toBe(true)
+  })
+
+  it('allows an active public athlete with one current active affiliation', () => {
+    expect(registryBundleSchema.safeParse(registryBundleFixture).success).toBe(true)
+  })
+
+  it('allows an injured public athlete with one current active affiliation', () => {
+    const injuredAthlete = cloneRegistryFixture()
+    injuredAthlete.athletes[0].lifecycleStatus = 'injured'
+
+    expect(registryBundleSchema.safeParse(injuredAthlete).success).toBe(true)
+  })
+
+  it('allows a recent free agent with one primary overseas released affiliation', () => {
+    const recentFreeAgent = cloneRegistryFixture()
+    recentFreeAgent.athletes[0].lifecycleStatus = 'free-agent'
+    recentFreeAgent.affiliations[0].rosterStatus = 'released'
+    recentFreeAgent.affiliations[0].endDate = '2026-07-01'
+
+    expect(registryBundleSchema.safeParse(recentFreeAgent).success).toBe(true)
+  })
+
+  it('rejects a free agent whose release is older than 90 days', () => {
+    const expiredFreeAgent = cloneRegistryFixture()
+    expiredFreeAgent.athletes[0].lifecycleStatus = 'free-agent'
+    expiredFreeAgent.affiliations[0].rosterStatus = 'released'
+    expiredFreeAgent.affiliations[0].endDate = '2026-04-23'
+
+    const result = registryBundleSchema.safeParse(expiredFreeAgent)
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: 'A public free agent requires one overseas release within the previous 90 days',
+            path: ['athletes', 0, 'lifecycleStatus'],
+          }),
+        ]),
+      )
+    }
+  })
+
+  it('rejects a free agent whose release date is in the future', () => {
+    const futureFreeAgent = cloneRegistryFixture()
+    futureFreeAgent.athletes[0].lifecycleStatus = 'free-agent'
+    futureFreeAgent.affiliations[0].rosterStatus = 'released'
+    futureFreeAgent.affiliations[0].endDate = '2026-07-24'
+
+    expect(registryBundleSchema.safeParse(futureFreeAgent).success).toBe(false)
+  })
+
+  it.each(['retired', 'inactive', 'unknown'] as const)(
+    'rejects a public athlete with %s lifecycle status',
+    (lifecycleStatus) => {
+      const ineligibleLifecycle = cloneRegistryFixture()
+      ineligibleLifecycle.athletes[0].lifecycleStatus = lifecycleStatus
+
+      expect(registryBundleSchema.safeParse(ineligibleLifecycle).success).toBe(false)
+    },
+  )
+
+  it('rejects a provider binding whose sport differs from the athlete sport', () => {
+    const mismatchedBinding = cloneRegistryFixture()
+    mismatchedBinding.providerBindings[0].sport = 'hockey'
+
+    const result = registryBundleSchema.safeParse(mismatchedBinding)
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ path: ['providerBindings', 0, 'sport'] }),
+        ]),
+      )
+    }
+  })
+
+  it('rejects a provider used with an incompatible sport', () => {
+    const incompatibleProvider = cloneRegistryFixture()
+    incompatibleProvider.providerBindings[0].provider = 'espn-nba'
+
+    const result = registryBundleSchema.safeParse(incompatibleProvider)
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ path: ['providerBindings', 0, 'provider'] }),
+        ]),
+      )
+    }
+  })
+
   it('requires candidate ids to be slugs', () => {
     expect(candidateSchema.safeParse({ ...candidateFixture, id: 'Candidate One' }).success).toBe(
       false,
@@ -182,5 +314,20 @@ describe('normalized registry schemas', () => {
     expect(candidateSchema.safeParse({ ...candidateFixture, reviewerNote: '   ' }).success).toBe(
       false,
     )
+  })
+
+  it('rejects duplicate candidate ids at the queue level', () => {
+    const duplicateCandidate = {
+      ...candidateFixture,
+      name: { en: 'Candidate Duplicate', he: 'Candidate Duplicate' },
+    }
+    const result = candidateQueueSchema.safeParse([candidateFixture, duplicateCandidate])
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([expect.objectContaining({ path: [1, 'id'] })]),
+      )
+    }
   })
 })

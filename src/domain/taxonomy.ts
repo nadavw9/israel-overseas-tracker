@@ -63,4 +63,3 @@ export type Sport = z.infer<typeof sportSchema>
 export type GenderCategory = z.infer<typeof genderCategorySchema>
 export type AthleteTier = z.infer<typeof athleteTierSchema>
 export type LifecycleStatus = z.infer<typeof lifecycleStatusSchema>
-

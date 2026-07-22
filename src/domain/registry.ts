@@ -116,27 +116,37 @@ const sourceSchema = z.object({
   retrievedAt: z.iso.datetime(),
 })
 
-export const affiliationSchema = z.object({
-  id: recordIdSchema,
-  athleteId: athleteIdSchema,
-  organization: organizationSchema,
-  competition: nonEmptyStringSchema,
-  season: nonEmptyStringSchema,
-  startDate: z.iso.date(),
-  endDate: z.iso.date().optional(),
-  primary: z.boolean(),
-  rosterStatus: rosterStatusSchema,
-  countsAsOverseas: z.boolean(),
-  source: sourceSchema,
-  location: z
-    .object({
-      city: nonEmptyStringSchema,
-      country: nonEmptyStringSchema,
-      lat: z.number().gte(-90).lte(90),
-      lng: z.number().gte(-180).lte(180),
-    })
-    .optional(),
-})
+export const affiliationSchema = z
+  .object({
+    id: recordIdSchema,
+    athleteId: athleteIdSchema,
+    organization: organizationSchema,
+    competition: nonEmptyStringSchema,
+    season: nonEmptyStringSchema,
+    startDate: z.iso.date(),
+    endDate: z.iso.date().optional(),
+    primary: z.boolean(),
+    rosterStatus: rosterStatusSchema,
+    countsAsOverseas: z.boolean(),
+    source: sourceSchema,
+    location: z
+      .object({
+        city: nonEmptyStringSchema,
+        country: nonEmptyStringSchema,
+        lat: z.number().gte(-90).lte(90),
+        lng: z.number().gte(-180).lte(180),
+      })
+      .optional(),
+  })
+  .superRefine((affiliation, context) => {
+    if (affiliation.endDate && affiliation.endDate < affiliation.startDate) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Affiliation end date cannot precede its start date',
+        path: ['endDate'],
+      })
+    }
+  })
 
 export const providerBindingSchema = z.object({
   id: recordIdSchema,
@@ -217,6 +227,11 @@ export const registryBundleSchema = z
     media: z.array(mediaAssetSchema),
   })
   .superRefine((bundle, context) => {
+    const asOfDate = new Date().toISOString().slice(0, 10)
+    const recentReleaseCutoff = new Date(`${asOfDate}T00:00:00.000Z`)
+    recentReleaseCutoff.setUTCDate(recentReleaseCutoff.getUTCDate() - 90)
+    const recentReleaseCutoffDate = recentReleaseCutoff.toISOString().slice(0, 10)
+
     addDuplicateIdIssues(bundle.athletes, 'athletes', context)
     addDuplicateIdIssues(bundle.evidence, 'evidence', context)
     addDuplicateIdIssues(bundle.affiliations, 'affiliations', context)
@@ -243,6 +258,23 @@ export const registryBundleSchema = z
       })
     })
 
+    const athletesById = new Map(bundle.athletes.map((athlete) => [athlete.id, athlete]))
+    const providerSport = {
+      'espn-nba': 'basketball',
+      nhl: 'hockey',
+    } as const
+    const bindingMatchesAthleteAndProvider = (binding: (typeof bundle.providerBindings)[number]) => {
+      const athlete = athletesById.get(binding.athleteId)
+      const requiredProviderSport =
+        binding.provider === 'curated' ? undefined : providerSport[binding.provider]
+
+      return (
+        athlete !== undefined &&
+        binding.sport === athlete.sport &&
+        (requiredProviderSport === undefined || binding.sport === requiredProviderSport)
+      )
+    }
+
     const providerIdentities = new Set<string>()
     bundle.providerBindings.forEach((binding, index) => {
       const identity = `${binding.provider}\u0000${binding.externalId}`
@@ -254,6 +286,25 @@ export const registryBundleSchema = z
         })
       }
       providerIdentities.add(identity)
+
+      const athlete = athletesById.get(binding.athleteId)
+      if (athlete && binding.sport !== athlete.sport) {
+        context.addIssue({
+          code: 'custom',
+          message: `Binding sport ${binding.sport} does not match athlete sport ${athlete.sport}`,
+          path: ['providerBindings', index, 'sport'],
+        })
+      }
+
+      const requiredProviderSport =
+        binding.provider === 'curated' ? undefined : providerSport[binding.provider]
+      if (requiredProviderSport && binding.sport !== requiredProviderSport) {
+        context.addIssue({
+          code: 'custom',
+          message: `${binding.provider} bindings require sport ${requiredProviderSport}`,
+          path: ['providerBindings', index, 'provider'],
+        })
+      }
     })
 
     bundle.athletes.forEach((athlete, athleteIndex) => {
@@ -270,24 +321,56 @@ export const registryBundleSchema = z
         })
       }
 
-      const currentPrimaryAffiliations = bundle.affiliations.filter(
+      const primaryOverseasAffiliations = bundle.affiliations.filter(
         (affiliation) =>
           affiliation.athleteId === athlete.id &&
           affiliation.primary &&
-          affiliation.rosterStatus === 'active' &&
-          affiliation.countsAsOverseas &&
-          affiliation.endDate === undefined,
+          affiliation.countsAsOverseas,
       )
-      if (currentPrimaryAffiliations.length !== 1) {
+
+      if (athlete.lifecycleStatus === 'active' || athlete.lifecycleStatus === 'injured') {
+        const currentActiveAffiliations = primaryOverseasAffiliations.filter(
+          (affiliation) =>
+            affiliation.rosterStatus === 'active' &&
+            affiliation.startDate <= asOfDate &&
+            (affiliation.endDate === undefined || affiliation.endDate >= asOfDate),
+        )
+        if (currentActiveAffiliations.length !== 1) {
+          context.addIssue({
+            code: 'custom',
+            message:
+              'An active or injured public athlete requires exactly one current primary overseas active affiliation',
+            path: ['athletes', athleteIndex, 'lifecycleStatus'],
+          })
+        }
+      } else if (athlete.lifecycleStatus === 'free-agent') {
+        const recentReleasedAffiliations = primaryOverseasAffiliations.filter(
+          (affiliation) =>
+            affiliation.rosterStatus === 'released' &&
+            affiliation.endDate !== undefined &&
+            affiliation.endDate >= recentReleaseCutoffDate &&
+            affiliation.endDate <= asOfDate,
+        )
+        if (recentReleasedAffiliations.length !== 1) {
+          context.addIssue({
+            code: 'custom',
+            message: 'A public free agent requires one overseas release within the previous 90 days',
+            path: ['athletes', athleteIndex, 'lifecycleStatus'],
+          })
+        }
+      } else {
         context.addIssue({
           code: 'custom',
-          message: 'A public athlete requires exactly one current primary overseas affiliation',
-          path: ['athletes', athleteIndex, 'visibility'],
+          message: `A ${athlete.lifecycleStatus} athlete cannot be public`,
+          path: ['athletes', athleteIndex, 'lifecycleStatus'],
         })
       }
 
       const hasVerifiedProviderBinding = bundle.providerBindings.some(
-        (binding) => binding.athleteId === athlete.id && binding.status === 'verified',
+        (binding) =>
+          binding.athleteId === athlete.id &&
+          binding.status === 'verified' &&
+          bindingMatchesAthleteAndProvider(binding),
       )
       if (!hasVerifiedProviderBinding) {
         context.addIssue({
@@ -324,7 +407,20 @@ export const candidateSchema = z.object({
   reviewerNote: nonEmptyStringSchema,
 })
 
-export const candidateQueueSchema = z.array(candidateSchema)
+export const candidateQueueSchema = z.array(candidateSchema).superRefine((candidates, context) => {
+  const seen = new Set<string>()
+
+  candidates.forEach((candidate, index) => {
+    if (seen.has(candidate.id)) {
+      context.addIssue({
+        code: 'custom',
+        message: `Duplicate candidate id: ${candidate.id}`,
+        path: [index, 'id'],
+      })
+    }
+    seen.add(candidate.id)
+  })
+})
 
 export type RegistryBundleInput = z.input<typeof registryBundleSchema>
 export type RegistryBundle = z.output<typeof registryBundleSchema>
