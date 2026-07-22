@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-07-23T08:00:00.000Z",
+  "entries": [
+    {
+      "id": "atp-isr-men",
+      "sport": "tennis",
+      "genderCategory": "men",
+      "tier": "international-circuit",
+      "universe": "ATP singles players filtered to ISR",
+      "sourceUrl": "https://www.atptour.com/en/rankings/singles?RankRange=0-5000&Region=ISR",
+      "sourceType": "primary-verification",
+      "cadence": "weekly",
+      "lastAttemptAt": "2026-07-23T08:00:00.000Z",
+      "lastSuccessAt": "2026-07-23T08:00:00.000Z",
+      "health": "partial",
+      "counts": { "observed": 8, "matched": 0, "newCandidates": 8, "conflicts": 0 },
+      "limitations": [
+        "Candidates have not been reconciled to eligibility, overseas activity, and provider bindings; this is not a comprehensive overseas-Israeli census."
+      ]
+    },
+    {
+      "id": "iihf-isr-senior-men-2026",
+      "sport": "hockey",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "universe": "IIHF 2026 Israel senior men roster",
+      "sourceUrl": "https://www.iihf.com/en/events/2026/wmiib/teams/roster/68052/israel",
+      "sourceType": "primary-verification",
+      "cadence": "weekly",
+      "lastAttemptAt": "2026-07-23T08:00:00.000Z",
+      "lastSuccessAt": "2026-07-23T08:00:00.000Z",
+      "health": "partial",
+      "limitations": [
+        "The roster has not been scanned or reconciled against overseas club affiliations and eligibility, so it is not a comprehensive overseas-Israeli census."
+      ]
+    },
+    {
+      "id": "ifa-isr-senior-men-2026",
+      "sport": "football",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "universe": "IFA 2026 senior men roster",
+      "sourceUrl": "https://www.football.org.il/national-team/national-team-players.aspx?national_team_id=558",
+      "sourceType": "primary-verification",
+      "cadence": "weekly",
+      "lastAttemptAt": "2026-07-23T08:00:00.000Z",
+      "lastSuccessAt": "2026-07-23T08:00:00.000Z",
+      "health": "partial",
+      "limitations": [
+        "Current foreign clubs have not been reconciled to eligibility, and this roster is not a census of all overseas Israelis or a comprehensive coverage claim."
+      ]
+    },
+    {
+      "id": "fiba-isr-competition-rosters",
+      "sport": "basketball",
+      "genderCategory": "mixed",
+      "tier": "senior-professional",
+      "universe": "FIBA Israel competition rosters",
+      "sourceUrl": "https://www.fiba.basketball/en/teams/82-israel",
+      "sourceType": "primary-verification",
+      "cadence": "weekly",
+      "lastAttemptAt": "2026-07-23T08:00:00.000Z",
+      "lastSuccessAt": "2026-07-23T08:00:00.000Z",
+      "health": "partial",
+      "limitations": [
+        "Senior, youth, women, and club seasons have not been separated and reconciled to overseas affiliations, so this is not a universal or comprehensive coverage claim."
+      ]
+    }
+  ]
+}
