@@ -130,7 +130,7 @@ async function readPreviousSnapshot(): Promise<AthleteSnapshot> {
 
 export async function syncData(now: Date = new Date()): Promise<AthleteSnapshot> {
   const previous = await readPreviousSnapshot()
-  const entries = compilePublicRegistry(now.toISOString().slice(0, 10))
+  const entries = compilePublicRegistry(now)
   const next = await buildSnapshot({
     entries,
     previous,

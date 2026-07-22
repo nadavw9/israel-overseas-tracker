@@ -218,10 +218,24 @@ const addDuplicateIdIssues = (
   })
 }
 
-export function createRegistryBundleSchema(asOfDate: string) {
-  if (!z.iso.date().safeParse(asOfDate).success) {
-    throw new Error(`Invalid registry as-of date: ${asOfDate}`)
+export type RegistryAsOf = Date | string
+
+export function normalizeRegistryAsOf(asOf: RegistryAsOf) {
+  const instant = asOf instanceof Date
+    ? asOf.toISOString()
+    : z.iso.datetime().safeParse(asOf).success
+      ? asOf
+      : z.iso.date().safeParse(asOf).success
+        ? `${asOf}T23:59:59.999Z`
+        : undefined
+  if (instant === undefined || Number.isNaN(new Date(instant).getTime())) {
+    throw new Error(`Invalid registry as-of instant: ${String(asOf)}`)
   }
+  return { instant, date: instant.slice(0, 10) }
+}
+
+export function createRegistryBundleSchema(asOf: RegistryAsOf) {
+  const { date: asOfDate, instant: asOfInstant } = normalizeRegistryAsOf(asOf)
 
   return z
   .object({
@@ -315,7 +329,7 @@ export function createRegistryBundleSchema(asOfDate: string) {
       if (athlete.visibility !== 'public') return
 
       const hasVerifiedEligibility = bundle.evidence.some(
-        (claim) => claim.athleteId === athlete.id && claim.status === 'verified',
+        (claim) => claim.athleteId === athlete.id && claim.status === 'verified' && claim.retrievedAt <= asOfInstant,
       )
       if (!hasVerifiedEligibility) {
         context.addIssue({
@@ -337,6 +351,7 @@ export function createRegistryBundleSchema(asOfDate: string) {
           (affiliation.endDate === undefined || affiliation.endDate >= asOfDate),
       )
 
+      let qualifyingCompetition: string | undefined
       if (athlete.lifecycleStatus === 'active' || athlete.lifecycleStatus === 'injured') {
         const currentActiveAffiliations = currentPrimaryOverseasAffiliations.filter(
           (affiliation) => affiliation.rosterStatus === 'active',
@@ -349,6 +364,7 @@ export function createRegistryBundleSchema(asOfDate: string) {
             path: ['athletes', athleteIndex, 'lifecycleStatus'],
           })
         }
+        qualifyingCompetition = currentActiveAffiliations[0]?.competition
       } else if (athlete.lifecycleStatus === 'free-agent') {
         if (currentPrimaryOverseasAffiliations.length !== 0) {
           context.addIssue({
@@ -372,6 +388,7 @@ export function createRegistryBundleSchema(asOfDate: string) {
             path: ['athletes', athleteIndex, 'lifecycleStatus'],
           })
         }
+        qualifyingCompetition = recentReleasedAffiliations[0]?.competition
       } else {
         context.addIssue({
           code: 'custom',
@@ -384,6 +401,8 @@ export function createRegistryBundleSchema(asOfDate: string) {
         (binding) =>
           binding.athleteId === athlete.id &&
           binding.status === 'verified' &&
+          binding.verifiedAt <= asOfInstant &&
+          binding.competition === qualifyingCompetition &&
           bindingMatchesAthleteAndProvider(binding),
       )
       if (!hasVerifiedProviderBinding) {
@@ -397,12 +416,7 @@ export function createRegistryBundleSchema(asOfDate: string) {
   })
 }
 
-const todayLocalIsoDate = () => {
-  const now = new Date()
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-}
-
-export const registryBundleSchema = createRegistryBundleSchema(todayLocalIsoDate())
+export const registryBundleSchema = createRegistryBundleSchema('2026-07-23T08:00:00.000Z')
 
 const candidateSignalSchema = z.object({
   sourceUrl: httpsUrlSchema,

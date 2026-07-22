@@ -79,13 +79,35 @@ describe('injectable registry compiler', () => {
     bundle.providerBindings[0].provider = 'espn-nba'
     bundle.providerBindings[0].sport = 'basketball'
     bundle.providerBindings[0].competition = 'NBA'
-    bundle.evidence.push({ ...bundle.evidence[0], id: 'evidence-new', retrievedAt: '2026-07-24T08:00:00.000Z' })
-    bundle.providerBindings.push({ ...bundle.providerBindings[0], id: 'binding-new', externalId: 'new', verifiedAt: '2026-07-24T08:00:00.000Z' })
-    bundle.media.push({ ...bundle.media[0], id: 'media-new', retrievedAt: '2026-07-24T08:00:00.000Z' })
+    bundle.evidence[0].retrievedAt = '2026-07-23T07:00:00.000Z'
+    bundle.providerBindings[0].verifiedAt = '2026-07-23T07:00:00.000Z'
+    bundle.media[0].retrievedAt = '2026-07-23T07:00:00.000Z'
+    bundle.evidence.push({ ...bundle.evidence[0], id: 'evidence-new', retrievedAt: '2026-07-23T08:00:00.000Z' })
+    bundle.providerBindings.push({ ...bundle.providerBindings[0], id: 'binding-new', externalId: 'new', verifiedAt: '2026-07-23T08:00:00.000Z' })
+    bundle.media.push({ ...bundle.media[0], id: 'media-new', retrievedAt: '2026-07-23T08:00:00.000Z' })
 
-    const athlete = compileRegistryBundle(bundle, '2026-07-23')[0]
+    const athlete = compileRegistryBundle(bundle, '2026-07-23T08:00:00.000Z')[0]
     expect(athlete?.eligibility.id).toBe('evidence-new')
     expect(athlete?.binding.id).toBe('binding-new')
     expect(athlete?.image?.id).toBe('media-new')
+  })
+
+  it('rejects future provenance and mismatched binding competitions', () => {
+    const future = structuredClone(registryBundleFixture)
+    future.athletes[0].sport = 'basketball'
+    future.affiliations[0].competition = 'NBA'
+    future.providerBindings[0].provider = 'espn-nba'
+    future.providerBindings[0].sport = 'basketball'
+    future.providerBindings[0].competition = 'NBA'
+    future.evidence[0].retrievedAt = '2026-07-24T08:00:00.000Z'
+    future.providerBindings[0].verifiedAt = '2026-07-24T08:00:00.000Z'
+
+    expect(() => compileRegistryBundle(future, '2026-07-23T08:00:00.000Z')).toThrow(/verified eligibility/i)
+
+    const mismatch = structuredClone(future)
+    mismatch.evidence[0].retrievedAt = '2026-07-23T08:00:00.000Z'
+    mismatch.providerBindings[0].verifiedAt = '2026-07-23T08:00:00.000Z'
+    mismatch.providerBindings[0].competition = 'EuroLeague'
+    expect(() => compileRegistryBundle(mismatch, '2026-07-23T08:00:00.000Z')).toThrow(/binding/i)
   })
 })

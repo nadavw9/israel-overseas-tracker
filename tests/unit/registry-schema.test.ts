@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import type { RegistryBundleInput } from '../../src/domain/registry'
 import { registryBundleFixture } from '../fixtures/registry'
 import {
@@ -6,20 +6,12 @@ import {
   athleteIdentitySchema,
   candidateQueueSchema,
   candidateSchema,
-  registryBundleSchema,
+  createRegistryBundleSchema,
 } from '../../src/domain/registry'
 import { athleteTierSchema } from '../../src/domain/taxonomy'
 
 const asOfTimestamp = '2026-07-23T08:00:00.000Z'
-
-beforeAll(() => {
-  vi.useFakeTimers()
-  vi.setSystemTime(new Date(asOfTimestamp))
-})
-
-afterAll(() => {
-  vi.useRealTimers()
-})
+const registryBundleSchema = createRegistryBundleSchema(asOfTimestamp)
 
 const cloneRegistryFixture = (): RegistryBundleInput => structuredClone(registryBundleFixture)
 
@@ -42,6 +34,16 @@ const candidateFixture = {
 } as const
 
 describe('normalized registry schemas', () => {
+  it('evaluates lifecycle rules against the supplied as-of instant', () => {
+    const freeAgent = cloneRegistryFixture()
+    freeAgent.athletes[0].lifecycleStatus = 'free-agent'
+    freeAgent.affiliations[0].rosterStatus = 'released'
+    freeAgent.affiliations[0].endDate = '2026-07-01'
+
+    expect(createRegistryBundleSchema('2026-07-23T08:00:00.000Z').safeParse(freeAgent).success).toBe(true)
+    expect(createRegistryBundleSchema('2026-10-01T08:00:00.000Z').safeParse(freeAgent).success).toBe(false)
+  })
+
   it('accepts a complete registry bundle', () => {
     expect(registryBundleSchema.safeParse(registryBundleFixture).success).toBe(true)
   })
