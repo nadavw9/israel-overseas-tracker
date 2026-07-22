@@ -166,6 +166,22 @@ describe('normalized registry schemas', () => {
     expect(registryBundleSchema.safeParse(recentFreeAgent).success).toBe(true)
   })
 
+  it('rejects a free agent who also has a current primary overseas affiliation', () => {
+    const activelyRosteredFreeAgent = cloneRegistryFixture()
+    activelyRosteredFreeAgent.athletes[0].lifecycleStatus = 'free-agent'
+    activelyRosteredFreeAgent.affiliations[0].rosterStatus = 'released'
+    activelyRosteredFreeAgent.affiliations[0].endDate = '2026-07-01'
+    activelyRosteredFreeAgent.affiliations.push({
+      ...activelyRosteredFreeAgent.affiliations[0],
+      id: 'affiliation-athlete-one-current-club',
+      startDate: '2026-07-10',
+      endDate: undefined,
+      rosterStatus: 'active',
+    })
+
+    expect(registryBundleSchema.safeParse(activelyRosteredFreeAgent).success).toBe(false)
+  })
+
   it('rejects a free agent whose release is older than 90 days', () => {
     const expiredFreeAgent = cloneRegistryFixture()
     expiredFreeAgent.athletes[0].lifecycleStatus = 'free-agent'

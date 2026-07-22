@@ -327,13 +327,15 @@ export const registryBundleSchema = z
           affiliation.primary &&
           affiliation.countsAsOverseas,
       )
+      const currentPrimaryOverseasAffiliations = primaryOverseasAffiliations.filter(
+        (affiliation) =>
+          affiliation.startDate <= asOfDate &&
+          (affiliation.endDate === undefined || affiliation.endDate >= asOfDate),
+      )
 
       if (athlete.lifecycleStatus === 'active' || athlete.lifecycleStatus === 'injured') {
-        const currentActiveAffiliations = primaryOverseasAffiliations.filter(
-          (affiliation) =>
-            affiliation.rosterStatus === 'active' &&
-            affiliation.startDate <= asOfDate &&
-            (affiliation.endDate === undefined || affiliation.endDate >= asOfDate),
+        const currentActiveAffiliations = currentPrimaryOverseasAffiliations.filter(
+          (affiliation) => affiliation.rosterStatus === 'active',
         )
         if (currentActiveAffiliations.length !== 1) {
           context.addIssue({
@@ -344,6 +346,14 @@ export const registryBundleSchema = z
           })
         }
       } else if (athlete.lifecycleStatus === 'free-agent') {
+        if (currentPrimaryOverseasAffiliations.length !== 0) {
+          context.addIssue({
+            code: 'custom',
+            message: 'A public free agent cannot have a current primary overseas affiliation',
+            path: ['athletes', athleteIndex, 'lifecycleStatus'],
+          })
+        }
+
         const recentReleasedAffiliations = primaryOverseasAffiliations.filter(
           (affiliation) =>
             affiliation.rosterStatus === 'released' &&
