@@ -1,0 +1,59 @@
+name: Sync verified sports data
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-and-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Refresh verified snapshot
+        run: pnpm sync:data
+
+      - name: Validate athlete images
+        run: pnpm validate:images
+
+      - name: Run unit tests
+        run: pnpm test
+
+      - name: Install browser for responsive tests
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run responsive browser tests
+        run: pnpm test:e2e
+
+      - name: Lint source
+        run: pnpm lint
+
+      - name: Build production app
+        run: pnpm build
+
+      - name: Upload generated snapshot
+        uses: actions/upload-artifact@v6
+        with:
+          name: verified-sports-snapshot
+          path: public/data/snapshot.json
+          if-no-files-found: error

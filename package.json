@@ -9,6 +9,7 @@
     "lint": "oxlint",
     "sync:data": "tsx scripts/sync-data.ts",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "test:watch": "vitest",
     "validate:images": "tsx scripts/validate-images.ts",
     "preview": "vite preview"
@@ -22,6 +23,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
