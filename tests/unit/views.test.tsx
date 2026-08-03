@@ -205,6 +205,31 @@ describe('rankings', () => {
     ])
   })
 
+  it('omits ranking-shaped partial objects that are not canonical athletes', () => {
+    const valid = snapshot.athletes[0]
+    const partial = {
+      visibility: 'public',
+      sport: 'basketball',
+      performance: {
+        status: 'available',
+        stats: {
+          kind: 'basketball',
+          games: 10,
+          pointsPerGame: 12,
+          reboundsPerGame: 3,
+          assistsPerGame: 4,
+        },
+      },
+    }
+
+    expect(() => rankAthletes([valid, partial])).not.toThrow()
+    expect(rankAthletes([valid, partial])).toEqual([valid])
+    expect(() => rankAthletesBySport([valid, partial])).not.toThrow()
+    expect(rankAthletesBySport([valid, partial])).toEqual([
+      { sport: 'basketball', athletes: [valid] },
+    ])
+  })
+
   it('renders separate sport ranking sequences for mixed input', async () => {
     const user = userEvent.setup()
     const football = {
@@ -245,6 +270,24 @@ describe('rankings', () => {
     expect(
       screen.getByRole('region', { name: /athlete locations/i }),
     ).toBeInTheDocument()
+  })
+
+  it('keeps the active directory filter across rankings and map views', async () => {
+    const user = userEvent.setup()
+    render(<TrackerApp snapshot={snapshot} />)
+
+    await user.click(screen.getByRole('button', { name: 'Basketball' }))
+    expect(screen.queryByRole('button', { name: /open oscar gloukh/i })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Rankings' }))
+    expect(screen.getByRole('heading', { name: 'Basketball' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Football' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Map' }))
+    expect(screen.getByText('2 mapped')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /open deni avdija from map/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /open ben saraf from map/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /open oscar gloukh from map/i })).not.toBeInTheDocument()
   })
 
   it('offers a keyboard-accessible map location list that opens details', async () => {

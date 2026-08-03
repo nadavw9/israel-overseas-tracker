@@ -1,4 +1,4 @@
-import type { Athlete } from '../domain/athlete'
+import { athleteSchema, type Athlete } from '../domain/athlete'
 import type { Sport } from '../domain/taxonomy'
 
 const sportOrder: Sport[] = [
@@ -49,10 +49,18 @@ function hasRankablePerformance(athlete: unknown): athlete is Athlete {
   return false
 }
 
-function isPublicRankable(athlete: unknown): athlete is Athlete {
-  return isRecord(athlete) &&
-    athlete.visibility === 'public' &&
-    hasRankablePerformance(athlete)
+function parseRankableAthlete(athlete: unknown): Athlete | null {
+  const parsed = athleteSchema.safeParse(athlete)
+  return parsed.success && hasRankablePerformance(parsed.data)
+    ? parsed.data
+    : null
+}
+
+function rankableAthletes(athletes: readonly unknown[]): Athlete[] {
+  return athletes.flatMap((athlete) => {
+    const parsed = parseRankableAthlete(athlete)
+    return parsed ? [parsed] : []
+  })
 }
 
 export function primaryMetric(athlete: Athlete): number {
@@ -65,14 +73,14 @@ export function primaryMetric(athlete: Athlete): number {
 }
 
 export function rankAthletes(athletes: readonly unknown[]): Athlete[] {
-  const eligible = athletes.filter(isPublicRankable)
+  const eligible = rankableAthletes(athletes)
   const sports = new Set(eligible.map((athlete) => athlete.sport))
   if (sports.size > 1) throw new Error('Cannot rank athletes from different sports together')
   return eligible.toSorted((left, right) => primaryMetric(right) - primaryMetric(left))
 }
 
 export function rankAthletesBySport(athletes: readonly unknown[]): Array<{ sport: Sport; athletes: Athlete[] }> {
-  const eligible = athletes.filter(isPublicRankable)
+  const eligible = rankableAthletes(athletes)
 
   return sportOrder
     .map((sport) => ({
