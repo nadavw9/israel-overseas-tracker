@@ -4,7 +4,8 @@ import { AppHeader } from '../components/AppHeader'
 import { AthleteCard } from '../components/AthleteCard'
 import { AthleteDrawer } from '../components/AthleteDrawer'
 import { AthleteMap } from '../components/AthleteMap'
-import { FilterBar, type SportFilter } from '../components/FilterBar'
+import { CoverageStatus } from '../components/CoverageStatus'
+import { FilterBar, type DirectoryFilters } from '../components/FilterBar'
 import { Leaderboard } from '../components/Leaderboard'
 import { ViewNav, type TrackerView } from '../components/ViewNav'
 import { I18nContext } from '../i18n/context'
@@ -19,6 +20,7 @@ function matchesQuery(athlete: Athlete, query: string): boolean {
   const haystack = [
     athlete.name.en,
     athlete.name.he,
+    ...athlete.aliases,
     athlete.affiliation.organization.name,
     athlete.affiliation.competition,
     athlete.affiliation.location?.city,
@@ -33,12 +35,27 @@ function matchesQuery(athlete: Athlete, query: string): boolean {
 
 export function TrackerApp({ snapshot }: TrackerAppProps) {
   const [query, setQuery] = useState('')
-  const [sport, setSport] = useState<SportFilter>('all')
+  const [filters, setFilters] = useState<DirectoryFilters>({
+    sport: 'all',
+    tier: 'all',
+    gender: 'all',
+    status: 'all',
+  })
   const [view, setView] = useState<TrackerView>('athletes')
   const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null)
   const [locale, setLocale] = useState<Locale>('en')
   const returnFocus = useRef<HTMLButtonElement | null>(null)
   const copy = messages[locale]
+  const sports = useMemo(
+    () => [...new Set(snapshot.athletes.map((athlete) => athlete.sport))],
+    [snapshot.athletes],
+  )
+
+  useEffect(() => {
+    if (filters.sport !== 'all' && !sports.includes(filters.sport)) {
+      setFilters((current) => ({ ...current, sport: 'all' }))
+    }
+  }, [filters.sport, sports])
 
   useEffect(() => {
     const previousLang = document.documentElement.lang
@@ -54,11 +71,14 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
   const athletes = useMemo(
     () =>
       snapshot.athletes.filter(
-        (athlete) =>
-          (sport === 'all' || athlete.sport === sport) &&
+          (athlete) =>
+          (filters.sport === 'all' || athlete.sport === filters.sport) &&
+          (filters.tier === 'all' || athlete.tier === filters.tier) &&
+          (filters.gender === 'all' || athlete.genderCategory === filters.gender) &&
+          (filters.status === 'all' || athlete.lifecycleStatus === filters.status) &&
           matchesQuery(athlete, query),
       ),
-    [query, snapshot.athletes, sport],
+    [filters, query, snapshot.athletes],
   )
 
   const updated = new Intl.DateTimeFormat(copy.locale, {
@@ -83,16 +103,19 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
         <section className="hero" aria-labelledby="tracker-title">
           <div className="hero__glow" aria-hidden="true" />
           <div className="hero__content">
-            <p className="hero__kicker">{copy.seasonKicker}</p>
-            <h1 id="tracker-title">
-              {copy.titleFirst} <span>{copy.titleSecond}</span>
-            </h1>
-            <p className="hero__lede">{copy.heroLede}</p>
-            <div className="hero__proof" aria-label={copy.snapshotStatus}>
-              <strong>{copy.verifiedAthletes(snapshot.athletes.length)}</strong>
-              <span>{copy.snapshotGenerated} {updated}</span>
-              <span>{copy.noInvented}</span>
+            <div className="hero__message">
+              <p className="hero__kicker">{copy.seasonKicker}</p>
+              <h1 id="tracker-title">
+                {copy.titleFirst} <span>{copy.titleSecond}</span>
+              </h1>
+              <p className="hero__lede">{copy.heroLede}</p>
+              <div className="hero__proof" aria-label={copy.snapshotStatus}>
+                <strong>{copy.verifiedAthletes(snapshot.athletes.length)}</strong>
+                <span>{copy.snapshotGenerated} {updated}</span>
+                <span>{copy.noInvented}</span>
+              </div>
             </div>
+            <CoverageStatus coverage={snapshot.coverage} />
           </div>
         </section>
 
@@ -112,8 +135,9 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
           <FilterBar
             query={query}
             onQueryChange={setQuery}
-            sport={sport}
-            onSportChange={setSport}
+            filters={filters}
+            onFiltersChange={setFilters}
+            sports={sports}
           />
 
           {view === 'athletes' && athletes.length > 0 ? (

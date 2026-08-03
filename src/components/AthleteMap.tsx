@@ -45,7 +45,7 @@ export function AthleteMap({ athletes, onOpen }: AthleteMapProps) {
               key={athlete.id}
               center={[athlete.affiliation.location!.lat, athlete.affiliation.location!.lng]}
               radius={9}
-              pathOptions={{ color: '#070708', weight: 3, fillColor: '#f5d878', fillOpacity: 1 }}
+              pathOptions={{ color: '#071526', weight: 3, fillColor: '#47c7a5', fillOpacity: 1 }}
             >
               <Popup>
                 <div dir={locale === 'he' ? 'rtl' : 'ltr'}>

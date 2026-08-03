@@ -73,6 +73,10 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
             <strong>{athlete.affiliation.organization.name}</strong>
             <span>{athlete.affiliation.competition} · {athlete.affiliation.season}</span>
           </p>
+          <div className="athlete-tags" aria-label={messages.athleteClassifications}>
+            <span>{messages.tiers[athlete.tier]}</span>
+            <span>{messages.lifecycleStatuses[athlete.lifecycleStatus]}</span>
+          </div>
           {stats.length > 0 ? (
             <dl className="stat-grid">
               {stats.map(([label, value]) => (

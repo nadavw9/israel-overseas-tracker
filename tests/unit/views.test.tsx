@@ -5,11 +5,29 @@ import snapshotJson from '../../public/data/snapshot.json'
 import { TrackerApp } from '../../src/app/App'
 import type { Athlete } from '../../src/domain/athlete'
 import { snapshotSchema } from '../../src/domain/athlete'
-import { rankAthletes } from '../../src/services/rankings'
+import { rankAthletes, rankAthletesBySport } from '../../src/services/rankings'
 
 const snapshot = snapshotSchema.parse(snapshotJson)
 
 describe('athlete details', () => {
+  it('distinguishes citizenship evidence from representing Israel and links each source', async () => {
+    const user = userEvent.setup()
+    render(<TrackerApp snapshot={snapshot} />)
+
+    await user.click(screen.getByRole('button', { name: /open deni avdija/i }))
+    expect(screen.getByText('Eligibility basis')).toBeInTheDocument()
+    expect(screen.getByText('Nationality / citizenship evidence')).toBeInTheDocument()
+    expect(screen.getByText(/does not by itself mean this athlete represents Israel in competition/i)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /eligibility source/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /affiliation source/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /performance source/i })).toBeInTheDocument()
+
+    await user.keyboard('{Escape}')
+    await user.click(screen.getByRole('button', { name: /open ben saraf/i }))
+    expect(screen.getByText('Represents Israel evidence')).toBeInTheDocument()
+    expect(screen.getByText(/verified sporting representation, not a claim about citizenship/i)).toBeInTheDocument()
+  })
+
   it('opens and closes details with keyboard focus restored', async () => {
     const user = userEvent.setup()
     render(<TrackerApp snapshot={snapshot} />)
@@ -33,7 +51,7 @@ describe('athlete details', () => {
 
     const main = document.querySelector('main')
     const close = screen.getByRole('button', { name: /close deni avdija details/i })
-    const seasonSource = screen.getByRole('link', { name: /season data source/i })
+    const seasonSource = screen.getByRole('link', { name: /performance source/i })
 
     expect(main).toHaveAttribute('inert')
     expect(close).toHaveFocus()
@@ -83,6 +101,31 @@ describe('rankings', () => {
     expect(() => rankAthletes([basketball, football])).toThrow(/sport/i)
   })
 
+  it('groups compatible public performance records into independent sport sequences', () => {
+    const basketball = snapshot.athletes[0]
+    const football = {
+      ...basketball,
+      id: 'football-leader',
+      sport: 'football',
+      affiliation: { ...basketball.affiliation, competition: 'Eredivisie' },
+      performance: {
+        ...basketball.performance,
+        competition: 'Eredivisie',
+        stats: { kind: 'football', appearances: 12, goals: 3, assists: 4 },
+      },
+    } as Athlete
+    const incompatible = {
+      ...football,
+      id: 'incompatible-record',
+      sport: 'basketball',
+    } as Athlete
+
+    expect(rankAthletesBySport([football, basketball, incompatible])).toEqual([
+      { sport: 'basketball', athletes: [basketball] },
+      { sport: 'football', athletes: [football] },
+    ])
+  })
+
   it('renders separate sport ranking sequences for mixed input', async () => {
     const user = userEvent.setup()
     const football = {
@@ -100,9 +143,14 @@ describe('rankings', () => {
     render(<TrackerApp snapshot={{ ...snapshot, athletes: [...snapshot.athletes, football] }} />)
 
     await user.click(screen.getByRole('button', { name: 'Rankings' }))
-    expect(screen.getAllByText('01')).toHaveLength(2)
-    expect(screen.getByRole('heading', { name: 'Basketball' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Football' })).toBeInTheDocument()
+    const basketballGroup = screen.getByRole('heading', { name: 'Basketball' }).closest('.leaderboard-group')
+    const footballGroup = screen.getByRole('heading', { name: 'Football' }).closest('.leaderboard-group')
+    expect(basketballGroup).not.toBeNull()
+    expect(footballGroup).not.toBeNull()
+    expect(basketballGroup?.querySelectorAll('ol')).toHaveLength(1)
+    expect(footballGroup?.querySelectorAll('ol')).toHaveLength(1)
+    expect(basketballGroup).toHaveTextContent('01')
+    expect(footballGroup).toHaveTextContent('01')
   })
 
   it('switches between rankings and the location map', async () => {

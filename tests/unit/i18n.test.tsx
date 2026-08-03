@@ -41,4 +41,19 @@ describe('Hebrew experience', () => {
     expect(screen.getByText('משחקים')).toBeInTheDocument()
     expect(screen.queryByText('Games')).not.toBeInTheDocument()
   })
+
+  it('localizes coverage, filter controls, tags, and RTL labels', async () => {
+    const user = userEvent.setup()
+    render(<TrackerApp snapshot={snapshot} />)
+
+    await user.click(screen.getByRole('button', { name: 'עברית' }))
+
+    expect(screen.getByText('הכיסוי חלקי: 0 מתוך 4 מאגרי סריקה תקינים')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'רמת ספורטאי' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'קטגוריית מגדר' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'סטטוס פעילות' })).toBeInTheDocument()
+    expect(screen.getAllByText('בוגרים מקצוענים')).not.toHaveLength(0)
+    expect(screen.getAllByText('פעיל')).not.toHaveLength(0)
+    expect(document.querySelector('.filter-dimensions')).toHaveAttribute('dir', 'rtl')
+  })
 })

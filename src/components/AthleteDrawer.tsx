@@ -122,6 +122,15 @@ export function AthleteDrawer({ athlete, onClose, returnFocus }: AthleteDrawerPr
           <p className="drawer__hebrew" lang={locale === 'en' ? 'he' : 'en'} dir={locale === 'en' ? 'rtl' : 'ltr'}>{athlete.name[locale === 'en' ? 'he' : 'en']}</p>
           <p className="drawer__club">{athlete.affiliation.organization.name}<span>{athlete.affiliation.competition} · {athlete.affiliation.season}</span></p>
           {athlete.affiliation.location && <p className="drawer__location"><MapPin size={16} aria-hidden="true" /> {athlete.affiliation.location.city}, {athlete.affiliation.location.country}</p>}
+          <div className="athlete-tags" aria-label={messages.athleteClassifications}>
+            <span>{messages.tiers[athlete.tier]}</span>
+            <span>{messages.lifecycleStatuses[athlete.lifecycleStatus]}</span>
+          </div>
+          <section className="drawer__eligibility" aria-labelledby="eligibility-basis-title">
+            <p id="eligibility-basis-title">{messages.eligibilityBasis}</p>
+            <strong>{messages.eligibilityBasisLabels[athlete.eligibility.basis]}</strong>
+            <span>{messages.eligibilityBasisNotes[athlete.eligibility.basis]}</span>
+          </section>
           {athlete.performance.stats ? (
             <dl className="drawer__stats">
               {statRows(athlete, messages.statLabels).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
@@ -130,6 +139,7 @@ export function AthleteDrawer({ athlete, onClose, returnFocus }: AthleteDrawerPr
           <FreshnessBadge performance={athlete.performance} />
           <div className="drawer__sources">
             <a href={athlete.eligibility.sourceUrl} target="_blank" rel="noreferrer"><ShieldCheck size={16} aria-hidden="true" /> {messages.eligibilitySource} <ArrowUpRight size={14} aria-hidden="true" /></a>
+            <a href={athlete.affiliation.source.sourceUrl} target="_blank" rel="noreferrer">{messages.affiliationSource} <ArrowUpRight size={14} aria-hidden="true" /></a>
             <a href={athlete.performance.source.sourceUrl} target="_blank" rel="noreferrer">{messages.seasonSource} <ArrowUpRight size={14} aria-hidden="true" /></a>
           </div>
         </div>

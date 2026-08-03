@@ -38,7 +38,9 @@ export function FreshnessBadge({ performance }: FreshnessBadgeProps) {
       ) : (
         <BadgeCheck size={14} aria-hidden="true" />
       )}
-      {freshness === 'stale' ? messages.lastVerified : messages.sourceChecked} {checked}
+      {freshness === 'identity-only'
+        ? messages.identityOnly
+        : <>{freshness === 'stale' ? messages.lastVerified : messages.sourceChecked} {checked}</>}
     </span>
   )
 }
