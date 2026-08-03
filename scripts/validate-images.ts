@@ -2,14 +2,33 @@ import { readFile } from 'node:fs/promises'
 import { pathToFileURL } from 'node:url'
 import { z } from 'zod'
 import { httpsUrlSchema } from '../src/domain/athlete'
+import { mediaLicenseSchema, mediaRightsStatusSchema, mediaUsageSchema } from '../src/domain/registry'
+
+const athleteIdSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+  message: 'Manifest athlete ID must be a slug',
+})
 
 const imageSchema = z.object({
   url: httpsUrlSchema,
   sourceUrl: httpsUrlSchema,
   alt: z.string().trim().min(1),
+  rightsStatus: mediaRightsStatusSchema,
+  rightsHolder: z.string().trim().min(1).optional(),
+  license: mediaLicenseSchema.optional(),
+  attribution: z.string().trim().min(1).optional(),
+  usage: mediaUsageSchema,
+  retrievedAt: z.iso.datetime(),
+}).strict().superRefine((image, context) => {
+  if (image.rightsStatus !== 'approved') return
+  if (!image.rightsHolder) {
+    context.addIssue({ code: 'custom', message: 'Approved image requires a rights holder', path: ['rightsHolder'] })
+  }
+  if (!image.license) {
+    context.addIssue({ code: 'custom', message: 'Approved image requires a license', path: ['license'] })
+  }
 })
 
-const manifestSchema = z.record(z.string(), imageSchema)
+const manifestSchema = z.record(athleteIdSchema, imageSchema)
 export type ImageManifest = z.infer<typeof manifestSchema>
 
 export async function validateImages(
@@ -20,6 +39,8 @@ export async function validateImages(
   const seen = new Set<string>()
 
   for (const [athleteId, image] of Object.entries(manifest)) {
+    if (image.rightsStatus !== 'approved') continue
+
     if (seen.has(image.url)) {
       throw new Error(`Duplicate image URL for ${athleteId}`)
     }
@@ -36,7 +57,7 @@ export async function validateImages(
     }
   }
 
-  return Object.keys(manifest).length
+  return seen.size
 }
 
 async function run() {
