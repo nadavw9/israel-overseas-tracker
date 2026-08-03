@@ -1,59 +1,66 @@
 import { readFile } from 'node:fs/promises'
 import { pathToFileURL } from 'node:url'
 import { z } from 'zod'
-import { httpsUrlSchema } from '../src/domain/athlete'
-import { mediaLicenseSchema, mediaRightsStatusSchema, mediaUsageSchema } from '../src/domain/registry'
+import { httpsUrlSchema, publicMediaSchema } from '../src/domain/athlete'
 
 const athleteIdSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
   message: 'Manifest athlete ID must be a slug',
 })
 
-const imageSchema = z.object({
-  url: httpsUrlSchema,
-  sourceUrl: httpsUrlSchema,
-  alt: z.string().trim().min(1),
-  rightsStatus: mediaRightsStatusSchema,
-  rightsHolder: z.string().trim().min(1).optional(),
-  license: mediaLicenseSchema.optional(),
-  attribution: z.string().trim().min(1).optional(),
-  usage: mediaUsageSchema,
-  retrievedAt: z.iso.datetime(),
-}).strict().superRefine((image, context) => {
-  if (image.rightsStatus !== 'approved') return
-  if (!image.rightsHolder) {
-    context.addIssue({ code: 'custom', message: 'Approved image requires a rights holder', path: ['rightsHolder'] })
-  }
-  if (!image.license) {
-    context.addIssue({ code: 'custom', message: 'Approved image requires a license', path: ['license'] })
-  }
-})
-
-const manifestSchema = z.record(athleteIdSchema, imageSchema)
+const manifestSchema = z.record(athleteIdSchema, publicMediaSchema)
 export type ImageManifest = z.infer<typeof manifestSchema>
+
+type ValidationOptions = { timeoutMs?: number }
+const defaultTimeoutMs = 10_000
 
 export async function validateImages(
   input: unknown,
   fetcher: typeof fetch = fetch,
+  { timeoutMs = defaultTimeoutMs }: ValidationOptions = {},
 ): Promise<number> {
-  const manifest = manifestSchema.parse(input)
+  const parsedManifest = manifestSchema.safeParse(input)
+  if (!parsedManifest.success) {
+    const missingRightsHolder = parsedManifest.error.issues.some(
+      (issue) => issue.path.at(-1) === 'rightsHolder' && issue.code === 'invalid_type',
+    )
+    if (missingRightsHolder) throw new Error('Approved image requires a rights holder')
+    throw parsedManifest.error
+  }
+  const manifest = parsedManifest.data
   const seen = new Set<string>()
 
   for (const [athleteId, image] of Object.entries(manifest)) {
-    if (image.rightsStatus !== 'approved') continue
-
     if (seen.has(image.url)) {
       throw new Error(`Duplicate image URL for ${athleteId}`)
     }
     seen.add(image.url)
 
-    const response = await fetcher(image.url, {
-      headers: { Range: 'bytes=0-1024' },
-    })
-    const contentType = response.headers.get('content-type') ?? ''
-    if (!response.ok || !contentType.startsWith('image/')) {
-      throw new Error(
-        `Image check failed for ${athleteId}: HTTP ${response.status} ${contentType}`,
-      )
+    const controller = new AbortController()
+    let timeout: ReturnType<typeof setTimeout> | undefined
+    let response: Response | undefined
+    try {
+      const timeoutError = new Promise<never>((_, reject) => {
+        timeout = setTimeout(() => {
+          controller.abort()
+          reject(new Error(`Image check timed out for ${athleteId}`))
+        }, timeoutMs)
+      })
+      response = await Promise.race([
+        fetcher(image.url, { headers: { Range: 'bytes=0-1024' }, signal: controller.signal }),
+        timeoutError,
+      ])
+      if (response.url && !httpsUrlSchema.safeParse(response.url).success) {
+        throw new Error(`Image check failed for ${athleteId}: final URL must be HTTPS`)
+      }
+      const contentType = response.headers.get('content-type') ?? ''
+      if (!response.ok || !contentType.startsWith('image/')) {
+        throw new Error(
+          `Image check failed for ${athleteId}: HTTP ${response.status} ${contentType}`,
+        )
+      }
+    } finally {
+      if (timeout !== undefined) clearTimeout(timeout)
+      await response?.body?.cancel?.()
     }
   }
 

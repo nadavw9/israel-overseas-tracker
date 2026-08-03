@@ -1,19 +1,31 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { createRef } from 'react'
 import { describe, expect, it } from 'vitest'
+import { AthleteCard } from '../../src/components/AthleteCard'
+import { AthleteDrawer } from '../../src/components/AthleteDrawer'
 import { AthletePhoto } from '../../src/components/AthletePhoto'
 import { publicRegistry } from '../../src/data/registry'
-import type { Athlete } from '../../src/domain/athlete'
+import { publicMediaSchema, type Athlete } from '../../src/domain/athlete'
 import { validateImages } from '../../scripts/validate-images'
+import registryMedia from '../../data/registry/media.json'
 import snapshot from '../../public/data/snapshot.json'
 import manifest from '../../public/images/athletes/manifest.json'
 
 describe('athlete imagery', () => {
-  it('omits media assets that do not have approved reuse rights', () => {
-    expect(publicRegistry.every((athlete) => athlete.image === undefined)).toBe(true)
+  it('ships only schema-valid approved media and excludes review source URLs', () => {
+    expect(publicRegistry.every((athlete) => athlete.image === undefined || publicMediaSchema.safeParse(athlete.image).success)).toBe(true)
+    expect(snapshot.athletes.every((athlete) => athlete.image === undefined || publicMediaSchema.safeParse(athlete.image).success)).toBe(true)
+    expect(Object.values(manifest).every((image) => publicMediaSchema.safeParse(image).success)).toBe(true)
+    const reviewUrls = registryMedia.filter((image) => image.rightsStatus !== 'approved').map((image) => image.url)
+    const publicUrls = [
+      ...publicRegistry.flatMap((athlete) => athlete.image ? [athlete.image.url] : []),
+      ...snapshot.athletes.flatMap((athlete) => athlete.image ? [athlete.image.url] : []),
+      ...Object.values(manifest).map((image) => image.url),
+    ]
+    expect(publicUrls).not.toEqual(expect.arrayContaining(reviewUrls))
   })
 
-  it('ships no unapproved image artifacts', () => {
-    expect(snapshot.athletes.every((athlete) => athlete.image === undefined)).toBe(true)
+  it('currently ships an empty public image manifest', () => {
     expect(manifest).toEqual({})
   })
 
@@ -102,7 +114,47 @@ describe('athlete imagery', () => {
     expect(screen.getByRole('link', { name: /image rights: photo by example/i })).toHaveAttribute('href', 'https://example.com/source')
   })
 
-  it('validates and fetches only approved documented image assets', async () => {
+  it.each([
+    ['javascript image URL', { url: 'javascript:alert(1)' }],
+    ['data source URL', { sourceUrl: 'data:text/html,unsafe' }],
+    ['unknown license', { license: 'unlicensed' }],
+    ['unknown usage', { usage: 'unsafe' }],
+    ['invalid retrieval date', { retrievedAt: 'not-a-date' }],
+    ['non-string attribution', { attribution: 7 }],
+    ['unknown media key', { private: true }],
+  ])('falls back when runtime media has %s', (_case, patch) => {
+    const athlete = athleteWithImage(patch)
+    render(<AthletePhoto athlete={athlete} />)
+    expect(screen.getByLabelText('Photo unavailable')).toBeInTheDocument()
+    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+  })
+
+  it('retries a replacement image after a failed previous URL', () => {
+    const first = athleteWithImage({ url: 'https://images.example.com/first.png' })
+    const second = athleteWithImage({ url: 'https://images.example.com/second.png' })
+    const { rerender } = render(<AthletePhoto athlete={first} />)
+    fireEvent.error(screen.getByRole('img', { name: 'An athlete portrait' }))
+    expect(screen.getByLabelText('Photo unavailable')).toBeInTheDocument()
+    rerender(<AthletePhoto athlete={second} />)
+    expect(screen.getByRole('img', { name: 'An athlete portrait' })).toHaveAttribute('src', second.image?.url)
+  })
+
+  it('renders attribution as text in a card button and as a source link in the drawer', () => {
+    const athlete = athleteWithImage()
+    const { rerender } = render(<AthleteCard athlete={athlete} rank={1} onOpen={() => {}} />)
+    expect(screen.getByRole('button').querySelector('a')).toBeNull()
+    expect(screen.getByText('Example holder (cc-by)')).toBeInTheDocument()
+
+    rerender(<AthleteDrawer athlete={athlete} onClose={() => {}} returnFocus={createRef()} />)
+    expect(screen.getByRole('link', { name: /image rights: example holder/i })).toHaveAttribute('href', 'https://example.com/source')
+  })
+
+  it('rejects review and expired rows from the public manifest', async () => {
+    await expect(validateImages({ review: { ...approvedImage(), rightsStatus: 'review' } }, async () => new Response())).rejects.toThrow()
+    await expect(validateImages({ expired: { ...approvedImage(), rightsStatus: 'expired' } }, async () => new Response())).rejects.toThrow()
+  })
+
+  it('validates and fetches every approved documented public image asset', async () => {
     const fetcher = async () => {
       fetched += 1
       return new Response('', { headers: { 'content-type': 'image/png' } })
@@ -110,12 +162,11 @@ describe('athlete imagery', () => {
     let fetched = 0
     const count = await validateImages({
       approved: approvedImage(),
-      review: { ...approvedImage(), rightsStatus: 'review', url: 'https://images.example.com/review.png' },
-      expired: { ...approvedImage(), rightsStatus: 'expired', url: 'https://images.example.com/expired.png' },
+      second: { ...approvedImage(), url: 'https://images.example.com/second.png' },
     }, fetcher)
 
-    expect(count).toBe(1)
-    expect(fetched).toBe(1)
+    expect(count).toBe(2)
+    expect(fetched).toBe(2)
   })
 
   it.each([
@@ -133,6 +184,17 @@ describe('athlete imagery', () => {
     await expect(validateImages({ athlete: approvedImage() }, async () => new Response('', { status: 500, headers: { 'content-type': 'image/png' } }))).rejects.toThrow(/HTTP 500/i)
     await expect(validateImages({ athlete: approvedImage() }, async () => new Response('', { headers: { 'content-type': 'text/html' } }))).rejects.toThrow(/text\/html/i)
   })
+
+  it('rejects a redirect whose final URL is not HTTPS', async () => {
+    await expect(validateImages({ athlete: approvedImage() }, async () => response({ url: 'http://images.example.com/final.png' }))).rejects.toThrow(/final URL.*HTTPS/i)
+  })
+
+  it('times out fetches that ignore abort signals and cancels response bodies', async () => {
+    await expect(validateImages({ athlete: approvedImage() }, () => new Promise(() => {}), { timeoutMs: 5 })).rejects.toThrow(/timed out/i)
+    let cancelled = 0
+    await validateImages({ athlete: approvedImage() }, async () => response({ cancel: () => { cancelled += 1 } }))
+    expect(cancelled).toBe(1)
+  })
 })
 
 function approvedImage() {
@@ -146,4 +208,20 @@ function approvedImage() {
     usage: 'editorial-display' as const,
     retrievedAt: '2026-07-23T08:00:00.000Z',
   }
+}
+
+function athleteWithImage(patch: Record<string, unknown> = {}) {
+  const athlete = snapshot.athletes[0]
+  if (!athlete) throw new Error('Expected a fixture athlete')
+  return { ...athlete, image: { ...approvedImage(), ...patch } } as unknown as Athlete
+}
+
+function response({ url = 'https://images.example.com/player.png', cancel }: { url?: string, cancel?: () => void } = {}) {
+  return {
+    ok: true,
+    status: 200,
+    url,
+    headers: new Headers({ 'content-type': 'image/png' }),
+    body: { cancel },
+  } as unknown as Response
 }

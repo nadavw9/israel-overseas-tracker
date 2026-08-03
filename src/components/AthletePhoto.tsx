@@ -1,24 +1,15 @@
 import { useState } from 'react'
 import { UserRound } from 'lucide-react'
-import type { Athlete } from '../domain/athlete'
+import { publicMediaSchema, type Athlete } from '../domain/athlete'
 import { useI18n } from '../i18n/context'
 
-export function AthletePhoto({ athlete }: { athlete: Athlete }) {
-  const [failed, setFailed] = useState(false)
+export function AthletePhoto({ athlete, attributionMode = 'link' }: { athlete: Athlete, attributionMode?: 'link' | 'text' }) {
+  const [failedUrl, setFailedUrl] = useState<string>()
   const { messages } = useI18n()
-  const image = athlete.image
+  const parsedImage = publicMediaSchema.safeParse(athlete.image)
+  const image = parsedImage.success ? parsedImage.data : undefined
 
-  const approvedImage = image &&
-    image.rightsStatus === 'approved' &&
-    typeof image.url === 'string' && image.url.trim() !== '' &&
-    typeof image.sourceUrl === 'string' && image.sourceUrl.trim() !== '' &&
-    typeof image.alt === 'string' && image.alt.trim() !== '' &&
-    typeof image.rightsHolder === 'string' && image.rightsHolder.trim() !== '' &&
-    typeof image.license === 'string' && image.license.trim() !== '' &&
-    typeof image.usage === 'string' && image.usage.trim() !== '' &&
-    typeof image.retrievedAt === 'string' && image.retrievedAt.trim() !== ''
-
-  if (!approvedImage || failed) {
+  if (!image || failedUrl === image.url) {
     return (
       <div className="athlete-photo athlete-photo--fallback" aria-label={messages.photoUnavailable}>
         <UserRound size={76} strokeWidth={1.2} aria-hidden="true" />
@@ -33,17 +24,13 @@ export function AthletePhoto({ athlete }: { athlete: Athlete }) {
       <img
         src={image.url}
         alt={image.alt}
-        onError={() => setFailed(true)}
+        onError={() => setFailedUrl(image.url)}
       />
-      <a
-        className="athlete-photo__attribution"
-        href={image.sourceUrl}
-        target="_blank"
-        rel="noreferrer"
-        aria-label={`Image rights: ${attribution}`}
-      >
-        {attribution}
-      </a>
+      {attributionMode === 'link' ? (
+        <a className="athlete-photo__attribution" href={image.sourceUrl} target="_blank" rel="noreferrer" aria-label={`Image rights: ${attribution}`}>
+          {attribution}
+        </a>
+      ) : <span className="athlete-photo__attribution" aria-label={`Image rights: ${attribution}`}>{attribution}</span>}
     </div>
   )
 }

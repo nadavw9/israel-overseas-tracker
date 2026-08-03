@@ -52,7 +52,7 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
           {String(rank).padStart(2, '0')}
         </span>
         <div className="athlete-card__visual">
-          <AthletePhoto athlete={athlete} />
+          <AthletePhoto athlete={athlete} attributionMode="text" />
           <span className="athlete-card__sport">
             {athlete.sport in messages.sports
               ? messages.sports[athlete.sport as keyof typeof messages.sports]
