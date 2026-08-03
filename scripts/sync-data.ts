@@ -4,7 +4,7 @@ import { dirname, extname, join, basename } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { z } from 'zod'
 import { parseCuratedRecord } from './providers/curated'
-import { parseNbaFixture } from './providers/nba'
+import { parseNbaFixture, parseNbaSeasonEndingYear } from './providers/nba'
 import { parseNhlFixture } from './providers/nhl'
 import type { ProviderResult } from './providers/types'
 import { compilePublicRegistry, type RegistryAthlete } from '../src/data/registry'
@@ -39,11 +39,7 @@ export async function fetchProviderRecord(
   }
 
   if (entry.binding.provider === 'espn-nba') {
-    const seasonSuffix = entry.affiliation.season.split('-').at(-1)
-    if (!seasonSuffix || !/^\d{2}$/.test(seasonSuffix)) {
-      throw new Error(`Unsupported NBA season format for ${entry.id}: ${entry.affiliation.season}`)
-    }
-    const seasonYear = 2000 + Number(seasonSuffix)
+    const seasonYear = parseNbaSeasonEndingYear(entry.affiliation.season)
     const sourceUrl = `https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/${seasonYear}/types/2/athletes/${entry.binding.externalId}/statistics?lang=en&region=us`
     const response = await fetcher(sourceUrl)
     if (!response.ok) {

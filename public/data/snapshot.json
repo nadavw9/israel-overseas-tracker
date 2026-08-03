@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-03T22:24:42.764Z",
+  "generatedAt": "2026-08-03T22:48:54.317Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -56,7 +56,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-03T22:24:42.764Z"
+          "retrievedAt": "2026-08-03T22:48:54.317Z"
         }
       }
     },
@@ -89,8 +89,8 @@
         "rosterStatus": "active",
         "countsAsOverseas": true,
         "source": {
-          "publisher": "NBA G League",
-          "sourceUrl": "https://gleague.nba.com/player/1642879/ben-saraf",
+          "publisher": "NBA",
+          "sourceUrl": "https://www.nba.com/player/1642879/ben-saraf",
           "retrievedAt": "2026-07-23T08:00:00.000Z"
         },
         "location": {
@@ -115,7 +115,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5242502/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-03T22:24:42.764Z"
+          "retrievedAt": "2026-08-03T22:48:54.317Z"
         }
       }
     },

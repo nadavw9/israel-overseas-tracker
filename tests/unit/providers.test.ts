@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import deniFixture from '../../data/fixtures/nba-deni.json'
 import zeevFixture from '../../data/fixtures/nhl-zeev.json'
 import { parseCuratedRecord } from '../../scripts/providers/curated'
-import { parseNbaFixture } from '../../scripts/providers/nba'
+import { parseNbaFixture, parseNbaSeasonEndingYear } from '../../scripts/providers/nba'
 import { parseNhlFixture } from '../../scripts/providers/nhl'
 import * as providerTypes from '../../scripts/providers/types'
 
@@ -169,6 +169,19 @@ describe('curated provider', () => {
     expect(result).toMatchObject({ sport: 'football', competition: 'Eredivisie', season: '2025-26' })
   })
 
+  it('accepts a full-taxonomy tennis identity-only record', () => {
+    const result = parseCuratedRecord('athlete-one', {
+      sport: 'tennis',
+      competition: 'ITF World Tennis Tour',
+      season: '2026',
+      sourceUrl: 'https://example.com/itf/athlete-one',
+      retrievedAt: '2026-07-23T08:00:00.000Z',
+      stats: null,
+    })
+
+    expect(result).toMatchObject({ athleteId: 'athlete-one', sport: 'tennis', stats: null })
+  })
+
   it('rejects an athlete reference from another league even when IDs match', () => {
     const wrongLeague = structuredClone(deniFixture)
     wrongLeague.athlete.$ref = wrongLeague.athlete.$ref.replace('/leagues/nba/', '/leagues/wnba/')
@@ -193,5 +206,30 @@ describe('provider result contract', () => {
 
   it('rejects stats whose kind differs from provider sport', () => {
     expect(providerResultSchema.safeParse({ ...valid, sport: 'football' }).success).toBe(false)
+  })
+
+  it('allows full-taxonomy sports only when the result is identity-only', () => {
+    expect(providerResultSchema.safeParse({ ...valid, sport: 'tennis', stats: null }).success).toBe(true)
+    expect(providerResultSchema.safeParse({ ...valid, sport: 'tennis' }).success).toBe(false)
+  })
+})
+
+describe('NBA season parsing', () => {
+  it.each([
+    ['2025-26', 2026],
+    ['2099-00', 2100],
+  ] as const)('maps canonical consecutive season %s to ESPN ending year %s', (season, endingYear) => {
+    expect(parseNbaSeasonEndingYear(season)).toBe(endingYear)
+  })
+
+  it.each([
+    'NBA-2025-26',
+    '2025-27',
+    '25-26',
+    '20255-26',
+    '1945-46',
+    '9999-00',
+  ])('rejects non-canonical or unsupported NBA season %s', (season) => {
+    expect(() => parseNbaSeasonEndingYear(season)).toThrow(/NBA season/i)
   })
 })

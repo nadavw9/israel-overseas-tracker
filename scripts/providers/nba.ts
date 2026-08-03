@@ -34,6 +34,24 @@ const fields = {
   avgAssists: 'assistsPerGame',
 } as const
 
+/** The NBA/BAA historical record begins in 1946; future canonical seasons remain valid. */
+export const NBA_SEASON_START_YEAR = 1946
+
+export function parseNbaSeasonEndingYear(season: string): number {
+  const match = /^(\d{4})-(\d{2})$/.exec(season)
+  if (!match) throw new Error(`Unsupported NBA season: ${season}`)
+
+  const startYear = Number(match[1])
+  if (startYear < NBA_SEASON_START_YEAR || startYear > 9998) {
+    throw new Error(`Unsupported NBA season: ${season}`)
+  }
+  const endingYear = startYear + 1
+  if (match[2] !== String(endingYear).slice(-2)) {
+    throw new Error(`Unsupported NBA season: ${season}`)
+  }
+  return endingYear
+}
+
 function referenceMatches(reference: string, expectedPath: string): boolean {
   const url = new URL(reference)
   return url.hostname === 'sports.core.api.espn.com' && url.pathname === expectedPath

@@ -73,8 +73,15 @@ function publicRegistryFields(entry: RegistryAthlete): Omit<Athlete, 'performanc
   }
 }
 
-function normalizeRecord(entry: RegistryAthlete, result: ProviderResult): Athlete {
+function normalizeRecord(entry: RegistryAthlete, result: ProviderResult, now: Date): Athlete {
   result = providerResultSchema.parse(result)
+  const retrievedMilliseconds = new Date(result.retrievedAt).getTime()
+  if (retrievedMilliseconds > now.getTime()) {
+    throw new Error(`Provider observation cannot be in the future for ${entry.id}`)
+  }
+  if (result.stats !== null && !isObservationWithinRetention(result.retrievedAt, now)) {
+    throw new Error(`Provider performance is outside the 48-hour retention window for ${entry.id}`)
+  }
   if (result.athleteId !== entry.id) {
     throw new Error(
       `Provider identity mismatch: expected ${entry.id}, received ${result.athleteId}`,
@@ -168,7 +175,7 @@ export async function buildSnapshot({
     const entry = entries[index]
     if (entry === undefined) throw new Error(`Missing registry entry at index ${index}`)
     return result.status === 'fulfilled'
-      ? normalizeRecord(entry, result.value)
+      ? normalizeRecord(entry, result.value, now)
       : staleRecord(entry, previous, result.reason, now)
   })
 

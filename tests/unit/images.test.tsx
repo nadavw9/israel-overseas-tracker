@@ -6,12 +6,57 @@ import { AthleteDrawer } from '../../src/components/AthleteDrawer'
 import { AthletePhoto } from '../../src/components/AthletePhoto'
 import { publicRegistry } from '../../src/data/registry'
 import { publicMediaSchema, type Athlete } from '../../src/domain/athlete'
-import { validateImages } from '../../scripts/validate-images'
+import { assertImageManifestMatchesSnapshot, validateImages } from '../../scripts/validate-images'
 import registryMedia from '../../data/registry/media.json'
 import snapshot from '../../public/data/snapshot.json'
 import manifest from '../../public/images/athletes/manifest.json'
 
 describe('athlete imagery', () => {
+  it('accepts the current empty snapshot and empty manifest boundary', () => {
+    expect(typeof assertImageManifestMatchesSnapshot).toBe('function')
+    expect(assertImageManifestMatchesSnapshot(snapshot, manifest)).toEqual({})
+  })
+
+  it('rejects a snapshot approved image missing from the manifest', () => {
+    expect(typeof assertImageManifestMatchesSnapshot).toBe('function')
+    expect(() => assertImageManifestMatchesSnapshot({
+      ...snapshot,
+      athletes: [athleteWithImage()],
+    }, {})).toThrow(/missing|manifest/i)
+  })
+
+  it('rejects an orphan manifest entry', () => {
+    expect(typeof assertImageManifestMatchesSnapshot).toBe('function')
+    expect(() => assertImageManifestMatchesSnapshot(snapshot, {
+      orphan: approvedImage(),
+    })).toThrow(/orphan|snapshot/i)
+  })
+
+  it('rejects manifest metadata that differs from the snapshot', () => {
+    expect(typeof assertImageManifestMatchesSnapshot).toBe('function')
+    const athlete = athleteWithImage()
+    expect(() => assertImageManifestMatchesSnapshot({ ...snapshot, athletes: [athlete] }, {
+      [athlete.id]: { ...approvedImage(), alt: 'Mismatched portrait' },
+    })).toThrow(/metadata|mismatch/i)
+  })
+
+  it('returns an exact approved manifest for subsequent fetch validation', async () => {
+    expect(typeof assertImageManifestMatchesSnapshot).toBe('function')
+    const athlete = athleteWithImage()
+    const exact = { [athlete.id]: approvedImage() }
+    const manifestForFetch = assertImageManifestMatchesSnapshot(
+      { ...snapshot, athletes: [athlete] },
+      exact,
+    )
+    let fetched = 0
+
+    await expect(validateImages(manifestForFetch, async () => {
+      fetched += 1
+      return new Response('', { headers: { 'content-type': 'image/png' } })
+    })).resolves.toBe(1)
+    expect(fetched).toBe(1)
+  })
+
   it('ships only schema-valid approved media and excludes review source URLs', () => {
     expect(publicRegistry.every((athlete) => athlete.image === undefined || publicMediaSchema.safeParse(athlete.image).success)).toBe(true)
     expect(snapshot.athletes.every((athlete) => athlete.image === undefined || publicMediaSchema.safeParse(athlete.image).success)).toBe(true)

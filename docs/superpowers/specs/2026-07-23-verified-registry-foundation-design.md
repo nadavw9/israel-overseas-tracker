@@ -1,7 +1,8 @@
 # Verified Registry and Coverage Foundation Design
 
 **Date:** 23 July 2026  
-**Status:** Approved direction; written specification pending user review  
+**Status:** Implemented and approved as the registry foundation
+
 **Project:** Israel Overseas Sports Tracker
 
 ## Summary

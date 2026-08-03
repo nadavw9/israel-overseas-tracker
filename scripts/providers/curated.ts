@@ -1,10 +1,11 @@
 import { z } from 'zod'
 import { athleteStatsSchema, httpsUrlSchema } from '../../src/domain/athlete'
+import { sportSchema } from '../../src/domain/taxonomy'
 import type { ProviderResult } from './types'
 import { providerResultSchema } from './types'
 
 const curatedRecordSchema = z.object({
-  sport: z.enum(['basketball', 'football', 'hockey']),
+  sport: sportSchema,
   competition: z.string().trim().min(1),
   season: z.string().trim().min(1),
   sourceUrl: httpsUrlSchema,

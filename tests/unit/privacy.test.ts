@@ -3,8 +3,9 @@ import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 import { build } from 'vite'
 import { describe, expect, it } from 'vitest'
+import { candidateQueueSchema } from '../../src/domain/registry'
 
-type ReviewCandidate = { id: string; reviewerNote: string }
+type ReviewCandidate = ReturnType<typeof candidateQueueSchema.parse>[number]
 type Artifact = { file: string; content: string }
 
 function collectFiles(directory: string): string[] {
@@ -23,19 +24,13 @@ function emittedArtifacts(directory: string): Artifact[] {
 
 function reviewCandidates(): ReviewCandidate[] {
   const candidates = JSON.parse(readFileSync('data/review/candidates.json', 'utf8')) as unknown
-  if (!Array.isArray(candidates)) throw new Error('Review candidates must be an array')
+  return candidateQueueSchema.parse(candidates)
+}
 
-  return candidates.map((candidate) => {
-    if (
-      candidate === null ||
-      typeof candidate !== 'object' ||
-      typeof candidate.id !== 'string' ||
-      typeof candidate.reviewerNote !== 'string'
-    ) {
-      throw new Error('Review candidate must have an id and reviewer note')
-    }
-    return candidate as ReviewCandidate
-  })
+function candidateProviderIdentifiers(candidates: ReviewCandidate[]): string[] {
+  return [...new Set(candidates.flatMap((candidate) => candidate.signals.flatMap((signal) =>
+    `${signal.sourceUrl}\n${signal.note}`.match(/\b\d{6,}\b/g) ?? [],
+  )))]
 }
 
 function containsBirthDateKey(value: unknown): boolean {
@@ -53,7 +48,17 @@ function assertNoPrivateContent(artifacts: Artifact[], candidates: ReviewCandida
 
   for (const candidate of candidates) {
     if (content.includes(candidate.id.toLocaleLowerCase())) throw new Error(`Leaked private candidate id: ${candidate.id}`)
+    if (content.includes(candidate.name.en.toLocaleLowerCase())) throw new Error(`Leaked private candidate English name: ${candidate.id}`)
+    if (content.includes(candidate.name.he.toLocaleLowerCase())) throw new Error(`Leaked private candidate Hebrew name: ${candidate.id}`)
+    for (const signal of candidate.signals) {
+      if (content.includes(signal.note.toLocaleLowerCase())) throw new Error(`Leaked private signal note for: ${candidate.id}`)
+    }
     if (content.includes(candidate.reviewerNote.toLocaleLowerCase())) throw new Error(`Leaked private reviewer note for: ${candidate.id}`)
+  }
+  for (const providerIdentifier of candidateProviderIdentifiers(candidates)) {
+    if (content.includes(providerIdentifier.toLocaleLowerCase())) {
+      throw new Error(`Leaked private provider identifier: ${providerIdentifier}`)
+    }
   }
   if (content.includes('reviewernote')) throw new Error('Leaked private reviewer-note field')
   if (birthDateField.test(content)) throw new Error('Leaked full birth-date field')
@@ -71,9 +76,14 @@ describe('privacy defaults', () => {
 
   it('rejects a synthetic emitted private-candidate leak', () => {
     const candidates = reviewCandidates()
+    const providerIdentifiers = candidateProviderIdentifiers(candidates)
     expect(candidates).not.toHaveLength(0)
     expect(candidates.map(({ id }) => id)).toEqual(expect.arrayContaining(['danny-wolf', 'zeev-buium']))
+    expect(candidates.every(({ name }) => name.en.trim().length > 0 && name.he.trim().length > 0)).toBe(true)
+    expect(candidates.every(({ signals }) => signals.length > 0 && signals.every(({ note }) => note.trim().length > 0))).toBe(true)
     expect(candidates.every(({ reviewerNote }) => reviewerNote.trim().length > 0)).toBe(true)
+    expect(providerIdentifiers).toEqual(expect.arrayContaining(['5107173', '8484798']))
+    expect(providerIdentifiers).not.toHaveLength(0)
 
     expect(() => assertNoPrivateContent([
       { file: 'assets/leak.js', content: `const candidate = '${candidates[0]?.id}'` },
@@ -81,6 +91,18 @@ describe('privacy defaults', () => {
     expect(() => assertNoPrivateContent([
       { file: 'assets/leak.js', content: `const note = '${candidates[0]?.reviewerNote}'` },
     ], candidates)).toThrow(/Leaked private reviewer note/)
+    expect(() => assertNoPrivateContent([
+      { file: 'assets/leak.js', content: `const name = '${candidates[0]?.name.en}'` },
+    ], candidates)).toThrow(/Leaked private candidate English name/)
+    expect(() => assertNoPrivateContent([
+      { file: 'assets/leak.js', content: `const name = '${candidates[0]?.name.he}'` },
+    ], candidates)).toThrow(/Leaked private candidate Hebrew name/)
+    expect(() => assertNoPrivateContent([
+      { file: 'assets/leak.js', content: `const providerId = '${providerIdentifiers[0]}'` },
+    ], candidates)).toThrow(/Leaked private provider identifier/)
+    expect(() => assertNoPrivateContent([
+      { file: 'assets/leak.js', content: `const note = '${candidates[0]?.signals[0]?.note}'` },
+    ], candidates)).toThrow(/Leaked private signal note/)
     expect(() => assertNoPrivateContent([
       { file: 'assets/leak.js', content: 'const record = { reviewerNote: "private" }' },
     ], candidates)).toThrow(/Leaked private reviewer-note field/)

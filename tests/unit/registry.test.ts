@@ -26,6 +26,20 @@ describe('registry compiler', () => {
   it('does not publish media without approved rights', () => {
     expect(publicRegistry.every((athlete) => athlete.image === undefined)).toBe(true)
   })
+
+  it('keeps Ben Saraf eligibility and affiliation provenance distinct and correct', () => {
+    const ben = publicRegistry.find((athlete) => athlete.id === 'ben-saraf')
+
+    expect(ben?.eligibility).toMatchObject({
+      publisher: 'FIBA',
+      sourceUrl: 'https://reports.fiba.basketball/reports/2025/FIBA%20U19%20Basketball%20World%20Cup/rosters.pdf',
+    })
+    expect(ben?.affiliation.source).toEqual({
+      publisher: 'NBA',
+      sourceUrl: 'https://www.nba.com/player/1642879/ben-saraf',
+      retrievedAt: '2026-07-23T08:00:00.000Z',
+    })
+  })
 })
 
 describe('candidate queue', () => {
@@ -58,6 +72,17 @@ describe('candidate queue', () => {
 })
 
 describe('injectable registry compiler', () => {
+  it('compiles the schema-valid public tennis fixture without mutation', () => {
+    const [athlete] = compileRegistryBundle(registryBundleFixture, '2026-07-23T08:00:00.000Z')
+
+    expect(athlete).toMatchObject({
+      id: 'athlete-one',
+      sport: 'tennis',
+      binding: { provider: 'curated', sport: 'tennis' },
+      affiliation: { competition: 'ITF World Tennis Tour' },
+    })
+  })
+
   it('compiles a recent free agent using its released affiliation', () => {
     const bundle = structuredClone(registryBundleFixture)
     bundle.athletes[0].sport = 'basketball'
@@ -138,4 +163,20 @@ describe('injectable registry compiler', () => {
 
     expect(() => compileRegistryBundle(bundle, '2026-07-23T08:00:00Z')).toThrow(/affiliation/i)
   })
+
+  it.each(['loan', 'reserve', 'injured', 'suspended', 'released', 'unknown'] as const)(
+    'refuses to compile a second current primary %s affiliation',
+    (rosterStatus) => {
+      const bundle = structuredClone(registryBundleFixture)
+      bundle.affiliations.push({
+        ...bundle.affiliations[0],
+        id: `affiliation-athlete-one-${rosterStatus}`,
+        rosterStatus,
+      })
+
+      expect(() => compileRegistryBundle(bundle, '2026-07-23T08:00:00.000Z')).toThrow(
+        /exactly one current primary overseas affiliation/i,
+      )
+    },
+  )
 })

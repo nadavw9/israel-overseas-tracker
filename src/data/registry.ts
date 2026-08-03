@@ -17,7 +17,6 @@ type Eligibility = RegistryBundle['evidence'][number]
 type Affiliation = RegistryBundle['affiliations'][number]
 type Binding = RegistryBundle['providerBindings'][number]
 type Media = RegistryBundle['media'][number]
-type SnapshotSport = 'basketball' | 'football' | 'hockey'
 type VerifiedEligibility = Eligibility & { status: 'verified' }
 type VerifiedBinding = Binding & { status: 'verified' }
 export type ApprovedMedia = Media & {
@@ -26,8 +25,7 @@ export type ApprovedMedia = Media & {
   license: NonNullable<Media['license']>
 }
 
-export type RegistryAthlete = Omit<AthleteIdentity, 'sport'> & {
-  sport: SnapshotSport
+export type RegistryAthlete = AthleteIdentity & {
   eligibility: VerifiedEligibility
   affiliation: Affiliation
   binding: VerifiedBinding
@@ -42,9 +40,6 @@ const bundledData = {
   media: mediaJson,
 }
 
-function isSnapshotSport(sport: AthleteIdentity['sport']): sport is SnapshotSport {
-  return sport === 'basketball' || sport === 'football' || sport === 'hockey'
-}
 function isVerifiedEligibility(claim: Eligibility): claim is VerifiedEligibility { return claim.status === 'verified' }
 function isVerifiedBinding(binding: Binding): binding is VerifiedBinding { return binding.status === 'verified' }
 function isApprovedMedia(media: Media): media is ApprovedMedia {
@@ -78,7 +73,15 @@ function releaseCutoff(asOfDate: string) {
 function selectAffiliation(bundle: RegistryBundle, athlete: AthleteIdentity, asOfDate: string, asOfMilliseconds: number): Affiliation {
   const primaryOverseas = bundle.affiliations.filter((record) => record.athleteId === athlete.id && record.primary && record.countsAsOverseas && registryInstantMs(record.source.retrievedAt) <= asOfMilliseconds)
   if (athlete.lifecycleStatus === 'active' || athlete.lifecycleStatus === 'injured') {
-    return exactly(primaryOverseas.filter((record) => current(record, asOfDate) && record.rosterStatus === 'active'), 'current primary active overseas affiliation', athlete.id)
+    const affiliation = exactly(
+      primaryOverseas.filter((record) => current(record, asOfDate)),
+      'current primary overseas affiliation',
+      athlete.id,
+    )
+    if (affiliation.rosterStatus !== 'active') {
+      throw new Error(`The current primary overseas affiliation must have active roster status for ${athlete.id}`)
+    }
+    return affiliation
   }
   if (athlete.lifecycleStatus === 'free-agent') {
     if (primaryOverseas.some((record) => current(record, asOfDate))) throw new Error(`A public free agent cannot have a current primary overseas affiliation for ${athlete.id}`)
@@ -91,7 +94,6 @@ export function compileRegistryBundle(input: unknown, asOf: RegistryAsOf): Regis
   const { date: asOfDate, instant: asOfInstant, milliseconds: asOfMilliseconds } = normalizeRegistryAsOf(asOf)
   const bundle = createRegistryBundleSchema(asOfInstant).parse(input)
   return bundle.athletes.filter((athlete) => athlete.visibility === 'public').map((athlete) => {
-    if (!isSnapshotSport(athlete.sport)) throw new Error(`Unsupported public snapshot sport for ${athlete.id}: ${athlete.sport}`)
     const affiliation = selectAffiliation(bundle, athlete, asOfDate, asOfMilliseconds)
     const eligibility = newest(bundle.evidence.filter((claim): claim is VerifiedEligibility => claim.athleteId === athlete.id && isVerifiedEligibility(claim) && registryInstantMs(claim.retrievedAt) <= asOfMilliseconds), 'retrievedAt', 'verified eligibility claim', athlete.id)
     const binding = newest(bundle.providerBindings.filter((record): record is VerifiedBinding => record.athleteId === athlete.id && isVerifiedBinding(record) && registryInstantMs(record.verifiedAt) <= asOfMilliseconds && record.competition === affiliation.competition), 'verifiedAt', 'verified provider binding matching affiliation competition', athlete.id)

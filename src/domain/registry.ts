@@ -31,7 +31,7 @@ const recordIdSchema = nonEmptyStringSchema
 export const localizedNameSchema = z.object({
   en: nonEmptyStringSchema,
   he: nonEmptyStringSchema,
-})
+}).strict()
 
 export const identityMatchFieldSchema = z.enum([
   'name',
@@ -65,7 +65,7 @@ export const athleteIdentitySchema = z.object({
   visibility: visibilitySchema,
   birthDate: z.iso.date().optional(),
   paraClassification: nonEmptyStringSchema.optional(),
-})
+}).strict()
 
 const matchedOnSchema = z.array(identityMatchFieldSchema).min(1)
 
@@ -78,26 +78,26 @@ export const eligibilityEvidenceSchema = z.object({
   sourceUrl: httpsUrlSchema,
   retrievedAt: z.iso.datetime(),
   matchedOn: matchedOnSchema,
-})
+}).strict()
 
 export const organizationSchema = z.object({
   name: nonEmptyStringSchema,
   type: organizationTypeSchema,
   country: nonEmptyStringSchema,
-})
+}).strict()
 
 export const locationSchema = z.object({
   city: nonEmptyStringSchema,
   country: nonEmptyStringSchema,
   lat: z.number().gte(-90).lte(90),
   lng: z.number().gte(-180).lte(180),
-})
+}).strict()
 
 const sourceSchema = z.object({
   publisher: nonEmptyStringSchema,
   sourceUrl: httpsUrlSchema,
   retrievedAt: z.iso.datetime(),
-})
+}).strict()
 
 export const affiliationSchema = z
   .object({
@@ -114,6 +114,7 @@ export const affiliationSchema = z
     source: sourceSchema,
     location: locationSchema.optional(),
   })
+  .strict()
   .superRefine((affiliation, context) => {
     if (affiliation.endDate && affiliation.endDate < affiliation.startDate) {
       context.addIssue({
@@ -139,7 +140,7 @@ export const providerBindingSchema = z.object({
       message: 'Provider identity matches must use distinct fields',
     }),
   verifiedAt: z.iso.datetime(),
-})
+}).strict()
 
 export const mediaAssetSchema = z
   .object({
@@ -155,6 +156,7 @@ export const mediaAssetSchema = z
     retrievedAt: z.iso.datetime(),
     alt: nonEmptyStringSchema,
   })
+  .strict()
   .superRefine((asset, context) => {
     if (asset.rightsStatus !== 'approved') return
 
@@ -232,6 +234,7 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
     providerBindings: z.array(providerBindingSchema),
     media: z.array(mediaAssetSchema),
   })
+  .strict()
   .superRefine((bundle, context) => {
     const recentReleaseCutoff = new Date(`${asOfDate}T00:00:00.000Z`)
     recentReleaseCutoff.setUTCDate(recentReleaseCutoff.getUTCDate() - 90)
@@ -341,18 +344,24 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
 
       let qualifyingCompetition: string | undefined
       if (athlete.lifecycleStatus === 'active' || athlete.lifecycleStatus === 'injured') {
-        const currentActiveAffiliations = currentPrimaryOverseasAffiliations.filter(
-          (affiliation) => affiliation.rosterStatus === 'active',
-        )
-        if (currentActiveAffiliations.length !== 1) {
+        if (currentPrimaryOverseasAffiliations.length !== 1) {
           context.addIssue({
             code: 'custom',
             message:
-              'An active or injured public athlete requires exactly one current primary overseas active affiliation',
+              'An active or injured public athlete requires exactly one current primary overseas affiliation',
+            path: ['athletes', athleteIndex, 'lifecycleStatus'],
+          })
+        } else if (currentPrimaryOverseasAffiliations[0]?.rosterStatus !== 'active') {
+          context.addIssue({
+            code: 'custom',
+            message: 'The current primary overseas affiliation must have active roster status',
             path: ['athletes', athleteIndex, 'lifecycleStatus'],
           })
         }
-        qualifyingCompetition = currentActiveAffiliations[0]?.competition
+        const currentAffiliation = currentPrimaryOverseasAffiliations[0]
+        qualifyingCompetition = currentAffiliation?.rosterStatus === 'active'
+          ? currentAffiliation.competition
+          : undefined
       } else if (athlete.lifecycleStatus === 'free-agent') {
         if (currentPrimaryOverseasAffiliations.length !== 0) {
           context.addIssue({
@@ -411,7 +420,7 @@ const candidateSignalSchema = z.object({
   sourceType: z.enum(['primary-verification', 'discovery-only']),
   discoveredAt: z.iso.datetime(),
   note: nonEmptyStringSchema,
-})
+}).strict()
 
 export const candidateSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
@@ -427,6 +436,7 @@ export const candidateSchema = z.object({
       competition: nonEmptyStringSchema,
       season: z.string().trim().min(4),
     })
+    .strict()
     .optional(),
   location: locationSchema.optional(),
   reviewerNote: nonEmptyStringSchema,

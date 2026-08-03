@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { pathToFileURL } from 'node:url'
 import { z } from 'zod'
-import { httpsUrlSchema, publicMediaSchema } from '../src/domain/athlete'
+import { httpsUrlSchema, publicMediaSchema, snapshotSchema } from '../src/domain/athlete'
 
 const athleteIdSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
   message: 'Manifest athlete ID must be a slug',
@@ -18,11 +18,7 @@ function cancelResponseBody(response: Response | undefined) {
   if (cancellation) void cancellation.catch(() => {})
 }
 
-export async function validateImages(
-  input: unknown,
-  fetcher: typeof fetch = fetch,
-  { timeoutMs = defaultTimeoutMs }: ValidationOptions = {},
-): Promise<number> {
+function parseManifest(input: unknown): ImageManifest {
   const parsedManifest = manifestSchema.safeParse(input)
   if (!parsedManifest.success) {
     const missingRightsHolder = parsedManifest.error.issues.some(
@@ -31,7 +27,42 @@ export async function validateImages(
     if (missingRightsHolder) throw new Error('Approved image requires a rights holder')
     throw parsedManifest.error
   }
-  const manifest = parsedManifest.data
+  return parsedManifest.data
+}
+
+export function assertImageManifestMatchesSnapshot(
+  snapshotInput: unknown,
+  manifestInput: unknown,
+): ImageManifest {
+  const snapshot = snapshotSchema.parse(snapshotInput)
+  const manifest = parseManifest(manifestInput)
+  const expected = Object.fromEntries(
+    snapshot.athletes.flatMap((athlete) => athlete.image ? [[athlete.id, athlete.image]] : []),
+  ) as ImageManifest
+
+  for (const athleteId of Object.keys(expected)) {
+    if (manifest[athleteId] === undefined) {
+      throw new Error(`Snapshot image missing from manifest for ${athleteId}`)
+    }
+  }
+  for (const athleteId of Object.keys(manifest)) {
+    if (expected[athleteId] === undefined) {
+      throw new Error(`Orphan manifest image not present in snapshot for ${athleteId}`)
+    }
+    if (JSON.stringify(manifest[athleteId]) !== JSON.stringify(expected[athleteId])) {
+      throw new Error(`Manifest image metadata mismatch for ${athleteId}`)
+    }
+  }
+
+  return manifest
+}
+
+export async function validateImages(
+  input: unknown,
+  fetcher: typeof fetch = fetch,
+  { timeoutMs = defaultTimeoutMs }: ValidationOptions = {},
+): Promise<number> {
+  const manifest = parseManifest(input)
   const seen = new Set<string>()
 
   for (const [athleteId, image] of Object.entries(manifest)) {
@@ -88,12 +119,17 @@ export async function validateImages(
 }
 
 async function run() {
+  const snapshotUrl = new URL('../public/data/snapshot.json', import.meta.url)
   const manifestUrl = new URL(
     '../public/images/athletes/manifest.json',
     import.meta.url,
   )
-  const manifest = JSON.parse(await readFile(manifestUrl, 'utf8'))
-  const count = await validateImages(manifest)
+  const [snapshot, manifest] = await Promise.all([
+    readFile(snapshotUrl, 'utf8').then((contents) => JSON.parse(contents)),
+    readFile(manifestUrl, 'utf8').then((contents) => JSON.parse(contents)),
+  ])
+  const boundManifest = assertImageManifestMatchesSnapshot(snapshot, manifest)
+  const count = await validateImages(boundManifest)
   console.log(`Validated ${count} athlete images`)
 }
 

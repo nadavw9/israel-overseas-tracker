@@ -34,6 +34,39 @@ const candidateFixture = {
 } as const
 
 describe('normalized registry schemas', () => {
+  it.each([
+    ['bundle', (bundle: Record<string, unknown>) => { bundle.unexpected = true }],
+    ['athlete row', (bundle: Record<string, unknown>) => { ((bundle.athletes as Record<string, unknown>[])[0]!).unexpected = true }],
+    ['evidence row', (bundle: Record<string, unknown>) => { ((bundle.evidence as Record<string, unknown>[])[0]!).unexpected = true }],
+    ['affiliation row', (bundle: Record<string, unknown>) => { ((bundle.affiliations as Record<string, unknown>[])[0]!).unexpected = true }],
+    ['provider binding row', (bundle: Record<string, unknown>) => { ((bundle.providerBindings as Record<string, unknown>[])[0]!).unexpected = true }],
+    ['media row', (bundle: Record<string, unknown>) => { ((bundle.media as Record<string, unknown>[])[0]!).unexpected = true }],
+    ['athlete name', (bundle: Record<string, unknown>) => {
+      const athlete = (bundle.athletes as Record<string, unknown>[])[0]!
+      ;(athlete.name as Record<string, unknown>).unexpected = true
+    }],
+    ['affiliation organization', (bundle: Record<string, unknown>) => {
+      const affiliation = (bundle.affiliations as Record<string, unknown>[])[0]!
+      ;(affiliation.organization as Record<string, unknown>).unexpected = true
+    }],
+    ['affiliation source', (bundle: Record<string, unknown>) => {
+      const affiliation = (bundle.affiliations as Record<string, unknown>[])[0]!
+      ;(affiliation.source as Record<string, unknown>).unexpected = true
+    }],
+    ['affiliation location', (bundle: Record<string, unknown>) => {
+      const affiliation = (bundle.affiliations as Record<string, unknown>[])[0]!
+      affiliation.location = {
+        city: 'London', country: 'United Kingdom', lat: 51.5072, lng: -0.1276,
+        unexpected: true,
+      }
+    }],
+  ])('rejects unknown keys at the normalized %s boundary', (_boundary, mutate) => {
+    const bundle = structuredClone(registryBundleFixture) as unknown as Record<string, unknown>
+    mutate(bundle)
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
   it('evaluates lifecycle rules against the supplied as-of instant', () => {
     const freeAgent = cloneRegistryFixture()
     freeAgent.athletes[0].lifecycleStatus = 'free-agent'
@@ -114,6 +147,20 @@ describe('normalized registry schemas', () => {
 
     expect(registryBundleSchema.safeParse(duplicateCurrentPrimary).success).toBe(false)
   })
+
+  it.each(['loan', 'reserve', 'injured', 'suspended', 'released', 'unknown'] as const)(
+    'rejects a simultaneous current primary %s affiliation alongside the active affiliation',
+    (rosterStatus) => {
+      const conflicting = cloneRegistryFixture()
+      conflicting.affiliations.push({
+        ...conflicting.affiliations[0],
+        id: `affiliation-athlete-one-${rosterStatus}`,
+        rosterStatus,
+      })
+
+      expect(registryBundleSchema.safeParse(conflicting).success).toBe(false)
+    },
+  )
 
   it('rejects a public athlete without verified eligibility', () => {
     const withoutVerifiedEligibility = structuredClone(registryBundleFixture)
@@ -260,6 +307,35 @@ describe('normalized registry schemas', () => {
     expect(candidateSchema.safeParse({ ...candidateFixture, id: 'Candidate One' }).success).toBe(
       false,
     )
+  })
+
+  it.each([
+    ['candidate', (candidate: Record<string, unknown>) => { candidate.unexpected = true }],
+    ['candidate name', (candidate: Record<string, unknown>) => {
+      ;(candidate.name as Record<string, unknown>).unexpected = true
+    }],
+    ['candidate signal', (candidate: Record<string, unknown>) => {
+      ;((candidate.signals as Record<string, unknown>[])[0]!).unexpected = true
+    }],
+    ['candidate proposed affiliation', (candidate: Record<string, unknown>) => {
+      candidate.proposedAffiliation = {
+        organization: 'Example Tennis Club',
+        competition: 'Example Tennis League',
+        season: '2026',
+        unexpected: true,
+      }
+    }],
+    ['candidate location', (candidate: Record<string, unknown>) => {
+      candidate.location = {
+        city: 'London', country: 'United Kingdom', lat: 51.5072, lng: -0.1276,
+        unexpected: true,
+      }
+    }],
+  ])('rejects unknown keys at the %s boundary', (_boundary, mutate) => {
+    const candidate = structuredClone(candidateFixture) as unknown as Record<string, unknown>
+    mutate(candidate)
+
+    expect(candidateSchema.safeParse(candidate).success).toBe(false)
   })
 
   it('requires at least one candidate signal', () => {

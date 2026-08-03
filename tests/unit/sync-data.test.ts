@@ -3,8 +3,10 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import type { AthleteSnapshot } from '../../src/domain/athlete'
-import { publicRegistry } from '../../src/data/registry'
+import { compileRegistryBundle, publicRegistry } from '../../src/data/registry'
+import { rankAthletesBySport } from '../../src/services/rankings'
 import { buildSnapshot } from '../../src/services/snapshot'
+import { registryBundleFixture } from '../fixtures/registry'
 import deniFixture from '../../data/fixtures/nba-deni.json'
 import {
   fetchProviderRecord,
@@ -280,6 +282,90 @@ describe('buildSnapshot', () => {
       now: new Date(generatedAt),
     })).rejects.toThrow(/snapshot|generated|future/i)
   })
+
+  it.each([
+    ['exact 48-hour boundary', '2026-07-21T08:00:00.000Z'],
+    ['one millisecond inside retention', '2026-07-21T08:00:00.001Z'],
+  ])('accepts fulfilled available performance at the %s', async (_case, retrievedAt) => {
+    const next = await buildSnapshot({
+      entries: [entry], previous: { athletes: [] }, coverage,
+      fetchRecord: async () => ({
+        athleteId: entry.id, ...providerContext, stats: availablePerformance().stats,
+        state: 'final', sourceUrl: 'https://example.com/retained', retrievedAt,
+      }),
+      now: new Date(generatedAt),
+    })
+
+    expect(next.athletes[0].performance.status).toBe('available')
+  })
+
+  it.each([
+    ['one millisecond outside retention', '2026-07-21T07:59:59.999Z'],
+    ['future available observation', '2026-07-23T08:00:00.001Z'],
+  ])('rejects fulfilled %s before it can enter the snapshot', async (_case, retrievedAt) => {
+    await expect(buildSnapshot({
+      entries: [entry], previous: { athletes: [] }, coverage,
+      fetchRecord: async () => ({
+        athleteId: entry.id, ...providerContext, stats: availablePerformance().stats,
+        state: 'final', sourceUrl: 'https://example.com/rejected', retrievedAt,
+      }),
+      now: new Date(generatedAt),
+    })).rejects.toThrow(/retention|future|snapshot|generated/i)
+  })
+
+  it('rejects a future fulfilled unavailable observation causally', async () => {
+    await expect(buildSnapshot({
+      entries: [entry], previous: { athletes: [] }, coverage,
+      fetchRecord: async () => ({
+        athleteId: entry.id, ...providerContext, stats: null, state: 'final',
+        sourceUrl: 'https://example.com/future-unavailable',
+        retrievedAt: '2026-07-23T08:00:00.001Z',
+      }),
+      now: new Date(generatedAt),
+    })).rejects.toThrow(/future|snapshot|generated/i)
+  })
+
+  it('allows an old fulfilled unavailable identity-only observation', async () => {
+    const next = await buildSnapshot({
+      entries: [entry], previous: { athletes: [] }, coverage,
+      fetchRecord: async () => ({
+        athleteId: entry.id, ...providerContext, stats: null, state: 'final',
+        sourceUrl: 'https://example.com/old-unavailable',
+        retrievedAt: '2026-01-01T00:00:00.000Z',
+      }),
+      now: new Date(generatedAt),
+    })
+
+    expect(next.athletes[0].performance).toMatchObject({ status: 'unavailable', stats: null })
+  })
+
+  it('publishes the valid tennis fixture identity-only and excludes it from rankings', async () => {
+    const tennisEntry = compileRegistryBundle(
+      registryBundleFixture,
+      '2026-07-23T08:00:00.000Z',
+    )[0]!
+    const next = await buildSnapshot({
+      entries: [tennisEntry], previous: { athletes: [] }, coverage,
+      fetchRecord: async () => ({
+        athleteId: tennisEntry.id,
+        sport: 'tennis',
+        competition: 'ITF World Tennis Tour',
+        season: '2026',
+        stats: null,
+        state: 'final',
+        sourceUrl: 'https://example.com/itf/athlete-one',
+        retrievedAt: generatedAt,
+      }),
+      now: new Date(generatedAt),
+    })
+
+    expect(next.athletes[0]).toMatchObject({
+      id: 'athlete-one',
+      sport: 'tennis',
+      performance: { status: 'unavailable', stats: null },
+    })
+    expect(rankAthletesBySport(next.athletes)).toEqual([])
+  })
 })
 
 describe('fetchProviderRecord', () => {
@@ -308,6 +394,18 @@ describe('fetchProviderRecord', () => {
     await expect(fetchProviderRecord(entry, fakeFetch, new Date(generatedAt))).rejects.toThrow(
       /identity mismatch/i,
     )
+  })
+
+  it('rejects a non-canonical NBA affiliation season before fetching', async () => {
+    const invalid = structuredClone(entry)
+    invalid.affiliation.season = 'NBA-2025-26'
+    let fetched = false
+
+    await expect(fetchProviderRecord(invalid, async () => {
+      fetched = true
+      return new Response(JSON.stringify(deniFixture), { status: 200 })
+    }, new Date(generatedAt))).rejects.toThrow(/NBA season/i)
+    expect(fetched).toBe(false)
   })
 })
 
