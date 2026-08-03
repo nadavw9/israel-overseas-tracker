@@ -1,12 +1,23 @@
 import { BadgeCheck, Clock3 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import type { Athlete } from '../domain/athlete'
 import { useI18n } from '../i18n/context'
-import { isObservationWithinRetention } from '../domain/observation'
+import { isObservationWithinRetention, PERFORMANCE_RETENTION_MS } from '../domain/observation'
 
 type FreshnessBadgeProps = { performance: Athlete['performance'] }
 
 export function FreshnessBadge({ performance }: FreshnessBadgeProps) {
   const { messages } = useI18n()
+  const [, updateClock] = useState(0)
+  useEffect(() => {
+    if (performance.status === 'unavailable' || performance.state === 'stale') return
+    const staleAt = new Date(performance.source.retrievedAt).getTime() + PERFORMANCE_RETENTION_MS + 1
+    const delay = staleAt - Date.now()
+    if (!Number.isFinite(delay) || delay <= 0) return
+    const timeout = setTimeout(() => updateClock((clock) => clock + 1), delay)
+    return () => clearTimeout(timeout)
+  }, [performance.source.retrievedAt, performance.state, performance.status])
+
   const freshness =
     performance.status === 'unavailable'
       ? 'identity-only'

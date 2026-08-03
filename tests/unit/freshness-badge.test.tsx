@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { FreshnessBadge } from '../../src/components/FreshnessBadge'
 import type { Athlete } from '../../src/domain/athlete'
@@ -44,6 +44,21 @@ describe('FreshnessBadge', () => {
       ...performance(), status: 'unavailable', state: 'unavailable', stats: null,
     }} />)
     expect(document.querySelector('.freshness--identity-only')).toBeInTheDocument()
+    vi.useRealTimers()
+  })
+
+  it('becomes stale one millisecond after the exact boundary without remounting', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-07-25T07:59:59.999Z'))
+    render(<FreshnessBadge performance={performance()} />)
+    const badge = document.querySelector('.freshness')
+
+    expect(badge).toHaveClass('freshness--fresh')
+    act(() => vi.advanceTimersByTime(1))
+    expect(badge).toHaveClass('freshness--fresh')
+    act(() => vi.advanceTimersByTime(1))
+    expect(badge).toHaveClass('freshness--stale')
+    expect(screen.getByText(/last verified/i)).toBeInTheDocument()
     vi.useRealTimers()
   })
 })

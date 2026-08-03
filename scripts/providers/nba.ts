@@ -51,16 +51,19 @@ export function parseNbaFixture(payload: unknown, options: NbaParserOptions): Pr
     throw new Error(`NBA season context mismatch for ${options.athleteId}`)
   }
 
-  const namedStats = new Map(
-    statistics.splits.categories.flatMap((category) => category.stats)
-      .map((stat) => [stat.name, stat] as const),
-  )
+  const allStats = statistics.splits.categories.flatMap((category) => category.stats)
   const parsed = Object.fromEntries(Object.entries(fields).map(([sourceName, targetName]) => {
-    const stat = namedStats.get(sourceName)
-    const value = Number(stat?.displayValue)
-    if (!stat || !Number.isFinite(value)) {
+    const matches = allStats.filter((stat) => stat.name === sourceName)
+    if (matches.length > 1) {
+      throw new Error(`Duplicate NBA field ${sourceName} for ${options.athleteId}`)
+    }
+    const stat = matches[0]
+    if (!stat) {
       throw new Error(`Missing NBA field ${sourceName} for ${options.athleteId}`)
     }
+    const value = targetName === 'games'
+      ? stat.value
+      : Math.round((stat.value + Number.EPSILON) * 10) / 10
     return [targetName, value]
   })) as { games: number; pointsPerGame: number; reboundsPerGame: number; assistsPerGame: number }
   if (!Number.isInteger(parsed.games)) {

@@ -34,6 +34,49 @@ describe('NBA provider', () => {
     expect(result.observedOrganization).toBeUndefined()
   })
 
+  it('uses authoritative numeric values and rounds public averages to one decimal', () => {
+    const payload = structuredClone(deniFixture)
+    const points = payload.splits.categories[0].stats.find((stat) => stat.name === 'avgPoints')
+    if (!points) throw new Error('Fixture missing avgPoints')
+    points.value = 24.26
+    points.displayValue = '   '
+
+    const result = parseNbaFixture(payload, {
+      athleteId: 'deni-avdija', externalId: '4683021', seasonYear: 2026, season: '2025-26',
+      sourceUrl: 'https://example.com/source', retrievedAt: '2026-07-19T08:00:00.000Z',
+    })
+
+    expect(result.stats).toMatchObject({ pointsPerGame: 24.3 })
+  })
+
+  it('rejects duplicate required statistic names', () => {
+    const payload = structuredClone(deniFixture)
+    payload.splits.categories[0].stats.push({ name: 'avgPoints', value: 99, displayValue: '99.0' })
+
+    expect(() => parseNbaFixture(payload, {
+      athleteId: 'deni-avdija', externalId: '4683021', seasonYear: 2026, season: '2025-26',
+      sourceUrl: 'https://example.com/source', retrievedAt: '2026-07-19T08:00:00.000Z',
+    })).toThrow(/duplicate.*avgPoints/i)
+  })
+
+  it.each([
+    ['missing', undefined],
+    ['non-finite', Number.NaN],
+  ])('rejects a %s authoritative numeric value', (_label, value) => {
+    const payload = structuredClone(deniFixture) as unknown as {
+      splits: { categories: Array<{ stats: Array<Record<string, unknown>> }> }
+    }
+    const points = payload.splits.categories[0]?.stats.find((stat) => stat.name === 'avgPoints')
+    if (!points) throw new Error('Fixture missing avgPoints')
+    if (value === undefined) delete points.value
+    else points.value = value
+
+    expect(() => parseNbaFixture(payload, {
+      athleteId: 'deni-avdija', externalId: '4683021', seasonYear: 2026, season: '2025-26',
+      sourceUrl: 'https://example.com/source', retrievedAt: '2026-07-19T08:00:00.000Z',
+    })).toThrow()
+  })
+
   it('rejects a payload that omits a required field', () => {
     const malformed = structuredClone(deniFixture)
     malformed.splits.categories[0].stats = malformed.splits.categories[0].stats.filter(

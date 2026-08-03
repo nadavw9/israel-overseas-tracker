@@ -417,4 +417,35 @@ describe('legacy snapshot migration', () => {
       athletes: [retained, review, pending, unavailable],
     }).athletes.map((athlete) => athlete.id)).toEqual(['retained'])
   })
+
+  it('never publishes future-dated legacy performance through stale fallback', async () => {
+    const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
+    const legacy = {
+      generatedAt: '2026-07-23T08:00:00.000Z',
+      athletes: [{
+        id: entry.id,
+        name: entry.name,
+        sport: 'basketball', competition: 'NBA', team: 'Portland Trail Blazers', season: '2025-26',
+        eligibility: { status: 'verified', sourceUrl: 'https://example.com/eligibility' },
+        visibility: 'public', statsStatus: 'verified',
+        stats: availablePerformance().stats,
+        source: {
+          provider: 'espn-nba', sourceUrl: 'https://example.com/stats',
+          retrievedAt: '2026-07-23T09:00:00.000Z',
+        },
+        freshness: 'fresh',
+      }],
+    } as const
+
+    const previous = parsePreviousSnapshot(legacy)
+    expect(previous.athletes).toEqual([])
+
+    await expect(buildSnapshot({
+      entries: [entry],
+      previous,
+      coverage,
+      fetchRecord: async () => { throw new Error('provider unavailable') },
+      now: new Date('2026-07-23T10:00:00.000Z'),
+    })).rejects.toThrow(/No verified data available/i)
+  })
 })

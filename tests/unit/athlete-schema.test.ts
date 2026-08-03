@@ -275,6 +275,23 @@ describe('snapshotSchema', () => {
     expect(() => snapshotSchema.parse({ ...validSnapshot, athletes: [mutate(validAthlete)] })).toThrow(/generated/i)
   })
 
+  it('reports the full affiliation source path for a future timestamp', () => {
+    const parsed = snapshotSchema.safeParse({
+      ...validSnapshot,
+      athletes: [{
+        ...validAthlete,
+        affiliation: {
+          ...validAthlete.affiliation,
+          source: { ...validAthlete.affiliation.source, retrievedAt: '2026-07-23T08:00:00.001Z' },
+        },
+      }],
+    })
+    expect(parsed.success).toBe(false)
+    if (parsed.success) throw new Error('Expected future affiliation source to fail')
+    expect(parsed.error.issues.find((issue) => /affiliation observation/i.test(issue.message))?.path)
+      .toEqual(['athletes', 0, 'affiliation', 'source', 'retrievedAt'])
+  })
+
   it.each([
     { required: 4, healthy: 5, complete: false },
     { required: 4, healthy: 4, complete: false },

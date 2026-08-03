@@ -223,7 +223,13 @@ export const snapshotSchema = z
           context.addIssue({
             code: 'custom',
             message: `${field} observation cannot be after snapshot generatedAt`,
-            path: ['athletes', index, field, 'retrievedAt'],
+            path: [
+              'athletes',
+              index,
+              field,
+              ...(field === 'affiliation' ? ['source'] : []),
+              'retrievedAt',
+            ],
           })
         }
       })

@@ -131,7 +131,8 @@ export function parsePreviousSnapshot(input: unknown): PreviousSnapshot {
       athlete.visibility === 'public' &&
       athlete.eligibility.status === 'verified' &&
       athlete.statsStatus === 'verified' &&
-      athlete.stats !== null
+      athlete.stats !== null &&
+      new Date(athlete.source.retrievedAt).getTime() <= new Date(legacy.generatedAt).getTime()
         ? [{
             id: athlete.id,
             performance: {
