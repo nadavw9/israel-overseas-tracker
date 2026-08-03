@@ -22,6 +22,7 @@ function matchesQuery(athlete: Athlete, query: string): boolean {
     athlete.name.he,
     ...athlete.aliases,
     athlete.affiliation.organization.name,
+    athlete.affiliation.organization.country,
     athlete.affiliation.competition,
     athlete.affiliation.location?.city,
     athlete.affiliation.location?.country,

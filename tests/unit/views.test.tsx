@@ -126,6 +126,63 @@ describe('rankings', () => {
     ])
   })
 
+  it('omits malformed and unsupported ranking payloads without throwing', () => {
+    const valid = snapshot.athletes[0]
+    const invalid = [
+      {
+        ...valid,
+        id: 'missing-stats',
+        performance: { ...valid.performance, stats: undefined },
+      },
+      {
+        ...valid,
+        id: 'unknown-kind',
+        performance: { ...valid.performance, stats: { kind: 'lacrosse', points: 8 } },
+      },
+      {
+        ...valid,
+        id: 'unsupported-pair',
+        sport: 'handball',
+        performance: { ...valid.performance, stats: { kind: 'handball', points: 8 } },
+      },
+      {
+        ...valid,
+        id: 'mismatched-pair',
+        sport: 'football',
+      },
+      {
+        ...valid,
+        id: 'nan-metric',
+        performance: {
+          ...valid.performance,
+          stats: { ...valid.performance.stats, pointsPerGame: Number.NaN },
+        },
+      },
+      {
+        ...valid,
+        id: 'infinite-metric',
+        performance: {
+          ...valid.performance,
+          stats: { ...valid.performance.stats, pointsPerGame: Number.POSITIVE_INFINITY },
+        },
+      },
+      {
+        ...valid,
+        id: 'malformed-metric',
+        performance: {
+          ...valid.performance,
+          stats: { ...valid.performance.stats, pointsPerGame: '24.2' },
+        },
+      },
+    ] as unknown as Athlete[]
+
+    expect(() => rankAthletesBySport([valid, ...invalid])).not.toThrow()
+    expect(rankAthletesBySport([valid, ...invalid])).toEqual([
+      { sport: 'basketball', athletes: [valid] },
+    ])
+    expect(rankAthletes([valid, ...invalid.filter((athlete) => athlete.sport === 'basketball')])).toEqual([valid])
+  })
+
   it('renders separate sport ranking sequences for mixed input', async () => {
     const user = userEvent.setup()
     const football = {

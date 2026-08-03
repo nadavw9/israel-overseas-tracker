@@ -7,7 +7,50 @@ const sportOrder: Sport[] = [
   'aquatics', 'judo', 'combat', 'gymnastics', 'sailing', 'winter-sport', 'other',
 ]
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function isFiniteNonnegative(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0
+}
+
+function isNonnegativeInteger(value: unknown): value is number {
+  return isFiniteNonnegative(value) && Number.isInteger(value)
+}
+
+function hasRankablePerformance(athlete: Athlete): boolean {
+  const candidate: unknown = athlete
+  if (!isRecord(candidate) || !isRecord(candidate.performance)) return false
+  const performance = candidate.performance
+  if (performance.status !== 'available' || !isRecord(performance.stats)) return false
+  const stats = performance.stats
+
+  if (candidate.sport === 'basketball' && stats.kind === 'basketball') {
+    return isNonnegativeInteger(stats.games) &&
+      isFiniteNonnegative(stats.pointsPerGame) &&
+      isFiniteNonnegative(stats.reboundsPerGame) &&
+      isFiniteNonnegative(stats.assistsPerGame)
+  }
+
+  if (candidate.sport === 'football' && stats.kind === 'football') {
+    return isNonnegativeInteger(stats.appearances) &&
+      isNonnegativeInteger(stats.goals) &&
+      isNonnegativeInteger(stats.assists)
+  }
+
+  if (candidate.sport === 'hockey' && stats.kind === 'hockey') {
+    return isNonnegativeInteger(stats.games) &&
+      isNonnegativeInteger(stats.goals) &&
+      isNonnegativeInteger(stats.assists) &&
+      isNonnegativeInteger(stats.points)
+  }
+
+  return false
+}
+
 export function primaryMetric(athlete: Athlete): number {
+  if (!hasRankablePerformance(athlete)) return Number.NEGATIVE_INFINITY
   const stats = athlete.performance.stats
   if (!stats) return Number.NEGATIVE_INFINITY
   if (stats.kind === 'basketball') return stats.pointsPerGame
@@ -19,8 +62,7 @@ export function rankAthletes(athletes: Athlete[]): Athlete[] {
   const eligible = athletes.filter(
       (athlete) =>
         athlete.visibility === 'public' &&
-        athlete.performance.status === 'available' &&
-        athlete.performance.stats !== null,
+        hasRankablePerformance(athlete),
     )
   const sports = new Set(eligible.map((athlete) => athlete.sport))
   if (sports.size > 1) throw new Error('Cannot rank athletes from different sports together')
@@ -30,9 +72,7 @@ export function rankAthletes(athletes: Athlete[]): Athlete[] {
 export function rankAthletesBySport(athletes: Athlete[]): Array<{ sport: Sport; athletes: Athlete[] }> {
   const eligible = athletes.filter((athlete) =>
     athlete.visibility === 'public' &&
-    athlete.performance.status === 'available' &&
-    athlete.performance.stats !== null &&
-    athlete.performance.stats.kind === athlete.sport,
+    hasRankablePerformance(athlete),
   )
 
   return sportOrder

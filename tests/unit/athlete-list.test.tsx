@@ -70,6 +70,24 @@ describe('verified athlete list', () => {
     }
   })
 
+  it('searches the authoritative organization country without a location', async () => {
+    const user = userEvent.setup()
+    const affiliation = {
+      ...snapshot.athletes[0].affiliation,
+      organization: {
+        ...snapshot.athletes[0].affiliation.organization,
+        country: 'Cyprus',
+      },
+    }
+    delete affiliation.location
+    const athlete = { ...snapshot.athletes[0], affiliation }
+    render(<TrackerApp snapshot={{ ...snapshot, athletes: [athlete] }} />)
+
+    await user.type(screen.getByRole('searchbox', { name: /search athletes/i }), 'Cyprus')
+
+    expect(screen.getByRole('button', { name: /open deni avdija/i })).toBeInTheDocument()
+  })
+
   it('filters by tier, gender, and lifecycle status without stale values', async () => {
     const user = userEvent.setup()
     const injuredWoman = {
