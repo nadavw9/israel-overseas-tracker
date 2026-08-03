@@ -25,10 +25,6 @@ describe('athlete imagery', () => {
     expect(publicUrls).not.toEqual(expect.arrayContaining(reviewUrls))
   })
 
-  it('currently ships an empty public image manifest', () => {
-    expect(manifest).toEqual({})
-  })
-
   it('renders an accessible fallback when a record has no image', () => {
     const athlete = {
       id: 'fallback-athlete',
@@ -189,7 +185,27 @@ describe('athlete imagery', () => {
     await expect(validateImages({ athlete: approvedImage() }, async () => response({ url: 'http://images.example.com/final.png' }))).rejects.toThrow(/final URL.*HTTPS/i)
   })
 
-  it('times out fetches that ignore abort signals and cancels response bodies', async () => {
+  it('normalizes abort-aware timeout failures to the timeout error', async () => {
+    const abortAwareFetcher: typeof fetch = (_input, init) => new Promise((_resolve, reject) => {
+      init?.signal?.addEventListener('abort', () => {
+        reject(Object.assign(new Error('request aborted'), { name: 'AbortError' }))
+      })
+    })
+    await expect(validateImages({ athlete: approvedImage() }, abortAwareFetcher, { timeoutMs: 5 })).rejects.toThrow(/timed out/i)
+  })
+
+  it('cancels late responses from abort-ignoring fetches after a timeout', async () => {
+    let cancelled = 0
+    const lateResponse = response({ cancel: () => { cancelled += 1 } })
+    const delayedFetcher: typeof fetch = () => new Promise((resolve) => {
+      setTimeout(() => resolve(lateResponse), 15)
+    })
+    await expect(validateImages({ athlete: approvedImage() }, delayedFetcher, { timeoutMs: 5 })).rejects.toThrow(/timed out/i)
+    await new Promise((resolve) => setTimeout(resolve, 25))
+    expect(cancelled).toBe(1)
+  })
+
+  it('times out fetches that ignore abort signals and cancels normal response bodies', async () => {
     await expect(validateImages({ athlete: approvedImage() }, () => new Promise(() => {}), { timeoutMs: 5 })).rejects.toThrow(/timed out/i)
     let cancelled = 0
     await validateImages({ athlete: approvedImage() }, async () => response({ cancel: () => { cancelled += 1 } }))

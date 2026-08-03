@@ -13,6 +13,11 @@ export type ImageManifest = z.infer<typeof manifestSchema>
 type ValidationOptions = { timeoutMs?: number }
 const defaultTimeoutMs = 10_000
 
+function cancelResponseBody(response: Response | undefined) {
+  const cancellation = response?.body?.cancel?.()
+  if (cancellation) void cancellation.catch(() => {})
+}
+
 export async function validateImages(
   input: unknown,
   fetcher: typeof fetch = fetch,
@@ -38,17 +43,32 @@ export async function validateImages(
     const controller = new AbortController()
     let timeout: ReturnType<typeof setTimeout> | undefined
     let response: Response | undefined
+    let timedOut = false
+    const timeoutError = new Error(`Image check timed out for ${athleteId}`)
     try {
-      const timeoutError = new Promise<never>((_, reject) => {
+      const timeoutPromise = new Promise<never>((_, reject) => {
         timeout = setTimeout(() => {
+          timedOut = true
+          reject(timeoutError)
           controller.abort()
-          reject(new Error(`Image check timed out for ${athleteId}`))
         }, timeoutMs)
       })
-      response = await Promise.race([
-        fetcher(image.url, { headers: { Range: 'bytes=0-1024' }, signal: controller.signal }),
-        timeoutError,
-      ])
+      const fetchPromise = fetcher(image.url, {
+        headers: { Range: 'bytes=0-1024' },
+        signal: controller.signal,
+      })
+      fetchPromise.then(
+        (lateResponse) => {
+          if (timedOut) cancelResponseBody(lateResponse)
+        },
+        () => {},
+      )
+      try {
+        response = await Promise.race([fetchPromise, timeoutPromise])
+      } catch (error) {
+        if (timedOut) throw timeoutError
+        throw error
+      }
       if (response.url && !httpsUrlSchema.safeParse(response.url).success) {
         throw new Error(`Image check failed for ${athleteId}: final URL must be HTTPS`)
       }
@@ -60,7 +80,7 @@ export async function validateImages(
       }
     } finally {
       if (timeout !== undefined) clearTimeout(timeout)
-      await response?.body?.cancel?.()
+      cancelResponseBody(response)
     }
   }
 
