@@ -22,7 +22,7 @@ pnpm build
 pnpm test:e2e
 ```
 
-`pnpm sync:data` verifies an ESPN athlete identity page before accepting its statistics response. It writes the public snapshot from the verified registry; a provider failure can retain a still-valid verified observation as `stale`, and otherwise fails closed.
+`pnpm sync:data` requests the ESPN season-statistics endpoint. Before accepting statistics, it validates that ESPN response reference URLs bind the configured external athlete ID, season, and regular-season type. It writes the public snapshot from the verified registry; a provider failure can retain a still-valid verified observation as `stale`, and otherwise fails closed.
 
 ## Trust and scope
 

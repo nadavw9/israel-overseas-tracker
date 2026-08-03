@@ -18,7 +18,7 @@ Public records carry source URLs and retrieval timestamps. Provider errors never
 
 ## Media rights
 
-Only media with approved rights metadata can enter the public snapshot or image manifest. The required metadata includes the source, rights holder, and the license or usage information required by the schema. Review, expired, or missing-rights assets stay out of public output and use the neutral local fallback. An official portrait is not assumed to be reusable merely because it appears on an official site.
+Only media with approved rights metadata can enter the public snapshot or image manifest. The required metadata includes the source, rights holder, license, and usage information required by the schema. Review, expired, or missing-rights assets stay out of public output and use the neutral local fallback. An official portrait is not assumed to be reusable merely because it appears on an official site.
 
 ## Coverage ledger
 

@@ -23,6 +23,26 @@ function manySportSnapshot() {
   }
 }
 
+function filterSnapshot() {
+  const athlete = (id: string) => {
+    const value = snapshotJson.athletes.find((candidate) => candidate.id === id)
+    if (value === undefined) throw new Error(`Missing fixture athlete: ${id}`)
+    return value
+  }
+  const deni = athlete('deni-avdija')
+  const ben = athlete('ben-saraf')
+  const oscar = athlete('oscar-gloukh')
+
+  return {
+    ...snapshotJson,
+    athletes: [
+      { ...deni, tier: 'senior-professional' as const, genderCategory: 'men' as const, lifecycleStatus: 'active' as const },
+      { ...ben, tier: 'development' as const, genderCategory: 'men' as const, lifecycleStatus: 'active' as const },
+      { ...oscar, tier: 'senior-professional' as const, genderCategory: 'women' as const, lifecycleStatus: 'injured' as const },
+    ],
+  }
+}
+
 test('mobile layout has no page-level horizontal overflow', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
@@ -42,6 +62,7 @@ test('mobile layout has no page-level horizontal overflow', async ({ page }) => 
 })
 
 test('390px filters, RTL profile, and drawer keep the directory usable', async ({ page }) => {
+  await page.route('**/data/snapshot.json', (route) => route.fulfill({ json: filterSnapshot() }))
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
 
@@ -49,13 +70,23 @@ test('390px filters, RTL profile, and drawer keep the directory usable', async (
   const gender = page.getByRole('combobox', { name: 'Gender category' })
   const lifecycle = page.getByRole('combobox', { name: 'Lifecycle status' })
   await tier.selectOption('development')
+  await expect(tier).toHaveValue('development')
   await expect(page.getByRole('heading', { name: 'Ben Saraf' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Deni Avdija' })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Oscar Gloukh' })).toHaveCount(0)
   await tier.selectOption('all')
-  await gender.selectOption('men')
-  await expect(page.getByRole('heading', { name: 'Deni Avdija' })).toBeVisible()
-  await gender.selectOption('all')
-  await lifecycle.selectOption('active')
+  await gender.selectOption('women')
+  await expect(gender).toHaveValue('women')
   await expect(page.getByRole('heading', { name: 'Oscar Gloukh' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Deni Avdija' })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Ben Saraf' })).toHaveCount(0)
+  await gender.selectOption('all')
+  await lifecycle.selectOption('injured')
+  await expect(lifecycle).toHaveValue('injured')
+  await expect(page.getByRole('heading', { name: 'Oscar Gloukh' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Deni Avdija' })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Ben Saraf' })).toHaveCount(0)
+  await lifecycle.selectOption('all')
 
   const dimensions = page.locator('.filter-dimensions')
   expect(await dimensions.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length)).toBe(1)
