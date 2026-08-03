@@ -28,13 +28,7 @@ test('mobile layout has no page-level horizontal overflow', async ({ page }) => 
   await page.goto('/')
 
   await expect(page.getByRole('heading', { name: /israel overseas/i })).toBeVisible()
-  expect(
-    await page.evaluate(
-      () =>
-        document.documentElement.scrollWidth <=
-        document.documentElement.clientWidth,
-    ),
-  ).toBe(true)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
 
   const filterBar = page.locator('.filter-bar')
   await expect(filterBar).toBeVisible()
@@ -45,6 +39,46 @@ test('mobile layout has no page-level horizontal overflow', async ({ page }) => 
   const lifecycleBox = await lifecycle.boundingBox()
   expect(lifecycleBox?.y).toBeGreaterThanOrEqual(0)
   expect((lifecycleBox?.y ?? 0) + (lifecycleBox?.height ?? 0)).toBeLessThanOrEqual(844)
+})
+
+test('390px filters, RTL profile, and drawer keep the directory usable', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+
+  const tier = page.getByRole('combobox', { name: 'Athlete tier' })
+  const gender = page.getByRole('combobox', { name: 'Gender category' })
+  const lifecycle = page.getByRole('combobox', { name: 'Lifecycle status' })
+  await tier.selectOption('development')
+  await expect(page.getByRole('heading', { name: 'Ben Saraf' })).toBeVisible()
+  await tier.selectOption('all')
+  await gender.selectOption('men')
+  await expect(page.getByRole('heading', { name: 'Deni Avdija' })).toBeVisible()
+  await gender.selectOption('all')
+  await lifecycle.selectOption('active')
+  await expect(page.getByRole('heading', { name: 'Oscar Gloukh' })).toBeVisible()
+
+  const dimensions = page.locator('.filter-dimensions')
+  expect(await dimensions.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length)).toBe(1)
+  for (const select of [tier, gender, lifecycle]) {
+    expect(await select.evaluate((element) => element.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44)
+  }
+
+  await page.getByRole('button', { name: 'עברית' }).click()
+  await expect(page.locator('html')).toHaveAttribute('lang', 'he')
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
+  await expect(page.getByRole('combobox', { name: 'רמת ספורטאי' })).toBeVisible()
+  await expect(page.getByRole('combobox', { name: 'קטגוריית מגדר' })).toBeVisible()
+  await expect(page.getByRole('combobox', { name: 'סטטוס פעילות' })).toBeVisible()
+
+  await page.getByRole('button', { name: /אוסקר גלוך/ }).click()
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByText('בסיס הזכאות')).toBeVisible()
+  await expect(dialog.getByRole('link', { name: /מקור הזכאות/ })).toBeVisible()
+  await expect(dialog.getByRole('link', { name: /מקור השיוך/ })).toBeVisible()
+  await expect(dialog.getByRole('link', { name: /מקור הביצועים/ })).toBeVisible()
+
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
 })
 
 test('wide many-sport filter owns overflow and keeps the final sport reachable', async ({ page }) => {
@@ -78,11 +112,5 @@ test('desktop and Hebrew RTL controls remain usable', async ({ page }) => {
     'placeholder',
     'חיפוש ספורטאים, קבוצות ותחרויות…',
   )
-  expect(
-    await page.evaluate(
-      () =>
-        document.documentElement.scrollWidth <=
-        document.documentElement.clientWidth,
-    ),
-  ).toBe(true)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
 })

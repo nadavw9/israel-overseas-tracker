@@ -1,14 +1,6 @@
 # Israel Overseas
 
-A source-backed tracker for verified Israeli athletes competing abroad. The public app intentionally starts small: it publishes only athletes whose eligibility, current club, statistics, and imagery can be tied to reviewable sources.
-
-## Current public coverage
-
-- Deni Avdija — NBA statistics from ESPN; eligibility and image evidence from NBA sources.
-- Ben Saraf — NBA statistics from ESPN; eligibility and image evidence from the NBA G League/NBA.
-- Oscar Gloukh — identity and Ajax membership from Ajax. His season statistics remain unavailable until a suitable sourced feed is connected.
-
-Danny Wolf and Zeev Buium are kept in the review registry and do not appear in public counts, rankings, or the map.
+A source-backed tracker for verified Israeli athletes competing abroad. The public application intentionally starts small: it publishes only records that have passed the registry's eligibility and current-activity checks.
 
 ## Run locally
 
@@ -19,7 +11,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Quality and data commands:
+Run the full local verification sequence with:
 
 ```bash
 pnpm test
@@ -27,26 +19,27 @@ pnpm lint
 pnpm sync:data
 pnpm validate:images
 pnpm build
+pnpm test:e2e
 ```
 
-`pnpm sync:data` verifies an ESPN athlete identity page before accepting its statistics response. If a provider fails, the generator preserves a previous verified record and marks it stale; it fails closed when no previous verified value exists.
+`pnpm sync:data` verifies an ESPN athlete identity page before accepting its statistics response. It writes the public snapshot from the verified registry; a provider failure can retain a still-valid verified observation as `stale`, and otherwise fails closed.
 
-## Trust model
+## Trust and scope
 
-- “Snapshot generated” is the build time, not a claim that every provider refreshed successfully.
-- Every card shows its own source-check time and freshness state.
-- Identity-only athletes never receive invented zero statistics.
-- Public URLs must use HTTPS and generated data is validated with Zod before writing.
-- Photos have separate source metadata and fall back to a labeled neutral icon.
+- The public snapshot is separate from the private review registry. Candidates and review notes never appear in public counts, filters, rankings, map locations, or browser artifacts.
+- The coverage ledger is currently incomplete. Its visible summary describes declared universe health and is not a promise of no missed athletes.
+- Snapshot generation time is not a claim that every provider refreshed successfully. Each public record keeps its own source URL, source timestamp, and freshness state.
+- Identity-only athletes are published without invented zero statistics.
+- The public seed has zero approved athlete portraits. Cards and profiles use neutral local fallbacks until rights metadata approves an image.
 
-See [the inclusion policy](docs/inclusion-policy.md) and [data-source register](docs/data-sources.md) for the detailed rules.
+See [the inclusion policy](docs/inclusion-policy.md) and [data-source register](docs/data-sources.md) for the detailed rules and current source limitations.
 
 ## Privacy and external services
 
-The default athlete view uses no analytics and no third-party font service. Official athlete images load from the NBA or Ajax domains. Opening the map requests CARTO tiles that include OpenStreetMap data; attribution remains visible in the map. Deployments should document or proxy those requests if their privacy policy requires it.
+The default athlete view uses no analytics and no third-party font service. Opening the map requests CARTO tiles that include OpenStreetMap data; attribution remains visible in the map. Deployments should document or proxy that external request when their privacy policy requires it.
 
 ## Automation
 
-`.github/workflows/sync-data.yml` runs the validation, refresh, image check, tests, lint, and production build every six hours and on demand. It uploads the generated snapshot as an artifact; it does not commit or deploy automatically.
+`.github/workflows/sync-data.yml` runs validation, refresh, image checks, tests, lint, and a production build every six hours and on demand. It uploads the generated snapshot as an artifact; it does not commit or deploy automatically.
 
 This independent project is not affiliated with the athletes, clubs, leagues, ESPN, NBA, NHL, Ajax, CARTO, or OpenStreetMap.
