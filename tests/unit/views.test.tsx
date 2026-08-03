@@ -183,6 +183,28 @@ describe('rankings', () => {
     expect(rankAthletes([valid, ...invalid.filter((athlete) => athlete.sport === 'basketball')])).toEqual([valid])
   })
 
+  it('omits non-object ranking entries before reading their fields', () => {
+    const valid = snapshot.athletes[0]
+    const malformed = [
+      null,
+      undefined,
+      'athlete',
+      42,
+      true,
+      [],
+      {},
+      { visibility: 'public' },
+    ] as unknown as Athlete[]
+    const input = [valid, ...malformed]
+
+    expect(() => rankAthletes(input)).not.toThrow()
+    expect(rankAthletes(input)).toEqual([valid])
+    expect(() => rankAthletesBySport(input)).not.toThrow()
+    expect(rankAthletesBySport(input)).toEqual([
+      { sport: 'basketball', athletes: [valid] },
+    ])
+  })
+
   it('renders separate sport ranking sequences for mixed input', async () => {
     const user = userEvent.setup()
     const football = {

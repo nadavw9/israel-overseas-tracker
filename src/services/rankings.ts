@@ -19,8 +19,8 @@ function isNonnegativeInteger(value: unknown): value is number {
   return isFiniteNonnegative(value) && Number.isInteger(value)
 }
 
-function hasRankablePerformance(athlete: Athlete): boolean {
-  const candidate: unknown = athlete
+function hasRankablePerformance(athlete: unknown): athlete is Athlete {
+  const candidate = athlete
   if (!isRecord(candidate) || !isRecord(candidate.performance)) return false
   const performance = candidate.performance
   if (performance.status !== 'available' || !isRecord(performance.stats)) return false
@@ -49,6 +49,12 @@ function hasRankablePerformance(athlete: Athlete): boolean {
   return false
 }
 
+function isPublicRankable(athlete: unknown): athlete is Athlete {
+  return isRecord(athlete) &&
+    athlete.visibility === 'public' &&
+    hasRankablePerformance(athlete)
+}
+
 export function primaryMetric(athlete: Athlete): number {
   if (!hasRankablePerformance(athlete)) return Number.NEGATIVE_INFINITY
   const stats = athlete.performance.stats
@@ -58,22 +64,15 @@ export function primaryMetric(athlete: Athlete): number {
   return stats.points
 }
 
-export function rankAthletes(athletes: Athlete[]): Athlete[] {
-  const eligible = athletes.filter(
-      (athlete) =>
-        athlete.visibility === 'public' &&
-        hasRankablePerformance(athlete),
-    )
+export function rankAthletes(athletes: readonly unknown[]): Athlete[] {
+  const eligible = athletes.filter(isPublicRankable)
   const sports = new Set(eligible.map((athlete) => athlete.sport))
   if (sports.size > 1) throw new Error('Cannot rank athletes from different sports together')
   return eligible.toSorted((left, right) => primaryMetric(right) - primaryMetric(left))
 }
 
-export function rankAthletesBySport(athletes: Athlete[]): Array<{ sport: Sport; athletes: Athlete[] }> {
-  const eligible = athletes.filter((athlete) =>
-    athlete.visibility === 'public' &&
-    hasRankablePerformance(athlete),
-  )
+export function rankAthletesBySport(athletes: readonly unknown[]): Array<{ sport: Sport; athletes: Athlete[] }> {
+  const eligible = athletes.filter(isPublicRankable)
 
   return sportOrder
     .map((sport) => ({
