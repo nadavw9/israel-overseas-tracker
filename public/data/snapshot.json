@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-23T08:00:00.000Z",
+  "generatedAt": "2026-08-03T21:11:51.869Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -55,8 +55,8 @@
         "season": "2025-26",
         "source": {
           "provider": "espn-nba",
-          "sourceUrl": "https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/4683021/overview",
-          "retrievedAt": "2026-07-23T08:00:00.000Z"
+          "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us",
+          "retrievedAt": "2026-08-03T21:11:51.869Z"
         }
       }
     },
@@ -114,8 +114,8 @@
         "season": "2025-26",
         "source": {
           "provider": "espn-nba",
-          "sourceUrl": "https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/5242502/overview",
-          "retrievedAt": "2026-07-23T08:00:00.000Z"
+          "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5242502/statistics?lang=en&region=us",
+          "retrievedAt": "2026-08-03T21:11:51.869Z"
         }
       }
     },
@@ -168,7 +168,7 @@
         "source": {
           "provider": "curated",
           "sourceUrl": "https://english.ajax.nl/teams/ajax-1/oscar-gloukh",
-          "retrievedAt": "2026-07-23T08:00:00.000Z"
+          "retrievedAt": "2026-07-22T20:30:15.000Z"
         }
       }
     }

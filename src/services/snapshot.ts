@@ -7,6 +7,8 @@ import {
   type PublicPerformance,
 } from '../domain/athlete'
 import type { CoverageSummary } from '../domain/coverage'
+import { isObservationWithinRetention } from '../domain/observation'
+import { providerResultSchema } from '../../scripts/providers/types'
 
 export type PreviousSnapshot = {
   athletes: Array<Pick<Athlete, 'id' | 'performance'>>
@@ -72,10 +74,18 @@ function publicRegistryFields(entry: RegistryAthlete): Omit<Athlete, 'performanc
 }
 
 function normalizeRecord(entry: RegistryAthlete, result: ProviderResult): Athlete {
+  result = providerResultSchema.parse(result)
   if (result.athleteId !== entry.id) {
     throw new Error(
       `Provider identity mismatch: expected ${entry.id}, received ${result.athleteId}`,
     )
+  }
+
+  if (result.sport !== entry.sport || result.sport !== entry.binding.sport ||
+      result.competition !== entry.affiliation.competition ||
+      result.competition !== entry.binding.competition ||
+      result.season !== entry.affiliation.season) {
+    throw new Error(`Provider context mismatch for ${entry.id}`)
   }
 
   if (
@@ -98,16 +108,16 @@ function normalizeRecord(entry: RegistryAthlete, result: ProviderResult): Athlet
       ? {
           status: 'unavailable',
           state: 'unavailable',
-          competition: entry.affiliation.competition,
-          season: entry.affiliation.season,
+          competition: result.competition,
+          season: result.season,
           stats: null,
           source,
         }
       : {
           status: 'available',
           state: result.state,
-          competition: entry.affiliation.competition,
-          season: entry.affiliation.season,
+          competition: result.competition,
+          season: result.season,
           stats: result.stats,
           source,
         }
@@ -119,6 +129,7 @@ function staleRecord(
   entry: RegistryAthlete,
   previous: PreviousSnapshot,
   reason: unknown,
+  now: Date,
 ): Athlete {
   const previousPerformance = previous.athletes.find(
     (athlete) => athlete.id === entry.id,
@@ -126,7 +137,11 @@ function staleRecord(
 
   if (
     previousPerformance?.status !== 'available' ||
-    previousPerformance.stats === null
+    previousPerformance.stats === null ||
+    previousPerformance.stats.kind !== entry.sport ||
+    previousPerformance.competition !== entry.affiliation.competition ||
+    previousPerformance.season !== entry.affiliation.season ||
+    !isObservationWithinRetention(previousPerformance.source.retrievedAt, now)
   ) {
     const message = reason instanceof Error ? reason.message : String(reason)
     throw new Error(`No verified data available for ${entry.id}: ${message}`)
@@ -136,8 +151,6 @@ function staleRecord(
     ...publicRegistryFields(entry),
     performance: {
       ...previousPerformance,
-      competition: entry.affiliation.competition,
-      season: entry.affiliation.season,
       state: 'stale',
     },
   }
@@ -156,7 +169,7 @@ export async function buildSnapshot({
     if (entry === undefined) throw new Error(`Missing registry entry at index ${index}`)
     return result.status === 'fulfilled'
       ? normalizeRecord(entry, result.value)
-      : staleRecord(entry, previous, result.reason)
+      : staleRecord(entry, previous, result.reason, now)
   })
 
   return snapshotSchema.parse({ generatedAt: now.toISOString(), athletes, coverage })

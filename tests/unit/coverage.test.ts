@@ -52,6 +52,23 @@ describe('coverage ledger schema', () => {
     expect(summarizeCoverage(ledger)).toEqual({ required: 0, healthy: 0, complete: false })
   })
 
+  it('ages an otherwise healthy entry at an explicit snapshot clock', () => {
+    const ledger = coverageLedgerSchema.parse(healthyLedger)
+
+    expect(summarizeCoverage(ledger, new Date('2026-07-30T08:00:00.001Z'))).toEqual({
+      required: 1,
+      healthy: 0,
+      complete: false,
+    })
+    expect(summarizeCoverage(ledger, new Date('2026-07-30T08:00:00.000Z')).healthy).toBe(1)
+  })
+
+  it('rejects summarizing a ledger from the future', () => {
+    const ledger = coverageLedgerSchema.parse(healthyLedger)
+
+    expect(() => summarizeCoverage(ledger, new Date('2026-07-23T07:59:59.999Z'))).toThrow(/future|after/i)
+  })
+
   it.each(['healthy', 'partial', 'stale', 'blocked', 'not-configured'] as const)(
     'accepts the %s health state',
     (health) => {

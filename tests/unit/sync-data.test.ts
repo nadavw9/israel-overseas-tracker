@@ -15,6 +15,11 @@ import {
 const generatedAt = '2026-07-23T08:00:00.000Z'
 const coverage = { required: 4, healthy: 0, complete: false } as const
 const entry = publicRegistry[0]
+const providerContext = {
+  sport: entry.sport,
+  competition: entry.affiliation.competition,
+  season: entry.affiliation.season,
+} as const
 
 function availablePerformance() {
   return {
@@ -39,7 +44,7 @@ function availablePerformance() {
 
 function previousSnapshot(): AthleteSnapshot {
   return {
-    generatedAt: '2026-07-22T12:00:00.000Z',
+    generatedAt,
     coverage,
     athletes: [
       {
@@ -90,6 +95,7 @@ describe('buildSnapshot', () => {
       coverage,
       fetchRecord: async () => ({
         athleteId: entry.id,
+        ...providerContext,
         stats: availablePerformance().stats,
         state: 'corrected',
         observedOrganization: 'PORTLAND—TRAIL BLAZERS!',
@@ -129,6 +135,7 @@ describe('buildSnapshot', () => {
         coverage,
         fetchRecord: async () => ({
           athleteId: entry.id,
+          ...providerContext,
           stats: availablePerformance().stats,
           state: 'final',
           observedOrganization: 'Brooklyn Nets',
@@ -157,6 +164,33 @@ describe('buildSnapshot', () => {
     expect(next.athletes[0].performance.stats).toEqual(prior.athletes[0].performance.stats)
     expect(next.athletes[0].performance.state).toBe('stale')
     expect(next.athletes[0].image).toBeUndefined()
+  })
+
+  it.each([
+    ['competition mismatch', (prior: AthleteSnapshot) => { prior.athletes[0].performance.competition = 'EuroLeague' }],
+    ['season mismatch', (prior: AthleteSnapshot) => { prior.athletes[0].performance.season = '2024-25' }],
+    ['sport mismatch', (prior: AthleteSnapshot) => { prior.athletes[0].performance.stats = { kind: 'football', appearances: 1, goals: 0, assists: 0 } }],
+    ['future observation', (prior: AthleteSnapshot) => { prior.athletes[0].performance.source.retrievedAt = '2026-07-23T08:00:00.001Z' }],
+    ['expired observation', (prior: AthleteSnapshot) => { prior.athletes[0].performance.source.retrievedAt = '2026-07-21T07:59:59.999Z' }],
+  ])('fails closed on prior %s', async (_label, mutate) => {
+    const prior = previousSnapshot()
+    mutate(prior)
+    await expect(buildSnapshot({
+      entries: [entry], previous: prior, coverage,
+      fetchRecord: async () => { throw new Error('provider unavailable') },
+      now: new Date(generatedAt),
+    })).rejects.toThrow(/No verified data available/i)
+  })
+
+  it('retains prior source context unchanged at the exact 48-hour boundary', async () => {
+    const prior = previousSnapshot()
+    prior.athletes[0].performance.source.retrievedAt = '2026-07-21T08:00:00.000Z'
+    const next = await buildSnapshot({
+      entries: [entry], previous: prior, coverage,
+      fetchRecord: async () => { throw new Error('provider unavailable') },
+      now: new Date(generatedAt),
+    })
+    expect(next.athletes[0].performance).toEqual({ ...prior.athletes[0].performance, state: 'stale' })
   })
 
   it('fails closed when prior performance is unavailable', async () => {
@@ -191,6 +225,7 @@ describe('buildSnapshot', () => {
         coverage,
         fetchRecord: async () => ({
           athleteId: 'ben-saraf',
+          ...providerContext,
           stats: availablePerformance().stats,
           state: 'final',
           sourceUrl: 'https://example.com/wrong-athlete',
@@ -209,6 +244,7 @@ describe('buildSnapshot', () => {
         coverage: { required: 4, healthy: 4, complete: false },
         fetchRecord: async () => ({
           athleteId: entry.id,
+          ...providerContext,
           stats: null,
           state: 'final',
           sourceUrl: 'https://example.com/no-stats',
@@ -218,21 +254,40 @@ describe('buildSnapshot', () => {
       }),
     ).rejects.toThrow(/coverage|complete/i)
   })
+
+  it.each([
+    ['sport', { ...providerContext, sport: 'football', stats: null }],
+    ['competition', { ...providerContext, competition: 'EuroLeague', stats: null }],
+    ['season', { ...providerContext, season: '2024-25', stats: null }],
+  ] as const)('rejects provider %s context that differs from verified registry context', async (_field, context) => {
+    await expect(buildSnapshot({
+      entries: [entry], previous: previousSnapshot(), coverage,
+      fetchRecord: async () => ({
+        athleteId: entry.id, ...context, state: 'final',
+        sourceUrl: 'https://example.com/context', retrievedAt: generatedAt,
+      }),
+      now: new Date(generatedAt),
+    })).rejects.toThrow(/context mismatch/i)
+  })
+
+  it('rejects a provider observation after the snapshot clock', async () => {
+    await expect(buildSnapshot({
+      entries: [entry], previous: previousSnapshot(), coverage,
+      fetchRecord: async () => ({
+        athleteId: entry.id, ...providerContext, stats: null, state: 'final',
+        sourceUrl: 'https://example.com/future', retrievedAt: '2026-07-23T08:00:00.001Z',
+      }),
+      now: new Date(generatedAt),
+    })).rejects.toThrow(/snapshot|generated|future/i)
+  })
 })
 
 describe('fetchProviderRecord', () => {
-  it('uses only normalized binding and affiliation fields for ESPN', async () => {
+  it('uses a season-specific ESPN endpoint whose payload verifies athlete and season', async () => {
     const requestedUrls: string[] = []
     const fakeFetch: typeof fetch = async (input) => {
       const requestedUrl = String(input)
       requestedUrls.push(requestedUrl)
-
-      if (requestedUrl.includes('espn.com/nba/player/_/id/')) {
-        return new Response(
-          '<meta property="og:title" content="Deni Avdija - Portland Trail Blazers Forward - ESPN"><link rel="canonical" href="https://www.espn.com/nba/player/_/id/4683021/deni-avdija">',
-          { status: 200, headers: { 'content-type': 'text/html' } },
-        )
-      }
 
       return new Response(JSON.stringify(deniFixture), { status: 200 })
     }
@@ -240,18 +295,15 @@ describe('fetchProviderRecord', () => {
     const result = await fetchProviderRecord(entry, fakeFetch, new Date(generatedAt))
 
     expect(requestedUrls).toEqual([
-      `https://www.espn.com/nba/player/_/id/${entry.binding.externalId}`,
-      `https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/${entry.binding.externalId}/overview`,
+      `https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/${entry.binding.externalId}/statistics?lang=en&region=us`,
     ])
-    expect(result).toMatchObject({ athleteId: entry.id, state: 'final' })
+    expect(result).toMatchObject({ athleteId: entry.id, ...providerContext, state: 'final' })
   })
 
   it('rejects ESPN stats when the binding resolves to another athlete', async () => {
-    const fakeFetch: typeof fetch = async () =>
-      new Response(
-        `<meta property="og:title" content="Another Player - Example Team - ESPN"><link rel="canonical" href="https://www.espn.com/nba/player/_/id/${entry.binding.externalId}/another-player">`,
-        { status: 200, headers: { 'content-type': 'text/html' } },
-      )
+    const wrongAthlete = structuredClone(deniFixture)
+    wrongAthlete.athlete.$ref = wrongAthlete.athlete.$ref.replace('4683021', '9999999')
+    const fakeFetch: typeof fetch = async () => new Response(JSON.stringify(wrongAthlete), { status: 200 })
 
     await expect(fetchProviderRecord(entry, fakeFetch, new Date(generatedAt))).rejects.toThrow(
       /identity mismatch/i,
@@ -267,6 +319,40 @@ describe('writeSnapshotAtomically', () => {
       const snapshot = previousSnapshot()
       await writeSnapshotAtomically(path, snapshot)
       expect(JSON.parse(await readFile(path, 'utf8'))).toEqual(snapshot)
+      expect(await readdir(directory)).toEqual(['snapshot.json'])
+    } finally {
+      await rm(directory, { recursive: true, force: true })
+    }
+  })
+
+  it('supports concurrent writers without sharing or leaking temp files', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'snapshot-atomic-concurrent-'))
+    const path = join(directory, 'snapshot.json')
+    try {
+      const snapshots = ['Alpha', 'Bravo', 'Charlie'].map((name) => {
+        const snapshot = previousSnapshot()
+        snapshot.athletes[0].name = { en: name, he: name }
+        return snapshot
+      })
+      await Promise.all(snapshots.map((snapshot) => writeSnapshotAtomically(path, snapshot)))
+      const written = JSON.parse(await readFile(path, 'utf8')) as AthleteSnapshot
+      expect(snapshots).toContainEqual(written)
+      expect(await readdir(directory)).toEqual(['snapshot.json'])
+    } finally {
+      await rm(directory, { recursive: true, force: true })
+    }
+  })
+
+  it('atomically replaces an existing target', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'snapshot-atomic-replace-'))
+    const path = join(directory, 'snapshot.json')
+    try {
+      const first = previousSnapshot()
+      const replacement = previousSnapshot()
+      replacement.athletes[0].name = { en: 'Replacement', he: 'Replacement' }
+      await writeSnapshotAtomically(path, first)
+      await writeSnapshotAtomically(path, replacement)
+      expect(JSON.parse(await readFile(path, 'utf8'))).toEqual(replacement)
       expect(await readdir(directory)).toEqual(['snapshot.json'])
     } finally {
       await rm(directory, { recursive: true, force: true })
@@ -297,5 +383,38 @@ describe('sync clock resolution', () => {
     const early = new Date('2026-07-22T00:00:00.000Z')
     expect(resolveSyncNow(undefined, early).toISOString()).toBe(generatedAt)
     expect(resolveSyncNow(early, new Date('2026-07-24T00:00:00.000Z'))).toBe(early)
+  })
+})
+
+describe('legacy snapshot migration', () => {
+  it('exposes a trust-boundary parser for isolated migration tests', async () => {
+    const syncModule = await import('../../scripts/sync-data')
+    expect(syncModule).toHaveProperty('parsePreviousSnapshot')
+  })
+
+  it('retains only public, eligibility-verified history with non-null verified stats', async () => {
+    const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
+    const legacyAthlete = (id: string) => ({
+      id,
+      name: { en: id, he: id },
+      sport: 'basketball', competition: 'NBA', team: 'Example', season: '2025-26',
+      eligibility: { status: 'verified', sourceUrl: 'https://example.com/eligibility' },
+      visibility: 'public', statsStatus: 'verified',
+      stats: { kind: 'basketball', games: 1, pointsPerGame: 1, reboundsPerGame: 1, assistsPerGame: 1 },
+      source: { provider: 'espn-nba', sourceUrl: 'https://example.com/stats', retrievedAt: generatedAt },
+      freshness: 'fresh',
+    } as const)
+    const retained = legacyAthlete('retained')
+    const review = { ...legacyAthlete('review-history'), visibility: 'review' as const }
+    const pending = {
+      ...legacyAthlete('pending-history'),
+      eligibility: { status: 'pending' as const, sourceUrl: 'https://example.com/eligibility' },
+    }
+    const unavailable = { ...legacyAthlete('unavailable-history'), statsStatus: 'unavailable' as const, stats: null }
+
+    expect(parsePreviousSnapshot({
+      generatedAt,
+      athletes: [retained, review, pending, unavailable],
+    }).athletes.map((athlete) => athlete.id)).toEqual(['retained'])
   })
 })

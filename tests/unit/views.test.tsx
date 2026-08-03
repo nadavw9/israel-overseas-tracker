@@ -66,6 +66,45 @@ describe('rankings', () => {
     ])
   })
 
+  it('rejects ranking athletes across incompatible sports', () => {
+    const basketball = snapshot.athletes[0]
+    const football = {
+      ...basketball,
+      id: 'football-leader',
+      sport: 'football',
+      affiliation: { ...basketball.affiliation, competition: 'Eredivisie' },
+      performance: {
+        ...basketball.performance,
+        competition: 'Eredivisie',
+        stats: { kind: 'football', appearances: 12, goals: 3, assists: 4 },
+      },
+    } as Athlete
+
+    expect(() => rankAthletes([basketball, football])).toThrow(/sport/i)
+  })
+
+  it('renders separate sport ranking sequences for mixed input', async () => {
+    const user = userEvent.setup()
+    const football = {
+      ...snapshot.athletes[0],
+      id: 'football-leader',
+      name: { en: 'Football Leader', he: 'Football Leader' },
+      sport: 'football',
+      affiliation: { ...snapshot.athletes[0].affiliation, competition: 'Eredivisie' },
+      performance: {
+        ...snapshot.athletes[0].performance,
+        competition: 'Eredivisie',
+        stats: { kind: 'football', appearances: 12, goals: 3, assists: 4 },
+      },
+    } as Athlete
+    render(<TrackerApp snapshot={{ ...snapshot, athletes: [...snapshot.athletes, football] }} />)
+
+    await user.click(screen.getByRole('button', { name: 'Rankings' }))
+    expect(screen.getAllByText('01')).toHaveLength(2)
+    expect(screen.getByRole('heading', { name: 'Basketball' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Football' })).toBeInTheDocument()
+  })
+
   it('switches between rankings and the location map', async () => {
     const user = userEvent.setup()
     render(<TrackerApp snapshot={snapshot} />)

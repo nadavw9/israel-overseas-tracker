@@ -1,16 +1,18 @@
 import { BadgeCheck, Clock3 } from 'lucide-react'
 import type { Athlete } from '../domain/athlete'
 import { useI18n } from '../i18n/context'
+import { isObservationWithinRetention } from '../domain/observation'
 
 type FreshnessBadgeProps = { performance: Athlete['performance'] }
 
 export function FreshnessBadge({ performance }: FreshnessBadgeProps) {
   const { messages } = useI18n()
   const freshness =
-    performance.state === 'stale'
-      ? 'stale'
-      : performance.status === 'unavailable'
-        ? 'identity-only'
+    performance.status === 'unavailable'
+      ? 'identity-only'
+      : performance.state === 'stale' ||
+          !isObservationWithinRetention(performance.source.retrievedAt, new Date())
+        ? 'stale'
         : 'fresh'
   const checked = new Intl.DateTimeFormat(messages.locale, {
     day: '2-digit',

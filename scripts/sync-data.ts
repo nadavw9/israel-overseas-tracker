@@ -1,4 +1,5 @@
-import { readFile, writeFile, mkdir, rename, rm } from 'node:fs/promises'
+import { readFile, mkdir, rename, rm, open } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
 import { dirname, extname, join, basename } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { z } from 'zod'
@@ -22,62 +23,6 @@ const snapshotUrl = new URL('../public/data/snapshot.json', import.meta.url)
 const curatedDataUrl = new URL('../data/curated-stats.json', import.meta.url)
 const coverageLedgerUrl = new URL('../data/coverage/ledger.json', import.meta.url)
 
-function htmlAttribute(
-  html: string,
-  tagName: 'link' | 'meta',
-  matchAttribute: string,
-  matchValue: string,
-  valueAttribute: string,
-): string | undefined {
-  const tags = html.match(new RegExp(`<${tagName}\\b[^>]*>`, 'gi')) ?? []
-
-  for (const tag of tags) {
-    const attributes = Object.fromEntries(
-      [...tag.matchAll(/([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)].map(
-        (match) => [match[1].toLowerCase(), match[2] ?? match[3]],
-      ),
-    )
-
-    if (attributes[matchAttribute]?.toLowerCase() === matchValue) {
-      return attributes[valueAttribute]
-    }
-  }
-}
-
-function normalizedIdentity(value: string): string {
-  return value
-    .normalize('NFKD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLocaleLowerCase('en')
-    .replace(/[^a-z0-9]/g, '')
-}
-
-function verifyEspnIdentity(entry: RegistryAthlete, html: string): void {
-  const title = htmlAttribute(html, 'meta', 'property', 'og:title', 'content')
-  const canonical = htmlAttribute(html, 'link', 'rel', 'canonical', 'href')
-
-  if (!title || !canonical) {
-    throw new Error(`ESPN identity metadata missing for ${entry.id}`)
-  }
-
-  const canonicalUrl = new URL(canonical)
-  const expectedPath = `/nba/player/_/id/${entry.binding.externalId}`
-  const upstreamName = title.split(' - ')[0]
-  const identityMatches =
-    canonicalUrl.protocol === 'https:' &&
-    (canonicalUrl.hostname === 'espn.com' ||
-      canonicalUrl.hostname.endsWith('.espn.com')) &&
-    (canonicalUrl.pathname === expectedPath ||
-      canonicalUrl.pathname.startsWith(`${expectedPath}/`)) &&
-    normalizedIdentity(upstreamName) === normalizedIdentity(entry.name.en)
-
-  if (!identityMatches) {
-    throw new Error(
-      `ESPN identity mismatch for ${entry.id}: received ${upstreamName || 'unknown athlete'}`,
-    )
-  }
-}
-
 export async function fetchProviderRecord(
   entry: RegistryAthlete,
   fetcher: typeof fetch = fetch,
@@ -90,29 +35,25 @@ export async function fetchProviderRecord(
       string,
       unknown
     >
-    return {
-      ...parseCuratedRecord(entry.id, records[entry.binding.externalId]),
-      retrievedAt,
-    }
+    return parseCuratedRecord(entry.id, records[entry.binding.externalId])
   }
 
   if (entry.binding.provider === 'espn-nba') {
-    const identityUrl = `https://www.espn.com/nba/player/_/id/${entry.binding.externalId}`
-    const identityResponse = await fetcher(identityUrl)
-    if (!identityResponse.ok) {
-      throw new Error(
-        `ESPN identity check returned HTTP ${identityResponse.status} for ${entry.id}`,
-      )
+    const seasonSuffix = entry.affiliation.season.split('-').at(-1)
+    if (!seasonSuffix || !/^\d{2}$/.test(seasonSuffix)) {
+      throw new Error(`Unsupported NBA season format for ${entry.id}: ${entry.affiliation.season}`)
     }
-    verifyEspnIdentity(entry, await identityResponse.text())
-
-    const sourceUrl = `https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/${entry.binding.externalId}/overview`
+    const seasonYear = 2000 + Number(seasonSuffix)
+    const sourceUrl = `https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/${seasonYear}/types/2/athletes/${entry.binding.externalId}/statistics?lang=en&region=us`
     const response = await fetcher(sourceUrl)
     if (!response.ok) {
       throw new Error(`ESPN returned HTTP ${response.status} for ${entry.id}`)
     }
     return parseNbaFixture(await response.json(), {
       athleteId: entry.id,
+      externalId: entry.binding.externalId,
+      seasonYear,
+      season: entry.affiliation.season,
       sourceUrl,
       retrievedAt,
     })
@@ -126,7 +67,11 @@ export async function fetchProviderRecord(
   const seasonId = Number(entry.affiliation.season.replace('-', '20'))
   return parseNhlFixture(await response.json(), {
     athleteId: entry.id,
+    externalId: entry.binding.externalId,
+    expectedName: entry.name.en,
     seasonId,
+    season: entry.affiliation.season,
+    sourceUrl,
     retrievedAt,
   })
 }
@@ -176,32 +121,37 @@ const legacySnapshotSchema = z
   })
   .strict()
 
+export function parsePreviousSnapshot(input: unknown): PreviousSnapshot {
+  const current = snapshotSchema.safeParse(input)
+  if (current.success) return current.data
+
+  const legacy = legacySnapshotSchema.parse(input)
+  return {
+    athletes: legacy.athletes.flatMap((athlete) =>
+      athlete.visibility === 'public' &&
+      athlete.eligibility.status === 'verified' &&
+      athlete.statsStatus === 'verified' &&
+      athlete.stats !== null
+        ? [{
+            id: athlete.id,
+            performance: {
+              status: 'available' as const,
+              state: athlete.freshness === 'stale' ? ('stale' as const) : ('final' as const),
+              competition: athlete.competition,
+              season: athlete.season,
+              stats: athlete.stats,
+              source: athlete.source,
+            },
+          }]
+        : [],
+    ),
+  }
+}
+
 async function readPreviousSnapshot(): Promise<PreviousSnapshot> {
   try {
     const input: unknown = JSON.parse(await readFile(snapshotUrl, 'utf8'))
-    const current = snapshotSchema.safeParse(input)
-    if (current.success) return current.data
-
-    const legacy = legacySnapshotSchema.parse(input)
-    return {
-      athletes: legacy.athletes.flatMap((athlete) =>
-        athlete.statsStatus === 'verified' && athlete.stats !== null
-          ? [
-              {
-                id: athlete.id,
-                performance: {
-                  status: 'available' as const,
-                  state: athlete.freshness === 'stale' ? ('stale' as const) : ('final' as const),
-                  competition: athlete.competition,
-                  season: athlete.season,
-                  stats: athlete.stats,
-                  source: athlete.source,
-                },
-              },
-            ]
-          : [],
-      ),
-    }
+    return parsePreviousSnapshot(input)
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       return { athletes: [] }
@@ -214,20 +164,41 @@ function snapshotPathname(snapshotPath: string | URL) {
   return snapshotPath instanceof URL ? fileURLToPath(snapshotPath) : snapshotPath
 }
 
+async function renameReplacing(temp: string, target: string): Promise<void> {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      await rename(temp, target)
+      return
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code
+      if (!['EPERM', 'EBUSY', 'EACCES'].includes(code ?? '') || attempt >= 20) throw error
+      await new Promise((resolve) => setTimeout(resolve, 5 * (attempt + 1)))
+    }
+  }
+}
+
 export async function writeSnapshotAtomically(
   snapshotPath: string | URL,
   snapshot: unknown,
 ): Promise<void> {
   const target = snapshotPathname(snapshotPath)
   const extension = extname(target)
-  const temp = join(dirname(target), `${basename(target, extension)}.tmp${extension || '.json'}`)
+  const temp = join(dirname(target), `${basename(target, extension)}.${process.pid}.${randomUUID()}.tmp${extension || '.json'}`)
+  let handle: Awaited<ReturnType<typeof open>> | undefined
 
   try {
     const validated = snapshotSchema.parse(snapshot)
     const serialized = `${JSON.stringify(validated, null, 2)}\n`
-    await writeFile(temp, serialized, 'utf8')
-    await rename(temp, target)
+    handle = await open(temp, 'wx')
+    await handle.writeFile(serialized, 'utf8')
+    await handle.sync()
+    await handle.close()
+    handle = undefined
+    const writtenBytes = await readFile(temp, 'utf8')
+    snapshotSchema.parse(JSON.parse(writtenBytes))
+    await renameReplacing(temp, target)
   } catch (error) {
+    await handle?.close().catch(() => undefined)
     await rm(temp, { force: true }).catch(() => undefined)
     throw error
   }
@@ -247,7 +218,7 @@ export async function syncData(now?: Date): Promise<AthleteSnapshot> {
   const coverageLedger = coverageLedgerSchema.parse(
     JSON.parse(await readFile(coverageLedgerUrl, 'utf8')),
   )
-  const coverage = summarizeCoverage(coverageLedger)
+  const coverage = summarizeCoverage(coverageLedger, effectiveNow)
   const next = await buildSnapshot({
     entries,
     previous,

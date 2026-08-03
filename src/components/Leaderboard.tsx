@@ -10,8 +10,10 @@ function metricLabel(athlete: Athlete) {
 }
 
 export function Leaderboard({ athletes }: { athletes: Athlete[] }) {
-  const leaders = rankAthletes(athletes)
   const { locale, messages } = useI18n()
+  const groups = [...new Set(athletes.map((athlete) => athlete.sport))]
+    .map((sport) => ({ sport, leaders: rankAthletes(athletes.filter((athlete) => athlete.sport === sport)) }))
+    .filter((group) => group.leaders.length > 0)
 
   return (
     <section className="leaderboard" aria-labelledby="leaders-title">
@@ -25,8 +27,11 @@ export function Leaderboard({ athletes }: { athletes: Athlete[] }) {
       <div className="leaderboard__note">
         <Trophy size={18} aria-hidden="true" /> {messages.leadersNote}
       </div>
-      <ol className="leaderboard__list">
-        {leaders.map((athlete, index) => (
+      {groups.map(({ sport, leaders }) => (
+        <div key={sport}>
+          <h3>{messages.sports[sport as keyof typeof messages.sports]}</h3>
+          <ol className="leaderboard__list">
+          {leaders.map((athlete, index) => (
           <li key={athlete.id}>
             <span className="leaderboard__rank">{String(index + 1).padStart(2, '0')}</span>
             <span className="leaderboard__name">
@@ -41,8 +46,10 @@ export function Leaderboard({ athletes }: { athletes: Athlete[] }) {
               <ArrowUpRight size={18} aria-hidden="true" />
             </a>
           </li>
-        ))}
-      </ol>
+          ))}
+          </ol>
+        </div>
+      ))}
     </section>
   )
 }

@@ -1,5 +1,8 @@
 {
   "oscar-gloukh": {
+    "sport": "football",
+    "competition": "Eredivisie",
+    "season": "2025-26",
     "sourceUrl": "https://english.ajax.nl/teams/ajax-1/oscar-gloukh",
     "retrievedAt": "2026-07-22T20:30:15.000Z",
     "stats": null,

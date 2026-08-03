@@ -84,6 +84,11 @@ describe('athleteSchema', () => {
       aliases: [],
       sport: 'football',
       image: undefined,
+      affiliation: {
+        ...validAthlete.affiliation,
+        competition: 'Eredivisie',
+        season: '2026-27',
+      },
       performance: {
         ...validAthlete.performance,
         status: 'unavailable',
@@ -104,6 +109,18 @@ describe('athleteSchema', () => {
         sport: 'football',
       }),
     ).toThrow(/stats kind.*sport/i)
+  })
+
+  it.each([
+    ['competition', 'EuroLeague'],
+    ['season', '2026-27'],
+  ] as const)('requires performance %s to match the verified affiliation', (field, value) => {
+    expect(() =>
+      athleteSchema.parse({
+        ...validAthlete,
+        performance: { ...validAthlete.performance, [field]: value },
+      }),
+    ).toThrow(/affiliation/i)
   })
 
   it('rejects non-public and non-overseas records', () => {
@@ -218,6 +235,44 @@ describe('snapshotSchema', () => {
     expect(() =>
       snapshotSchema.parse({ ...validSnapshot, athletes: [validAthlete, validAthlete] }),
     ).toThrow(/duplicate/i)
+  })
+
+  it('compares causal timestamps by numeric instant', () => {
+    const equivalentInstant = {
+      ...validAthlete,
+      eligibility: { ...validAthlete.eligibility, retrievedAt: '2026-07-23T08:00:00Z' },
+      affiliation: {
+        ...validAthlete.affiliation,
+        source: { ...validAthlete.affiliation.source, retrievedAt: '2026-07-23T08:00:00Z' },
+      },
+      performance: {
+        ...validAthlete.performance,
+        source: { ...validAthlete.performance.source, retrievedAt: '2026-07-23T08:00:00Z' },
+      },
+      image: { ...validAthlete.image, retrievedAt: '2026-07-23T08:00:00Z' },
+    }
+    expect(snapshotSchema.safeParse({ ...validSnapshot, athletes: [equivalentInstant] }).success).toBe(true)
+  })
+
+  it.each([
+    ['eligibility', (athlete: typeof validAthlete) => ({
+      ...athlete,
+      eligibility: { ...athlete.eligibility, retrievedAt: '2026-07-23T08:00:00.001Z' },
+    })],
+    ['affiliation', (athlete: typeof validAthlete) => ({
+      ...athlete,
+      affiliation: { ...athlete.affiliation, source: { ...athlete.affiliation.source, retrievedAt: '2026-07-23T08:00:00.001Z' } },
+    })],
+    ['performance', (athlete: typeof validAthlete) => ({
+      ...athlete,
+      performance: { ...athlete.performance, source: { ...athlete.performance.source, retrievedAt: '2026-07-23T08:00:00.001Z' } },
+    })],
+    ['image', (athlete: typeof validAthlete) => ({
+      ...athlete,
+      image: { ...athlete.image, retrievedAt: '2026-07-23T08:00:00.001Z' },
+    })],
+  ] as const)('rejects %s evidence observed after snapshot generation', (_label, mutate) => {
+    expect(() => snapshotSchema.parse({ ...validSnapshot, athletes: [mutate(validAthlete)] })).toThrow(/generated/i)
   })
 
   it.each([

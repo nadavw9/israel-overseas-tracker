@@ -9,12 +9,13 @@ export function primaryMetric(athlete: Athlete): number {
 }
 
 export function rankAthletes(athletes: Athlete[]): Athlete[] {
-  return athletes
-    .filter(
+  const eligible = athletes.filter(
       (athlete) =>
         athlete.visibility === 'public' &&
         athlete.performance.status === 'available' &&
         athlete.performance.stats !== null,
     )
-    .toSorted((left, right) => primaryMetric(right) - primaryMetric(left))
+  const sports = new Set(eligible.map((athlete) => athlete.sport))
+  if (sports.size > 1) throw new Error('Cannot rank athletes from different sports together')
+  return eligible.toSorted((left, right) => primaryMetric(right) - primaryMetric(left))
 }

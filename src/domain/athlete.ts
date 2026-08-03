@@ -175,6 +175,20 @@ export const athleteSchema = z
         path: ['performance', 'stats', 'kind'],
       })
     }
+    if (athlete.performance.competition !== athlete.affiliation.competition) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Performance competition must match affiliation competition',
+        path: ['performance', 'competition'],
+      })
+    }
+    if (athlete.performance.season !== athlete.affiliation.season) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Performance season must match affiliation season',
+        path: ['performance', 'season'],
+      })
+    }
   })
 
 export const snapshotSchema = z
@@ -196,6 +210,23 @@ export const snapshotSchema = z
         })
       }
       seen.add(athlete.id)
+
+      const generatedMilliseconds = new Date(snapshot.generatedAt).getTime()
+      const observations = [
+        ['eligibility', athlete.eligibility.retrievedAt],
+        ['affiliation', athlete.affiliation.source.retrievedAt],
+        ['performance', athlete.performance.source.retrievedAt],
+        ...(athlete.image ? ([['image', athlete.image.retrievedAt]] as const) : []),
+      ] as const
+      observations.forEach(([field, retrievedAt]) => {
+        if (new Date(retrievedAt).getTime() > generatedMilliseconds) {
+          context.addIssue({
+            code: 'custom',
+            message: `${field} observation cannot be after snapshot generatedAt`,
+            path: ['athletes', index, field, 'retrievedAt'],
+          })
+        }
+      })
     })
   })
 

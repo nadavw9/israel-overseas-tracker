@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import snapshotJson from '../../public/data/snapshot.json'
 import { TrackerApp } from '../../src/app/App'
 import { snapshotSchema } from '../../src/domain/athlete'
@@ -9,6 +9,8 @@ const snapshot = snapshotSchema.parse(snapshotJson)
 
 describe('verified athlete list', () => {
   it('shows the verified count and honest source freshness', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(snapshot.generatedAt))
     render(<TrackerApp snapshot={snapshot} />)
     const generatedDate = new Intl.DateTimeFormat('en-GB', {
       day: 'numeric',
@@ -23,6 +25,7 @@ describe('verified athlete list', () => {
     ).toBeInTheDocument()
     expect(screen.queryByText(/^live$/i)).not.toBeInTheDocument()
     expect(screen.getAllByText(/source checked/i)).toHaveLength(3)
+    vi.useRealTimers()
   })
 
   it('filters by athlete, team, competition, and sport', async () => {

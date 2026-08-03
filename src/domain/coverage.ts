@@ -192,9 +192,20 @@ export const coverageSummarySchema = z
 
 export type CoverageSummary = z.output<typeof coverageSummarySchema>
 
-export function summarizeCoverage(ledger: CoverageLedger) {
+export function summarizeCoverage(ledger: CoverageLedger, asOf?: Date) {
+  const summaryInstant = asOf ?? new Date(ledger.generatedAt)
+  const summaryMilliseconds = summaryInstant.getTime()
+  const ledgerMilliseconds = new Date(ledger.generatedAt).getTime()
+  if (!Number.isFinite(summaryMilliseconds) || ledgerMilliseconds > summaryMilliseconds) {
+    throw new Error('Coverage ledger cannot be generated after the summary clock')
+  }
   const required = ledger.entries.length
-  const healthy = ledger.entries.filter((entry) => entry.health === 'healthy').length
+  const healthy = ledger.entries.filter((entry) => {
+    if (entry.health !== 'healthy' || entry.lastSuccessAt === undefined) return false
+    const ageMilliseconds = summaryMilliseconds - new Date(entry.lastSuccessAt).getTime()
+    return ageMilliseconds >= 0 &&
+      ageMilliseconds <= entry.freshnessWindowDays * 24 * 60 * 60 * 1000
+  }).length
   return coverageSummarySchema.parse({ required, healthy, complete: required > 0 && required === healthy })
 }
 
