@@ -12,7 +12,7 @@
   {"id":"daniel-peretz","name":{"en":"Daniel Peretz","he":"דניאל פרץ"},"aliases":[],"sport":"football","genderCategory":"men","tier":"senior-professional","lifecycleStatus":"active","visibility":"public"},
   {"id":"talia-sommer","name":{"en":"Talia Sommer","he":"טליה זומר"},"aliases":[],"sport":"football","genderCategory":"women","tier":"senior-professional","lifecycleStatus":"active","visibility":"public"},
   {"id":"vital-kats","name":{"en":"Vital Kats","he":"ויטל כץ"},"aliases":[],"sport":"football","genderCategory":"women","tier":"senior-professional","lifecycleStatus":"active","visibility":"public"},
-  {"id":"amit-vales","name":{"en":"Amit Vales","he":"עמית ואלס"},"aliases":[],"sport":"tennis","discipline":"singles","genderCategory":"men","tier":"international-circuit","lifecycleStatus":"active","visibility":"public"},
+  {"id":"amit-vales","name":{"en":"Amit Vales","he":"עמית ולס"},"aliases":[],"sport":"tennis","discipline":"singles","genderCategory":"men","tier":"international-circuit","lifecycleStatus":"active","visibility":"public"},
   {"id":"orel-kimhi","name":{"en":"Orel Kimhi","he":"אוראל קמחי"},"aliases":[],"sport":"tennis","discipline":"singles","genderCategory":"men","tier":"international-circuit","lifecycleStatus":"active","visibility":"public"},
   {"id":"ofek-shimanov","name":{"en":"Ofek Shimanov","he":"אופק שימנוב"},"aliases":[],"sport":"tennis","discipline":"singles","genderCategory":"men","tier":"international-circuit","lifecycleStatus":"active","visibility":"public"},
   {"id":"daniel-cukierman","name":{"en":"Daniel Cukierman","he":"דניאל צוקרמן"},"aliases":["Daniel Zuckerman"],"sport":"tennis","discipline":"singles","genderCategory":"men","tier":"international-circuit","lifecycleStatus":"active","visibility":"public"},

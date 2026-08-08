@@ -45,6 +45,13 @@ describe('registry compiler', () => {
     ])
   })
 
+  it('uses the official Israel Tennis Association Hebrew spelling for Amit Vales', () => {
+    const amit = publicRegistry.find((athlete) => athlete.id === 'amit-vales')
+
+    expect(amit?.name.he).toBe('עמית ולס')
+    expect(amit?.eligibility.publisher).toBe('Israel Tennis Association')
+  })
+
   it('does not publish media without approved rights', () => {
     expect(publicRegistry.every((athlete) => athlete.image === undefined)).toBe(true)
   })
