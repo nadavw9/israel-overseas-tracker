@@ -39,7 +39,7 @@ describe('FreshnessBadge', () => {
 
   it.each([
     ['not-integrated', /identity\/activity verified.*not integrated/i],
-    ['provider-unavailable', /performance temporarily unavailable/i],
+    ['provider-unavailable', /identity\/activity verified · performance temporarily unavailable/i],
   ] as const)('explains unavailable %s without reading a performance source', (reason, expected) => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-08-01T08:00:00.000Z'))

@@ -35,7 +35,7 @@ export function Leaderboard({ athletes }: { athletes: Athlete[] }) {
             <span className="leaderboard__rank">{String(index + 1).padStart(2, '0')}</span>
             <span className="leaderboard__name">
               <strong>{athlete.name[locale]}</strong>
-              <small>{participationDisplay(athlete.participation).title} · {participationDisplay(athlete.participation).competition}</small>
+              <small>{participationDisplay(athlete.participation, messages.circuitParticipation).title} · {participationDisplay(athlete.participation, messages.circuitParticipation).competition}</small>
             </span>
             <span className="leaderboard__metric">
               <strong>{primaryMetric(athlete)}</strong>

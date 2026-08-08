@@ -45,7 +45,7 @@ export function AthleteDrawer({ athlete, onClose, returnFocus }: AthleteDrawerPr
   const drawer = useRef<HTMLElement>(null)
   const { locale, messages } = useI18n()
   const displayName = athlete.name[locale]
-  const participation = participationDisplay(athlete.participation)
+  const participation = participationDisplay(athlete.participation, messages.circuitParticipation)
 
   useEffect(() => {
     const returnTarget = returnFocus.current

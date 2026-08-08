@@ -41,7 +41,8 @@ export const messages = {
     lastVerified: 'Last verified',
     identityOnly: 'Identity verified · performance unavailable',
     notIntegrated: 'Identity/activity verified · performance not integrated',
-    providerUnavailable: 'Performance temporarily unavailable',
+    providerUnavailable: 'Identity/activity verified · performance temporarily unavailable',
+    circuitParticipation: (circuit: string) => `${circuit} international circuit`,
     viewsLabel: 'Tracker views',
     views: { athletes: 'Athletes', rankings: 'Rankings', map: 'Map' },
     sports: {
@@ -140,7 +141,8 @@ export const messages = {
     lastVerified: 'אימות אחרון',
     identityOnly: 'הזהות אומתה · נתוני ביצועים אינם זמינים',
     notIntegrated: 'הזהות/הפעילות אומתה · נתוני הביצועים טרם שולבו',
-    providerUnavailable: 'נתוני הביצועים אינם זמינים זמנית',
+    providerUnavailable: 'הזהות/הפעילות אומתה · נתוני הביצועים אינם זמינים זמנית',
+    circuitParticipation: (circuit: string) => `הסבב הבין־לאומי ${circuit}`,
     viewsLabel: 'תצוגות המעקב',
     views: { athletes: 'ספורטאים', rankings: 'דירוגים', map: 'מפה' },
     sports: {

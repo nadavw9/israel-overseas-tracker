@@ -40,7 +40,7 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
   const stats = statItems(athlete.performance.stats)
   const { locale, messages } = useI18n()
   const displayName = athlete.name[locale]
-  const participation = participationDisplay(athlete.participation)
+  const participation = participationDisplay(athlete.participation, messages.circuitParticipation)
   const source = athlete.performance.status === 'available'
     ? athlete.performance.source
     : participation.source

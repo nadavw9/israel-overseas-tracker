@@ -55,10 +55,14 @@ describe('athlete details', () => {
     const circuit = circuitAthlete()
     render(<TrackerApp snapshot={{ ...snapshot, athletes: [circuit] }} />)
 
-    expect(screen.getByText('ITF')).toBeInTheDocument()
+    expect(screen.getByText('ITF international circuit')).toBeInTheDocument()
     expect(screen.getByText(/Granby National Bank Championships · 2026/)).toBeInTheDocument()
     expect(screen.queryByText(/United Kingdom|Ajax|Portland Trail Blazers/)).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /view data source/i })).toHaveAttribute('href', 'https://example.com/itf/circuit-athlete')
+
+    await user.click(screen.getByRole('button', { name: 'עברית' }))
+    expect(screen.getByText('הסבב הבין־לאומי ITF')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'English' }))
 
     await user.click(screen.getByRole('button', { name: /open circuit athlete/i }))
     expect(screen.getByRole('link', { name: /circuit activity source/i })).toBeInTheDocument()

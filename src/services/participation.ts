@@ -2,6 +2,9 @@ import type { Athlete, PublicParticipation } from '../domain/athlete'
 
 export type TeamParticipation = Extract<PublicParticipation, { kind: 'team-affiliation' }>
 export type CircuitParticipation = Extract<PublicParticipation, { kind: 'circuit-activity' }>
+export type CircuitTitleFormatter = (circuit: CircuitParticipation['activity']['circuit']) => string
+
+const englishCircuitTitle: CircuitTitleFormatter = (circuit) => `${circuit} international circuit`
 
 export function isTeamParticipation(participation: PublicParticipation): participation is TeamParticipation {
   return participation.kind === 'team-affiliation'
@@ -11,7 +14,10 @@ export function isCircuitParticipation(participation: PublicParticipation): part
   return participation.kind === 'circuit-activity'
 }
 
-export function participationDisplay(participation: PublicParticipation) {
+export function participationDisplay(
+  participation: PublicParticipation,
+  circuitTitle: CircuitTitleFormatter = englishCircuitTitle,
+) {
   if (isTeamParticipation(participation)) {
     const { affiliation } = participation
     return {
@@ -27,7 +33,7 @@ export function participationDisplay(participation: PublicParticipation) {
   const { activity } = participation
   return {
     kind: participation.kind,
-    title: activity.circuit,
+    title: circuitTitle(activity.circuit),
     competition: activity.competition,
     season: activity.season,
     source: activity.source,
