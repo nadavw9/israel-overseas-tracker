@@ -840,6 +840,71 @@ describe('legacy snapshot migration', () => {
     }).athletes.map((athlete) => athlete.id)).toEqual(['retained'])
   })
 
+  it('migrates the checked-in normalized predecessor snapshot', async () => {
+    const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
+    const predecessor: unknown = JSON.parse(await readFile(
+      join(process.cwd(), 'public/data/snapshot.json'),
+      'utf8',
+    ))
+
+    const previous = parsePreviousSnapshot(predecessor)
+
+    expect(previous.athletes.map((athlete) => athlete.id)).toEqual([
+      'deni-avdija',
+      'ben-saraf',
+    ])
+    expect(previous.athletes.every(
+      (athlete) => athlete.performance.status === 'available',
+    )).toBe(true)
+  })
+
+  it('keeps only causal available history from a normalized predecessor snapshot', async () => {
+    const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
+    const predecessor = JSON.parse(await readFile(
+      join(process.cwd(), 'public/data/snapshot.json'),
+      'utf8',
+    )) as {
+      generatedAt: string
+      athletes: Array<{
+        id: string
+        performance: {
+          status: string
+          source: { retrievedAt: string }
+        }
+      }>
+    }
+    const retained = predecessor.athletes[0]
+    const unavailable = predecessor.athletes[2]
+    if (retained === undefined || unavailable === undefined) {
+      throw new Error('Checked-in predecessor fixtures are incomplete')
+    }
+    const future = structuredClone(retained)
+    future.id = 'future-history'
+    future.performance.source.retrievedAt = new Date(
+      new Date(predecessor.generatedAt).getTime() + 1,
+    ).toISOString()
+
+    const previous = parsePreviousSnapshot({
+      ...predecessor,
+      athletes: [retained, unavailable, future],
+    })
+
+    expect(previous.athletes.map((athlete) => athlete.id)).toEqual(['deni-avdija'])
+  })
+
+  it('rejects private or unknown fields in a normalized predecessor snapshot', async () => {
+    const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
+    const predecessor = JSON.parse(await readFile(
+      join(process.cwd(), 'public/data/snapshot.json'),
+      'utf8',
+    )) as { athletes: Array<Record<string, unknown>> }
+    const athlete = predecessor.athletes[0]
+    if (athlete === undefined) throw new Error('Checked-in predecessor fixture is empty')
+    athlete.birthDate = '2001-01-02'
+
+    expect(() => parsePreviousSnapshot(predecessor)).toThrow(/birthDate|unrecognized/i)
+  })
+
   it('accepts the current source-free unavailable shape without making it stale', async () => {
     const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
     const current = previousSnapshot()

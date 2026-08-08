@@ -12,11 +12,25 @@ import { registryMigrationInstant } from '../src/domain/registry'
 import {
   athleteStatsSchema,
   httpsUrlSchema,
+  publicAffiliationSchema,
+  publicEligibilitySchema,
+  publicMediaSchema,
   snapshotSchema,
   type AthleteSnapshot,
 } from '../src/domain/athlete'
-import { coverageLedgerSchema, summarizeCoverage } from '../src/domain/coverage'
-import { providerSchema } from '../src/domain/taxonomy'
+import {
+  coverageLedgerSchema,
+  coverageSummarySchema,
+  summarizeCoverage,
+} from '../src/domain/coverage'
+import {
+  athleteTierSchema,
+  genderCategorySchema,
+  lifecycleStatusSchema,
+  observationStateSchema,
+  providerSchema,
+  sportSchema,
+} from '../src/domain/taxonomy'
 import { buildSnapshot, type PreviousSnapshot } from '../src/services/snapshot'
 
 const snapshotUrl = new URL('../public/data/snapshot.json', import.meta.url)
@@ -76,6 +90,101 @@ export async function fetchProviderRecord(
   })
 }
 
+const nonEmptyStringSchema = z.string().trim().min(1)
+const predecessorPerformanceSourceSchema = z
+  .object({
+    provider: providerSchema,
+    sourceUrl: httpsUrlSchema,
+    retrievedAt: z.iso.datetime(),
+  })
+  .strict()
+const predecessorPerformanceContext = {
+  competition: nonEmptyStringSchema,
+  season: nonEmptyStringSchema,
+  source: predecessorPerformanceSourceSchema,
+}
+const predecessorPerformanceSchema = z.discriminatedUnion('status', [
+  z
+    .object({
+      status: z.literal('available'),
+      state: observationStateSchema.exclude(['unavailable']),
+      stats: athleteStatsSchema,
+      ...predecessorPerformanceContext,
+    })
+    .strict(),
+  z
+    .object({
+      status: z.literal('unavailable'),
+      state: z.literal('unavailable'),
+      stats: z.null(),
+      ...predecessorPerformanceContext,
+    })
+    .strict(),
+])
+const predecessorAthleteSchema = z
+  .object({
+    id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+    name: z.object({ en: nonEmptyStringSchema, he: nonEmptyStringSchema }).strict(),
+    aliases: z.array(nonEmptyStringSchema),
+    sport: sportSchema,
+    discipline: nonEmptyStringSchema.optional(),
+    genderCategory: genderCategorySchema,
+    tier: athleteTierSchema,
+    lifecycleStatus: lifecycleStatusSchema,
+    visibility: z.literal('public'),
+    eligibility: publicEligibilitySchema,
+    affiliation: publicAffiliationSchema,
+    performance: predecessorPerformanceSchema,
+    image: publicMediaSchema.optional(),
+  })
+  .strict()
+  .superRefine((athlete, context) => {
+    if (
+      athlete.performance.status === 'available' &&
+      athlete.performance.stats.kind !== athlete.sport
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Stats kind must match athlete sport',
+        path: ['performance', 'stats', 'kind'],
+      })
+    }
+    if (athlete.performance.competition !== athlete.affiliation.competition) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Performance competition must match affiliation competition',
+        path: ['performance', 'competition'],
+      })
+    }
+    if (athlete.performance.season !== athlete.affiliation.season) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Performance season must match affiliation season',
+        path: ['performance', 'season'],
+      })
+    }
+  })
+const predecessorSnapshotSchema = z
+  .object({
+    generatedAt: z.iso.datetime(),
+    athletes: z.array(predecessorAthleteSchema),
+    coverage: coverageSummarySchema,
+  })
+  .strict()
+  .superRefine((snapshot, context) => {
+    const seen = new Set<string>()
+    snapshot.athletes.forEach((athlete, index) => {
+      if (seen.has(athlete.id)) {
+        context.addIssue({
+          code: 'custom',
+          message: `Duplicate athlete id: ${athlete.id}`,
+          path: ['athletes', index, 'id'],
+        })
+      }
+      seen.add(athlete.id)
+    })
+  })
+
 const legacySnapshotSchema = z
   .object({
     generatedAt: z.iso.datetime(),
@@ -124,6 +233,19 @@ const legacySnapshotSchema = z
 export function parsePreviousSnapshot(input: unknown): PreviousSnapshot {
   const current = snapshotSchema.safeParse(input)
   if (current.success) return current.data
+
+  const predecessor = predecessorSnapshotSchema.safeParse(input)
+  if (predecessor.success) {
+    const generatedMilliseconds = new Date(predecessor.data.generatedAt).getTime()
+    return {
+      athletes: predecessor.data.athletes.flatMap((athlete) =>
+        athlete.performance.status === 'available' &&
+        new Date(athlete.performance.source.retrievedAt).getTime() <= generatedMilliseconds
+          ? [{ id: athlete.id, performance: athlete.performance }]
+          : [],
+      ),
+    }
+  }
 
   const legacy = legacySnapshotSchema.parse(input)
   return {
