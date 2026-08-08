@@ -18,15 +18,26 @@ type TrackerAppProps = {
 }
 
 function matchesQuery(athlete: Athlete, query: string): boolean {
-  const participation = participationDisplay(athlete.participation)
+  const englishParticipation = participationDisplay(
+    athlete.participation,
+    messages.en.circuitParticipation,
+  )
+  const hebrewParticipation = participationDisplay(
+    athlete.participation,
+    messages.he.circuitParticipation,
+  )
   const haystack = [
     athlete.name.en,
     athlete.name.he,
     ...athlete.aliases,
-    participation.title,
-    participation.competition,
-    participation.location?.city,
-    participation.location?.country,
+    englishParticipation.title,
+    englishParticipation.competition,
+    englishParticipation.season,
+    hebrewParticipation.title,
+    hebrewParticipation.competition,
+    hebrewParticipation.season,
+    englishParticipation.location?.city,
+    englishParticipation.location?.country,
   ]
     .filter(Boolean)
     .join(' ')

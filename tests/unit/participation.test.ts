@@ -25,7 +25,7 @@ function circuitActivity(circuit: 'ATP' | 'WTA' | 'ITF'): PublicParticipation {
 describe('circuit participation display', () => {
   it.each([
     ['ATP', 'ATP / ITF international circuit', 'הסבב הבין־לאומי ATP / ITF'],
-    ['ITF', 'ATP / ITF international circuit', 'הסבב הבין־לאומי ATP / ITF'],
+    ['ITF', 'ITF international circuit', 'הסבב הבין־לאומי ITF'],
     ['WTA', 'WTA / ITF international circuit', 'הסבב הבין־לאומי WTA / ITF'],
   ] as const)('labels %s without inventing an organization or location', (circuit, english, hebrew) => {
     const participation = circuitActivity(circuit)

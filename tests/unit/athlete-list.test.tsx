@@ -95,6 +95,9 @@ describe('verified athlete list', () => {
       await user.type(search, term)
       expect(screen.getByRole('button', { name: /open circuit athlete/i })).toBeInTheDocument()
     }
+    await user.clear(search)
+    await user.type(search, 'הסבב')
+    expect(screen.getByRole('button', { name: /open circuit athlete/i })).toBeInTheDocument()
   })
 
   it('does not add an organization country as a location search term', async () => {

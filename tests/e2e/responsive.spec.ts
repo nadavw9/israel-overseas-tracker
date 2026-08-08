@@ -106,8 +106,8 @@ test('390px filters, RTL profile, and drawer keep the directory usable', async (
   await expect(dialog).toBeVisible()
   await expect(dialog.getByText('בסיס הזכאות')).toBeVisible()
   await expect(dialog.getByRole('link', { name: /מקור הזכאות/ })).toBeVisible()
-  await expect(dialog.getByRole('link', { name: /מקור השיוך/ })).toBeVisible()
-  await expect(dialog.getByRole('link', { name: /מקור הביצועים/ })).toBeVisible()
+  await expect(dialog.getByRole('link', { name: /מקור הקבוצה הנוכחית/ })).toBeVisible()
+  await expect(dialog.getByRole('link', { name: /מקור הביצועים/ })).toHaveCount(0)
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
 })

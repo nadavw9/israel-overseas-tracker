@@ -7,6 +7,8 @@ export type CircuitTitleFormatter = (circuit: CircuitParticipation['activity']['
 const englishCircuitTitle: CircuitTitleFormatter = (circuit) =>
   circuit === 'WTA'
     ? 'WTA / ITF international circuit'
+    : circuit === 'ITF'
+      ? 'ITF international circuit'
     : 'ATP / ITF international circuit'
 
 export function isTeamParticipation(participation: PublicParticipation): participation is TeamParticipation {

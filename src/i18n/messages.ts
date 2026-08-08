@@ -44,6 +44,8 @@ export const messages = {
     providerUnavailable: 'Identity/activity verified · performance temporarily unavailable',
     circuitParticipation: (circuit: string) => circuit === 'WTA'
       ? 'WTA / ITF international circuit'
+      : circuit === 'ITF'
+        ? 'ITF international circuit'
       : 'ATP / ITF international circuit',
     viewsLabel: 'Tracker views',
     views: { athletes: 'Athletes', rankings: 'Rankings', map: 'Map' },
@@ -146,6 +148,8 @@ export const messages = {
     providerUnavailable: 'הזהות/הפעילות אומתה · נתוני הביצועים אינם זמינים זמנית',
     circuitParticipation: (circuit: string) => circuit === 'WTA'
       ? 'הסבב הבין־לאומי WTA / ITF'
+      : circuit === 'ITF'
+        ? 'הסבב הבין־לאומי ITF'
       : 'הסבב הבין־לאומי ATP / ITF',
     viewsLabel: 'תצוגות המעקב',
     views: { athletes: 'ספורטאים', rankings: 'דירוגים', map: 'מפה' },
