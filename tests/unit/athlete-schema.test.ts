@@ -74,9 +74,53 @@ const validSnapshot = {
   coverage: { required: 4, healthy: 0, complete: false },
 } as const
 
+const circuitAthlete = (tier: 'international-circuit' | 'senior-professional' = 'international-circuit') => ({
+  ...validAthlete,
+  sport: 'tennis',
+  tier,
+  participation: {
+    kind: 'circuit-activity',
+    activity: {
+      circuit: 'ATP',
+      discipline: 'singles',
+      competition: 'Wimbledon',
+      season: '2026',
+      activityType: 'sanctioned-result',
+      effectiveAt: '2026-07-10T08:00:00.000Z',
+      source: {
+        publisher: 'ATP',
+        sourceUrl: 'https://example.com/atp/wimbledon',
+        retrievedAt: '2026-07-23T08:00:00.000Z',
+      },
+    },
+  },
+  performance: {
+    status: 'unavailable',
+    state: 'unavailable',
+    stats: null,
+    reason: 'not-integrated',
+  },
+} as const)
+
 describe('athleteSchema', () => {
   it('accepts a normalized public athlete with verified public data', () => {
     expect(athleteSchema.parse(validAthlete)).toEqual(validAthlete)
+  })
+
+  it('accepts both valid tier and participation pairings', () => {
+    expect(athleteSchema.safeParse(validAthlete).success).toBe(true)
+    expect(athleteSchema.safeParse(circuitAthlete()).success).toBe(true)
+  })
+
+  it('rejects an international-circuit tier paired with team participation', () => {
+    expect(athleteSchema.safeParse({
+      ...validAthlete,
+      tier: 'international-circuit',
+    }).success).toBe(false)
+  })
+
+  it('rejects a non-circuit tier paired with circuit participation', () => {
+    expect(athleteSchema.safeParse(circuitAthlete('senior-professional')).success).toBe(false)
   })
 
   it.each(['not-integrated', 'provider-unavailable'] as const)(
@@ -327,6 +371,25 @@ describe('athleteSchema', () => {
 describe('snapshotSchema', () => {
   it('accepts honest coverage', () => {
     expect(snapshotSchema.parse(validSnapshot).coverage.complete).toBe(false)
+  })
+
+  it('accepts snapshots with both valid tier and participation pairings', () => {
+    expect(snapshotSchema.safeParse(validSnapshot).success).toBe(true)
+    expect(snapshotSchema.safeParse({
+      ...validSnapshot,
+      athletes: [circuitAthlete()],
+    }).success).toBe(true)
+  })
+
+  it('rejects snapshots with either invalid tier and participation pairing', () => {
+    expect(snapshotSchema.safeParse({
+      ...validSnapshot,
+      athletes: [{ ...validAthlete, tier: 'international-circuit' }],
+    }).success).toBe(false)
+    expect(snapshotSchema.safeParse({
+      ...validSnapshot,
+      athletes: [circuitAthlete('senior-professional')],
+    }).success).toBe(false)
   })
 
   it('rejects duplicate athlete ids', () => {

@@ -187,6 +187,16 @@ export const athleteSchema = z
   })
   .strict()
   .superRefine((athlete, context) => {
+    const circuitTier = athlete.tier === 'international-circuit'
+    const circuitParticipation = athlete.participation.kind === 'circuit-activity'
+    if (circuitTier !== circuitParticipation) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Athlete tier must match participation kind',
+        path: ['participation', 'kind'],
+      })
+    }
+
     if (athlete.performance.status !== 'available') return
 
     if (athlete.performance.stats.kind !== athlete.sport) {
