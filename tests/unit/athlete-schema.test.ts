@@ -77,6 +77,7 @@ const validSnapshot = {
 const circuitAthlete = (tier: 'international-circuit' | 'senior-professional' = 'international-circuit') => ({
   ...validAthlete,
   sport: 'tennis',
+  discipline: 'singles',
   tier,
   participation: {
     kind: 'circuit-activity',
@@ -121,6 +122,20 @@ describe('athleteSchema', () => {
 
   it('rejects a non-circuit tier paired with circuit participation', () => {
     expect(athleteSchema.safeParse(circuitAthlete('senior-professional')).success).toBe(false)
+  })
+
+  it('rejects circuit participation for a non-tennis public athlete', () => {
+    expect(athleteSchema.safeParse({
+      ...circuitAthlete(),
+      sport: 'football',
+    }).success).toBe(false)
+  })
+
+  it('rejects circuit participation that differs from the public athlete declared discipline', () => {
+    expect(athleteSchema.safeParse({
+      ...circuitAthlete(),
+      discipline: 'doubles',
+    }).success).toBe(false)
   })
 
   it.each(['not-integrated', 'provider-unavailable'] as const)(

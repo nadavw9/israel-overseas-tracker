@@ -196,6 +196,25 @@ export const athleteSchema = z
         path: ['participation', 'kind'],
       })
     }
+    if (athlete.participation.kind === 'circuit-activity') {
+      if (athlete.sport !== 'tennis') {
+        context.addIssue({
+          code: 'custom',
+          message: 'Circuit participation requires tennis sport',
+          path: ['sport'],
+        })
+      }
+      if (
+        athlete.discipline !== undefined &&
+        athlete.discipline !== athlete.participation.activity.discipline
+      ) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Circuit participation discipline must match athlete discipline',
+          path: ['participation', 'activity', 'discipline'],
+        })
+      }
+    }
 
     if (athlete.performance.status !== 'available') return
 

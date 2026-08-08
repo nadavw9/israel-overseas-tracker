@@ -322,6 +322,28 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
     })
 
     bundle.circuitActivities.forEach((activity, index) => {
+      const athlete = athletesById.get(activity.athleteId)
+      if (athlete?.tier !== undefined && athlete.tier !== 'international-circuit') {
+        context.addIssue({
+          code: 'custom',
+          message: 'Circuit activities require an international-circuit athlete',
+          path: ['circuitActivities', index, 'athleteId'],
+        })
+      }
+      if (athlete?.sport !== undefined && athlete.sport !== 'tennis') {
+        context.addIssue({
+          code: 'custom',
+          message: 'Circuit activities require a tennis athlete',
+          path: ['circuitActivities', index, 'athleteId'],
+        })
+      }
+      if (athlete?.discipline !== undefined && athlete.discipline !== activity.discipline) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Circuit activity discipline must match athlete discipline',
+          path: ['circuitActivities', index, 'discipline'],
+        })
+      }
       if (!atOrBeforeAsOf(activity.effectiveAt)) {
         context.addIssue({
           code: 'custom',

@@ -232,6 +232,43 @@ describe('normalized registry schemas', () => {
     expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
   })
 
+  it('rejects a verified circuit activity owned by a review non-circuit athlete', () => {
+    const bundle = cloneRegistryFixture()
+    bundle.circuitActivities.push({
+      ...structuredClone(circuitActivity),
+      id: 'activity-athlete-two-wimbledon-2026',
+      athleteId: 'athlete-two',
+    })
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it.each([
+    ['pending', (activity: Record<string, unknown>) => { activity.status = 'pending' }],
+    ['stale', (activity: Record<string, unknown>) => { activity.effectiveAt = '2025-07-22T07:59:59.999Z' }],
+  ])('rejects a %s circuit activity owned by a public non-circuit athlete', (_label, mutate) => {
+    const bundle = cloneRegistryFixture()
+    const activity = structuredClone(circuitActivity) as unknown as Record<string, unknown>
+    mutate(activity)
+    bundle.circuitActivities.push(activity as typeof circuitActivity)
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it('rejects an international-circuit activity owned by a non-tennis athlete', () => {
+    const bundle = circuitRegistryFixture()
+    bundle.athletes[0].sport = 'basketball'
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it('rejects a circuit activity that differs from the athlete declared discipline', () => {
+    const bundle = circuitRegistryFixture()
+    bundle.circuitActivities[0].discipline = 'doubles'
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
   it('accepts an optional para classification for a tennis athlete', () => {
     const tennisAthlete = {
       ...registryBundleFixture.athletes[0],
