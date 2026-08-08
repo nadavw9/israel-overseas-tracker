@@ -12,11 +12,13 @@ describe('registry compiler', () => {
       'oscar-gloukh',
     ])
     expect(publicRegistry.every((athlete) => athlete.eligibility.status === 'verified')).toBe(true)
-    expect(publicRegistry.every((athlete) => athlete.affiliation.primary)).toBe(true)
+    expect(publicRegistry.every((athlete) =>
+      athlete.participation.kind === 'team-affiliation' && athlete.participation.affiliation.primary,
+    )).toBe(true)
   })
 
   it('includes only verified provider bindings', () => {
-    expect(publicRegistry.map((athlete) => athlete.binding.externalId)).toEqual([
+    expect(publicRegistry.map((athlete) => athlete.binding?.externalId)).toEqual([
       '4683021',
       '5242502',
       'oscar-gloukh',
@@ -34,7 +36,9 @@ describe('registry compiler', () => {
       publisher: 'FIBA',
       sourceUrl: 'https://reports.fiba.basketball/reports/2025/FIBA%20U19%20Basketball%20World%20Cup/rosters.pdf',
     })
-    expect(ben?.affiliation.source).toEqual({
+    expect(ben?.participation.kind).toBe('team-affiliation')
+    if (ben?.participation.kind !== 'team-affiliation') throw new Error('Expected team participation')
+    expect(ben.participation.affiliation.source).toEqual({
       publisher: 'NBA',
       sourceUrl: 'https://www.nba.com/player/1642879/ben-saraf',
       retrievedAt: '2026-07-23T08:00:00.000Z',
@@ -79,8 +83,53 @@ describe('injectable registry compiler', () => {
       id: 'athlete-one',
       sport: 'tennis',
       binding: { provider: 'curated', sport: 'tennis' },
-      affiliation: { competition: 'ITF World Tennis Tour' },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: { competition: 'ITF World Tennis Tour' },
+      },
     })
+  })
+
+  it('compiles a circuit athlete without a team affiliation or provider binding', () => {
+    const bundle = structuredClone(registryBundleFixture)
+    bundle.athletes[0].tier = 'international-circuit'
+    bundle.affiliations = []
+    bundle.providerBindings = []
+    bundle.circuitActivities = [{
+      id: 'activity-athlete-one-wimbledon-2026',
+      athleteId: 'athlete-one',
+      circuit: 'WTA',
+      discipline: 'singles',
+      competition: 'Wimbledon',
+      season: '2026',
+      activityType: 'sanctioned-result',
+      effectiveAt: '2026-07-10T08:00:00.000Z',
+      status: 'verified',
+      source: {
+        publisher: 'WTA',
+        sourceUrl: 'https://example.com/wta/wimbledon/athlete-one',
+        retrievedAt: '2026-07-23T08:00:00.000Z',
+      },
+    }]
+
+    const athlete = compileRegistryBundle(bundle, '2026-07-23T08:00:00.000Z')[0]
+    expect(athlete).toMatchObject({
+      participation: {
+        kind: 'circuit-activity',
+        activity: { id: 'activity-athlete-one-wimbledon-2026' },
+      },
+    })
+    expect(athlete?.binding).toBeUndefined()
+  })
+
+  it('compiles a team athlete without a provider binding', () => {
+    const bundle = structuredClone(registryBundleFixture)
+    bundle.providerBindings = []
+
+    expect(compileRegistryBundle(bundle, '2026-07-23T08:00:00.000Z')[0]).toMatchObject({
+      participation: { kind: 'team-affiliation' },
+    })
+    expect(compileRegistryBundle(bundle, '2026-07-23T08:00:00.000Z')[0]?.binding).toBeUndefined()
   })
 
   it('compiles a recent free agent using its released affiliation', () => {
@@ -94,7 +143,10 @@ describe('injectable registry compiler', () => {
     bundle.providerBindings[0].sport = 'basketball'
     bundle.providerBindings[0].competition = 'NBA'
 
-    expect(compileRegistryBundle(bundle, '2026-07-23')[0]?.affiliation.rosterStatus).toBe('released')
+    expect(compileRegistryBundle(bundle, '2026-07-23')[0]?.participation).toMatchObject({
+      kind: 'team-affiliation',
+      affiliation: { rosterStatus: 'released' },
+    })
   })
 
   it('selects the newest evidence, matching binding, and approved media deterministically', () => {
@@ -113,11 +165,11 @@ describe('injectable registry compiler', () => {
 
     const athlete = compileRegistryBundle(bundle, '2026-07-23T08:00:00.000Z')[0]
     expect(athlete?.eligibility.id).toBe('evidence-new')
-    expect(athlete?.binding.id).toBe('binding-new')
+    expect(athlete?.binding?.id).toBe('binding-new')
     expect(athlete?.image?.id).toBe('media-new')
   })
 
-  it('rejects future provenance and mismatched binding competitions', () => {
+  it('rejects future eligibility provenance but ignores a nonmatching optional binding', () => {
     const future = structuredClone(registryBundleFixture)
     future.athletes[0].sport = 'basketball'
     future.affiliations[0].competition = 'NBA'
@@ -133,7 +185,56 @@ describe('injectable registry compiler', () => {
     mismatch.evidence[0].retrievedAt = '2026-07-23T08:00:00.000Z'
     mismatch.providerBindings[0].verifiedAt = '2026-07-23T08:00:00.000Z'
     mismatch.providerBindings[0].competition = 'EuroLeague'
-    expect(() => compileRegistryBundle(mismatch, '2026-07-23T08:00:00.000Z')).toThrow(/binding/i)
+    expect(compileRegistryBundle(mismatch, '2026-07-23T08:00:00.000Z')[0]?.binding).toBeUndefined()
+  })
+
+  it('selects the unique newest qualifying circuit activity deterministically', () => {
+    const bundle = structuredClone(registryBundleFixture)
+    bundle.athletes[0].tier = 'international-circuit'
+    bundle.affiliations = []
+    bundle.providerBindings = []
+    bundle.circuitActivities = [
+      {
+        id: 'activity-new', athleteId: 'athlete-one', circuit: 'WTA', discipline: 'singles',
+        competition: 'Wimbledon', season: '2026', activityType: 'sanctioned-result',
+        effectiveAt: '2026-07-10T08:00:00.000Z', status: 'verified',
+        source: { publisher: 'WTA', sourceUrl: 'https://example.com/new', retrievedAt: '2026-07-23T08:00:00.000Z' },
+      },
+      {
+        id: 'activity-old', athleteId: 'athlete-one', circuit: 'WTA', discipline: 'singles',
+        competition: 'WTA Rankings', season: '2026', activityType: 'ranking',
+        effectiveAt: '2026-07-01T08:00:00.000Z', status: 'verified',
+        source: { publisher: 'WTA', sourceUrl: 'https://example.com/old', retrievedAt: '2026-07-23T08:00:00.000Z' },
+      },
+    ]
+
+    expect(compileRegistryBundle(bundle, '2026-07-23T08:00:00.000Z')[0]?.participation).toMatchObject({
+      kind: 'circuit-activity',
+      activity: { id: 'activity-new' },
+    })
+  })
+
+  it('rejects ambiguous newest circuit activities with identical effective times', () => {
+    const bundle = structuredClone(registryBundleFixture)
+    bundle.athletes[0].tier = 'international-circuit'
+    bundle.affiliations = []
+    bundle.providerBindings = []
+    bundle.circuitActivities = [
+      {
+        id: 'activity-one', athleteId: 'athlete-one', circuit: 'WTA', discipline: 'singles',
+        competition: 'Wimbledon', season: '2026', activityType: 'sanctioned-result',
+        effectiveAt: '2026-07-10T08:00:00.000Z', status: 'verified',
+        source: { publisher: 'WTA', sourceUrl: 'https://example.com/one', retrievedAt: '2026-07-23T08:00:00.000Z' },
+      },
+      {
+        id: 'activity-two', athleteId: 'athlete-one', circuit: 'WTA', discipline: 'doubles',
+        competition: 'Wimbledon', season: '2026', activityType: 'sanctioned-result',
+        effectiveAt: '2026-07-10T08:00:00.000Z', status: 'verified',
+        source: { publisher: 'WTA', sourceUrl: 'https://example.com/two', retrievedAt: '2026-07-23T08:00:00.000Z' },
+      },
+    ]
+
+    expect(() => compileRegistryBundle(bundle, '2026-07-23T08:00:00.000Z')).toThrow(/ambiguous|newest/i)
   })
 
   it('treats equivalent instants equally and rejects fractional-second future provenance', () => {

@@ -70,6 +70,7 @@ export const registryBundleFixture = {
       },
     },
   ],
+  circuitActivities: [],
   providerBindings: [
     {
       id: 'binding-athlete-one-itf',
@@ -78,6 +79,7 @@ export const registryBundleFixture = {
       externalId: 'athlete-one',
       sport: 'tennis',
       competition: 'ITF World Tennis Tour',
+      season: '2026',
       status: 'verified',
       matchedOn: ['name', 'governing-body-identity'],
       verifiedAt: fixtureTimestamp,

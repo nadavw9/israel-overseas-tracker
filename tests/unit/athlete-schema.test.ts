@@ -16,22 +16,25 @@ const validAthlete = {
     sourceUrl: 'https://www.nba.com/player/1630166/deni-avdija/profile',
     retrievedAt: '2026-07-23T08:00:00.000Z',
   },
-  affiliation: {
-    organization: {
-      name: 'Portland Trail Blazers',
-      type: 'club',
-      country: 'United States',
+  participation: {
+    kind: 'team-affiliation',
+    affiliation: {
+      organization: {
+        name: 'Portland Trail Blazers',
+        type: 'club',
+        country: 'United States',
+      },
+      competition: 'NBA',
+      season: '2025-26',
+      rosterStatus: 'active',
+      countsAsOverseas: true,
+      source: {
+        publisher: 'NBA',
+        sourceUrl: 'https://www.nba.com/blazers/roster',
+        retrievedAt: '2026-07-23T08:00:00.000Z',
+      },
+      location: { city: 'Portland', country: 'United States', lat: 45.5152, lng: -122.6784 },
     },
-    competition: 'NBA',
-    season: '2025-26',
-    rosterStatus: 'active',
-    countsAsOverseas: true,
-    source: {
-      publisher: 'NBA',
-      sourceUrl: 'https://www.nba.com/blazers/roster',
-      retrievedAt: '2026-07-23T08:00:00.000Z',
-    },
-    location: { city: 'Portland', country: 'United States', lat: 45.5152, lng: -122.6784 },
   },
   performance: {
     status: 'available',
@@ -76,7 +79,9 @@ describe('athleteSchema', () => {
     expect(athleteSchema.parse(validAthlete)).toEqual(validAthlete)
   })
 
-  it('accepts an unavailable identity-only performance without invented stats', () => {
+  it.each(['not-integrated', 'provider-unavailable'] as const)(
+    'accepts an exact unavailable performance with the %s reason',
+    (reason) => {
     const identityOnly = {
       ...validAthlete,
       id: 'oscar-gloukh',
@@ -84,23 +89,25 @@ describe('athleteSchema', () => {
       aliases: [],
       sport: 'football',
       image: undefined,
-      affiliation: {
-        ...validAthlete.affiliation,
-        competition: 'Eredivisie',
-        season: '2026-27',
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          ...validAthlete.participation.affiliation,
+          competition: 'Eredivisie',
+          season: '2026-27',
+        },
       },
       performance: {
-        ...validAthlete.performance,
         status: 'unavailable',
         state: 'unavailable',
-        competition: 'Eredivisie',
-        season: '2026-27',
         stats: null,
+        reason,
       },
     }
 
     expect(athleteSchema.parse(identityOnly).performance.stats).toBeNull()
-  })
+    },
+  )
 
   it('rejects stats whose kind does not match the athlete sport', () => {
     expect(() =>
@@ -111,16 +118,25 @@ describe('athleteSchema', () => {
     ).toThrow(/stats kind.*sport/i)
   })
 
-  it.each([
-    ['competition', 'EuroLeague'],
-    ['season', '2026-27'],
-  ] as const)('requires performance %s to match the verified affiliation', (field, value) => {
+  it('requires available performance competition to match team participation', () => {
     expect(() =>
       athleteSchema.parse({
         ...validAthlete,
-        performance: { ...validAthlete.performance, [field]: value },
+        performance: { ...validAthlete.performance, competition: 'EuroLeague' },
       }),
-    ).toThrow(/affiliation/i)
+    ).toThrow(/participation/i)
+  })
+
+  it('accepts available performance from a prior season when competition matches participation', () => {
+    const athlete = {
+      ...validAthlete,
+      participation: {
+        ...validAthlete.participation,
+        affiliation: { ...validAthlete.participation.affiliation, season: '2026-27' },
+      },
+    }
+
+    expect(athleteSchema.safeParse(athlete).success).toBe(true)
   })
 
   it('rejects non-public and non-overseas records', () => {
@@ -128,7 +144,10 @@ describe('athleteSchema', () => {
     expect(() =>
       athleteSchema.parse({
         ...validAthlete,
-        affiliation: { ...validAthlete.affiliation, countsAsOverseas: false },
+        participation: {
+          ...validAthlete.participation,
+          affiliation: { ...validAthlete.participation.affiliation, countsAsOverseas: false },
+        },
       }),
     ).toThrow()
   })
@@ -142,15 +161,15 @@ describe('athleteSchema', () => {
     ).toThrow()
   })
 
-  it('requires unavailable performance to have unavailable state and null stats', () => {
+  it('requires unavailable performance to have exactly its unavailable state, null stats, and reason', () => {
     expect(() =>
       athleteSchema.parse({
         ...validAthlete,
         performance: {
-          ...validAthlete.performance,
           status: 'unavailable',
           state: 'final',
           stats: null,
+          reason: 'not-integrated',
         },
       }),
     ).toThrow()
@@ -159,12 +178,85 @@ describe('athleteSchema', () => {
       athleteSchema.parse({
         ...validAthlete,
         performance: {
-          ...validAthlete.performance,
           status: 'unavailable',
           state: 'unavailable',
+          stats: null,
         },
       }),
     ).toThrow()
+  })
+
+  it.each([
+    ['source', { provider: 'curated', sourceUrl: 'https://example.com/stats', retrievedAt: '2026-07-23T08:00:00.000Z' }],
+    ['competition', 'NBA'],
+    ['season', '2025-26'],
+    ['context', { note: 'not fetched' }],
+    ['unexpected', true],
+  ] as const)('rejects %s on unavailable performance', (field, value) => {
+    expect(() => athleteSchema.parse({
+      ...validAthlete,
+      performance: {
+        status: 'unavailable',
+        state: 'unavailable',
+        stats: null,
+        reason: 'not-integrated',
+        [field]: value,
+      },
+    })).toThrow()
+  })
+
+  it('accepts circuit participation and requires its competition for available performance', () => {
+    const circuitAthlete = {
+      ...validAthlete,
+      sport: 'tennis',
+      tier: 'international-circuit',
+      participation: {
+        kind: 'circuit-activity',
+        activity: {
+          circuit: 'ATP',
+          discipline: 'singles',
+          competition: 'Wimbledon',
+          season: '2026',
+          activityType: 'sanctioned-result',
+          effectiveAt: '2026-07-10T08:00:00.000Z',
+          source: {
+            publisher: 'ATP',
+            sourceUrl: 'https://example.com/atp/wimbledon',
+            retrievedAt: '2026-07-23T08:00:00.000Z',
+          },
+        },
+      },
+      performance: {
+        status: 'unavailable',
+        state: 'unavailable',
+        stats: null,
+        reason: 'not-integrated',
+      },
+    }
+
+    expect(athleteSchema.parse(circuitAthlete).participation.kind).toBe('circuit-activity')
+    expect(() => athleteSchema.parse({
+      ...circuitAthlete,
+      performance: { ...validAthlete.performance, competition: 'US Open' },
+    })).toThrow(/participation/i)
+  })
+
+  it('requires exactly one participation union variant', () => {
+    const withoutParticipation = { ...validAthlete } as Record<string, unknown>
+    delete withoutParticipation.participation
+    expect(athleteSchema.safeParse(withoutParticipation).success).toBe(false)
+
+    expect(athleteSchema.safeParse({
+      ...validAthlete,
+      participation: {
+        ...validAthlete.participation,
+        activity: {
+          circuit: 'ATP', discipline: 'singles', competition: 'Wimbledon', season: '2026',
+          activityType: 'ranking', effectiveAt: '2026-07-10T08:00:00.000Z',
+          source: validAthlete.participation.affiliation.source,
+        },
+      },
+    }).success).toBe(false)
   })
 
   it('rejects media without approved rights and HTTPS URLs', () => {
@@ -188,7 +280,7 @@ describe('athleteSchema', () => {
     ).toThrow(/HTTPS/i)
   })
 
-  it('rejects non-HTTPS eligibility, affiliation, and performance URLs', () => {
+  it('rejects non-HTTPS eligibility, participation, and available performance URLs', () => {
     expect(() =>
       athleteSchema.parse({
         ...validAthlete,
@@ -198,9 +290,15 @@ describe('athleteSchema', () => {
     expect(() =>
       athleteSchema.parse({
         ...validAthlete,
-        affiliation: {
-          ...validAthlete.affiliation,
-          source: { ...validAthlete.affiliation.source, sourceUrl: 'http://example.com/roster' },
+        participation: {
+          ...validAthlete.participation,
+          affiliation: {
+            ...validAthlete.participation.affiliation,
+            source: {
+              ...validAthlete.participation.affiliation.source,
+              sourceUrl: 'http://example.com/roster',
+            },
+          },
         },
       }),
     ).toThrow(/HTTPS/i)
@@ -241,9 +339,15 @@ describe('snapshotSchema', () => {
     const equivalentInstant = {
       ...validAthlete,
       eligibility: { ...validAthlete.eligibility, retrievedAt: '2026-07-23T08:00:00Z' },
-      affiliation: {
-        ...validAthlete.affiliation,
-        source: { ...validAthlete.affiliation.source, retrievedAt: '2026-07-23T08:00:00Z' },
+      participation: {
+        ...validAthlete.participation,
+        affiliation: {
+          ...validAthlete.participation.affiliation,
+          source: {
+            ...validAthlete.participation.affiliation.source,
+            retrievedAt: '2026-07-23T08:00:00Z',
+          },
+        },
       },
       performance: {
         ...validAthlete.performance,
@@ -259,9 +363,18 @@ describe('snapshotSchema', () => {
       ...athlete,
       eligibility: { ...athlete.eligibility, retrievedAt: '2026-07-23T08:00:00.001Z' },
     })],
-    ['affiliation', (athlete: typeof validAthlete) => ({
+    ['participation', (athlete: typeof validAthlete) => ({
       ...athlete,
-      affiliation: { ...athlete.affiliation, source: { ...athlete.affiliation.source, retrievedAt: '2026-07-23T08:00:00.001Z' } },
+      participation: {
+        ...athlete.participation,
+        affiliation: {
+          ...athlete.participation.affiliation,
+          source: {
+            ...athlete.participation.affiliation.source,
+            retrievedAt: '2026-07-23T08:00:00.001Z',
+          },
+        },
+      },
     })],
     ['performance', (athlete: typeof validAthlete) => ({
       ...athlete,
@@ -275,21 +388,69 @@ describe('snapshotSchema', () => {
     expect(() => snapshotSchema.parse({ ...validSnapshot, athletes: [mutate(validAthlete)] })).toThrow(/generated/i)
   })
 
-  it('reports the full affiliation source path for a future timestamp', () => {
+  it('reports the full participation source path for a future timestamp', () => {
     const parsed = snapshotSchema.safeParse({
       ...validSnapshot,
       athletes: [{
         ...validAthlete,
-        affiliation: {
-          ...validAthlete.affiliation,
-          source: { ...validAthlete.affiliation.source, retrievedAt: '2026-07-23T08:00:00.001Z' },
+        participation: {
+          ...validAthlete.participation,
+          affiliation: {
+            ...validAthlete.participation.affiliation,
+            source: {
+              ...validAthlete.participation.affiliation.source,
+              retrievedAt: '2026-07-23T08:00:00.001Z',
+            },
+          },
         },
       }],
     })
     expect(parsed.success).toBe(false)
-    if (parsed.success) throw new Error('Expected future affiliation source to fail')
-    expect(parsed.error.issues.find((issue) => /affiliation observation/i.test(issue.message))?.path)
-      .toEqual(['athletes', 0, 'affiliation', 'source', 'retrievedAt'])
+    if (parsed.success) throw new Error('Expected future participation source to fail')
+    expect(parsed.error.issues.find((issue) => /participation observation/i.test(issue.message))?.path)
+      .toEqual(['athletes', 0, 'participation', 'affiliation', 'source', 'retrievedAt'])
+  })
+
+  it('checks circuit activity source and effective timestamps causally', () => {
+    const circuitAthlete = {
+      ...validAthlete,
+      sport: 'tennis',
+      tier: 'international-circuit',
+      participation: {
+        kind: 'circuit-activity',
+        activity: {
+          circuit: 'ITF', discipline: 'singles', competition: 'Wimbledon', season: '2026',
+          activityType: 'sanctioned-result', effectiveAt: '2026-07-10T08:00:00.000Z',
+          source: {
+            publisher: 'ITF', sourceUrl: 'https://example.com/itf/wimbledon',
+            retrievedAt: '2026-07-23T08:00:00.001Z',
+          },
+        },
+      },
+      performance: {
+        status: 'unavailable', state: 'unavailable', stats: null, reason: 'not-integrated',
+      },
+    }
+    expect(snapshotSchema.safeParse({ ...validSnapshot, athletes: [circuitAthlete] }).success).toBe(false)
+
+    const futureEffective = structuredClone(circuitAthlete)
+    futureEffective.participation.activity.source.retrievedAt = '2026-07-23T08:00:00.000Z'
+    futureEffective.participation.activity.effectiveAt = '2026-07-23T08:00:00.001Z'
+    expect(snapshotSchema.safeParse({ ...validSnapshot, athletes: [futureEffective] }).success).toBe(false)
+  })
+
+  it('does not inspect a performance source when performance is unavailable', () => {
+    const unavailable = {
+      ...validAthlete,
+      performance: {
+        status: 'unavailable',
+        state: 'unavailable',
+        stats: null,
+        reason: 'provider-unavailable',
+      },
+    }
+
+    expect(snapshotSchema.safeParse({ ...validSnapshot, athletes: [unavailable] }).success).toBe(true)
   })
 
   it.each([

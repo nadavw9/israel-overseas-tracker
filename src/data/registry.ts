@@ -1,5 +1,6 @@
 import affiliationsJson from '../../data/registry/affiliations.json'
 import athletesJson from '../../data/registry/athletes.json'
+import circuitActivitiesJson from '../../data/registry/circuit-activities.json'
 import evidenceJson from '../../data/registry/evidence.json'
 import mediaJson from '../../data/registry/media.json'
 import providerBindingsJson from '../../data/registry/provider-bindings.json'
@@ -15,20 +16,26 @@ import {
 type AthleteIdentity = RegistryBundle['athletes'][number]
 type Eligibility = RegistryBundle['evidence'][number]
 type Affiliation = RegistryBundle['affiliations'][number]
+type CircuitActivity = RegistryBundle['circuitActivities'][number]
 type Binding = RegistryBundle['providerBindings'][number]
 type Media = RegistryBundle['media'][number]
 type VerifiedEligibility = Eligibility & { status: 'verified' }
 type VerifiedBinding = Binding & { status: 'verified' }
+type VerifiedCircuitActivity = CircuitActivity & { status: 'verified' }
 export type ApprovedMedia = Media & {
   rightsStatus: 'approved'
   rightsHolder: string
   license: NonNullable<Media['license']>
 }
 
+type RegistryParticipation =
+  | { kind: 'team-affiliation'; affiliation: Affiliation }
+  | { kind: 'circuit-activity'; activity: VerifiedCircuitActivity }
+
 export type RegistryAthlete = AthleteIdentity & {
   eligibility: VerifiedEligibility
-  affiliation: Affiliation
-  binding: VerifiedBinding
+  participation: RegistryParticipation
+  binding?: VerifiedBinding
   image?: ApprovedMedia
 }
 
@@ -36,12 +43,16 @@ const bundledData = {
   athletes: athletesJson,
   evidence: evidenceJson,
   affiliations: affiliationsJson,
+  circuitActivities: circuitActivitiesJson,
   providerBindings: providerBindingsJson,
   media: mediaJson,
 }
 
 function isVerifiedEligibility(claim: Eligibility): claim is VerifiedEligibility { return claim.status === 'verified' }
 function isVerifiedBinding(binding: Binding): binding is VerifiedBinding { return binding.status === 'verified' }
+function isVerifiedCircuitActivity(activity: CircuitActivity): activity is VerifiedCircuitActivity {
+  return activity.status === 'verified'
+}
 function isApprovedMedia(media: Media): media is ApprovedMedia {
   return media.rightsStatus === 'approved' && media.rightsHolder !== undefined && media.license !== undefined
 }
@@ -56,6 +67,14 @@ function newest<T extends { id: string }>(records: readonly T[], timestamp: keyo
     return left.id === right.id ? 0 : left.id < right.id ? -1 : 1
   })[0]
   if (selected === undefined) throw new Error(`Missing ${description} for ${athleteId}`)
+  return selected
+}
+function newestCircuitActivity(records: readonly VerifiedCircuitActivity[], athleteId: string) {
+  const selected = newest(records, 'effectiveAt', 'verified current circuit activity', athleteId)
+  const newestMilliseconds = registryInstantMs(selected.effectiveAt)
+  if (records.filter((activity) => registryInstantMs(activity.effectiveAt) === newestMilliseconds).length > 1) {
+    throw new Error(`Ambiguous newest qualifying circuit activity for ${athleteId}`)
+  }
   return selected
 }
 function exactly<T>(records: readonly T[], description: string, athleteId: string): T {
@@ -90,16 +109,54 @@ function selectAffiliation(bundle: RegistryBundle, athlete: AthleteIdentity, asO
   throw new Error(`A ${athlete.lifecycleStatus} athlete cannot be public: ${athlete.id}`)
 }
 
+function selectParticipation(
+  bundle: RegistryBundle,
+  athlete: AthleteIdentity,
+  asOfDate: string,
+  asOfMilliseconds: number,
+): RegistryParticipation {
+  if (athlete.tier !== 'international-circuit') {
+    return {
+      kind: 'team-affiliation',
+      affiliation: selectAffiliation(bundle, athlete, asOfDate, asOfMilliseconds),
+    }
+  }
+
+  const cutoffMilliseconds = asOfMilliseconds - (365 * 24 * 60 * 60 * 1_000)
+  const activities = bundle.circuitActivities.filter(
+    (activity): activity is VerifiedCircuitActivity =>
+      activity.athleteId === athlete.id &&
+      isVerifiedCircuitActivity(activity) &&
+      registryInstantMs(activity.effectiveAt) <= asOfMilliseconds &&
+      registryInstantMs(activity.source.retrievedAt) <= asOfMilliseconds &&
+      registryInstantMs(activity.effectiveAt) >= cutoffMilliseconds,
+  )
+  return { kind: 'circuit-activity', activity: newestCircuitActivity(activities, athlete.id) }
+}
+
 export function compileRegistryBundle(input: unknown, asOf: RegistryAsOf): RegistryAthlete[] {
   const { date: asOfDate, instant: asOfInstant, milliseconds: asOfMilliseconds } = normalizeRegistryAsOf(asOf)
   const bundle = createRegistryBundleSchema(asOfInstant).parse(input)
   return bundle.athletes.filter((athlete) => athlete.visibility === 'public').map((athlete) => {
-    const affiliation = selectAffiliation(bundle, athlete, asOfDate, asOfMilliseconds)
+    const participation = selectParticipation(bundle, athlete, asOfDate, asOfMilliseconds)
+    const participationCompetition = participation.kind === 'team-affiliation'
+      ? participation.affiliation.competition
+      : participation.activity.competition
     const eligibility = newest(bundle.evidence.filter((claim): claim is VerifiedEligibility => claim.athleteId === athlete.id && isVerifiedEligibility(claim) && registryInstantMs(claim.retrievedAt) <= asOfMilliseconds), 'retrievedAt', 'verified eligibility claim', athlete.id)
-    const binding = newest(bundle.providerBindings.filter((record): record is VerifiedBinding => record.athleteId === athlete.id && isVerifiedBinding(record) && registryInstantMs(record.verifiedAt) <= asOfMilliseconds && record.competition === affiliation.competition), 'verifiedAt', 'verified provider binding matching affiliation competition', athlete.id)
+    const matchingBindings = bundle.providerBindings.filter((record): record is VerifiedBinding => record.athleteId === athlete.id && isVerifiedBinding(record) && registryInstantMs(record.verifiedAt) <= asOfMilliseconds && record.competition === participationCompetition)
+    const binding = matchingBindings.length === 0
+      ? undefined
+      : newest(matchingBindings, 'verifiedAt', 'verified provider binding matching participation competition', athlete.id)
     const approved = bundle.media.filter((record): record is ApprovedMedia => record.athleteId === athlete.id && isApprovedMedia(record) && registryInstantMs(record.retrievedAt) <= asOfMilliseconds)
     const image = approved.length === 0 ? undefined : newest(approved, 'retrievedAt', 'approved media', athlete.id)
-    return { ...athlete, sport: athlete.sport, eligibility, affiliation, binding, ...(image === undefined ? {} : { image }) }
+    return {
+      ...athlete,
+      sport: athlete.sport,
+      eligibility,
+      participation,
+      ...(binding === undefined ? {} : { binding }),
+      ...(image === undefined ? {} : { image }),
+    }
   })
 }
 

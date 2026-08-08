@@ -103,6 +103,29 @@ export const publicAffiliationSchema = z
   })
   .strict()
 
+export const publicCircuitActivitySchema = z
+  .object({
+    circuit: z.enum(['ATP', 'WTA', 'ITF']),
+    discipline: z.enum(['singles', 'doubles']),
+    competition: nonEmptyStringSchema,
+    season: nonEmptyStringSchema,
+    activityType: z.enum(['ranking', 'sanctioned-result']),
+    effectiveAt: z.iso.datetime(),
+    source: publicSourceSchema,
+  })
+  .strict()
+
+export const publicParticipationSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('team-affiliation'),
+    affiliation: publicAffiliationSchema,
+  }).strict(),
+  z.object({
+    kind: z.literal('circuit-activity'),
+    activity: publicCircuitActivitySchema,
+  }).strict(),
+])
+
 const performanceSourceSchema = z
   .object({
     provider: providerSchema,
@@ -111,19 +134,15 @@ const performanceSourceSchema = z
   })
   .strict()
 
-const performanceBase = {
-  competition: nonEmptyStringSchema,
-  season: nonEmptyStringSchema,
-  source: performanceSourceSchema,
-}
-
 export const publicPerformanceSchema = z.discriminatedUnion('status', [
   z
     .object({
       status: z.literal('available'),
       state: observationStateSchema.exclude(['unavailable']),
+      competition: nonEmptyStringSchema,
+      season: nonEmptyStringSchema,
       stats: athleteStatsSchema,
-      ...performanceBase,
+      source: performanceSourceSchema,
     })
     .strict(),
   z
@@ -131,7 +150,7 @@ export const publicPerformanceSchema = z.discriminatedUnion('status', [
       status: z.literal('unavailable'),
       state: z.literal('unavailable'),
       stats: z.null(),
-      ...performanceBase,
+      reason: z.enum(['not-integrated', 'provider-unavailable']),
     })
     .strict(),
 ])
@@ -162,31 +181,29 @@ export const athleteSchema = z
     lifecycleStatus: lifecycleStatusSchema,
     visibility: z.literal('public'),
     eligibility: publicEligibilitySchema,
-    affiliation: publicAffiliationSchema,
+    participation: publicParticipationSchema,
     performance: publicPerformanceSchema,
     image: publicMediaSchema.optional(),
   })
   .strict()
   .superRefine((athlete, context) => {
-    if (athlete.performance.stats && athlete.performance.stats.kind !== athlete.sport) {
+    if (athlete.performance.status !== 'available') return
+
+    if (athlete.performance.stats.kind !== athlete.sport) {
       context.addIssue({
         code: 'custom',
         message: 'Stats kind must match athlete sport',
         path: ['performance', 'stats', 'kind'],
       })
     }
-    if (athlete.performance.competition !== athlete.affiliation.competition) {
+    const participationCompetition = athlete.participation.kind === 'team-affiliation'
+      ? athlete.participation.affiliation.competition
+      : athlete.participation.activity.competition
+    if (athlete.performance.competition !== participationCompetition) {
       context.addIssue({
         code: 'custom',
-        message: 'Performance competition must match affiliation competition',
+        message: 'Performance competition must match participation competition',
         path: ['performance', 'competition'],
-      })
-    }
-    if (athlete.performance.season !== athlete.affiliation.season) {
-      context.addIssue({
-        code: 'custom',
-        message: 'Performance season must match affiliation season',
-        path: ['performance', 'season'],
       })
     }
   })
@@ -213,23 +230,46 @@ export const snapshotSchema = z
 
       const generatedMilliseconds = new Date(snapshot.generatedAt).getTime()
       const observations = [
-        ['eligibility', athlete.eligibility.retrievedAt],
-        ['affiliation', athlete.affiliation.source.retrievedAt],
-        ['performance', athlete.performance.source.retrievedAt],
-        ...(athlete.image ? ([['image', athlete.image.retrievedAt]] as const) : []),
-      ] as const
-      observations.forEach(([field, retrievedAt]) => {
-        if (new Date(retrievedAt).getTime() > generatedMilliseconds) {
+        {
+          label: 'eligibility',
+          instant: athlete.eligibility.retrievedAt,
+          path: ['eligibility', 'retrievedAt'],
+        },
+        ...(athlete.participation.kind === 'team-affiliation'
+          ? [{
+              label: 'participation',
+              instant: athlete.participation.affiliation.source.retrievedAt,
+              path: ['participation', 'affiliation', 'source', 'retrievedAt'],
+            }]
+          : [
+              {
+                label: 'participation',
+                instant: athlete.participation.activity.source.retrievedAt,
+                path: ['participation', 'activity', 'source', 'retrievedAt'],
+              },
+              {
+                label: 'participation',
+                instant: athlete.participation.activity.effectiveAt,
+                path: ['participation', 'activity', 'effectiveAt'],
+              },
+            ]),
+        ...(athlete.performance.status === 'available'
+          ? [{
+              label: 'performance',
+              instant: athlete.performance.source.retrievedAt,
+              path: ['performance', 'source', 'retrievedAt'],
+            }]
+          : []),
+        ...(athlete.image
+          ? [{ label: 'image', instant: athlete.image.retrievedAt, path: ['image', 'retrievedAt'] }]
+          : []),
+      ]
+      observations.forEach(({ label, instant, path }) => {
+        if (new Date(instant).getTime() > generatedMilliseconds) {
           context.addIssue({
             code: 'custom',
-            message: `${field} observation cannot be after snapshot generatedAt`,
-            path: [
-              'athletes',
-              index,
-              field,
-              ...(field === 'affiliation' ? ['source'] : []),
-              'retrievedAt',
-            ],
+            message: `${label} observation cannot be after snapshot generatedAt`,
+            path: ['athletes', index, ...path],
           })
         }
       })
@@ -240,6 +280,8 @@ export type Athlete = z.output<typeof athleteSchema>
 export type AthleteStats = z.output<typeof athleteStatsSchema>
 export type AthleteSnapshot = z.output<typeof snapshotSchema>
 export type PublicAffiliation = z.output<typeof publicAffiliationSchema>
+export type PublicCircuitActivity = z.output<typeof publicCircuitActivitySchema>
 export type PublicEligibility = z.output<typeof publicEligibilitySchema>
 export type PublicMedia = z.output<typeof publicMediaSchema>
+export type PublicParticipation = z.output<typeof publicParticipationSchema>
 export type PublicPerformance = z.output<typeof publicPerformanceSchema>

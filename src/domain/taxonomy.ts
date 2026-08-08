@@ -64,7 +64,7 @@ export const observationStateSchema = z.enum([
   'unavailable',
 ])
 
-export const eligibilityBasisSchema = z.enum(['citizenship', 'represents-israel'])
+export const eligibilityBasisSchema = z.enum(['citizenship', 'nationality', 'represents-israel'])
 
 export const organizationTypeSchema = z.enum([
   'club',
