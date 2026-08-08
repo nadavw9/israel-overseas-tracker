@@ -42,7 +42,7 @@ export const messages = {
     identityOnly: 'Identity verified · performance unavailable',
     notIntegrated: 'Identity/activity verified · performance not integrated',
     providerUnavailable: 'Identity/activity verified · performance temporarily unavailable',
-    circuitParticipation: (circuit: string) => `${circuit} international circuit`,
+    circuitParticipation: (_circuit: string) => 'ATP / ITF international circuit',
     viewsLabel: 'Tracker views',
     views: { athletes: 'Athletes', rankings: 'Rankings', map: 'Map' },
     sports: {
@@ -142,7 +142,7 @@ export const messages = {
     identityOnly: 'הזהות אומתה · נתוני ביצועים אינם זמינים',
     notIntegrated: 'הזהות/הפעילות אומתה · נתוני הביצועים טרם שולבו',
     providerUnavailable: 'הזהות/הפעילות אומתה · נתוני הביצועים אינם זמינים זמנית',
-    circuitParticipation: (circuit: string) => `הסבב הבין־לאומי ${circuit}`,
+    circuitParticipation: (_circuit: string) => 'הסבב הבין־לאומי ATP / ITF',
     viewsLabel: 'תצוגות המעקב',
     views: { athletes: 'ספורטאים', rankings: 'דירוגים', map: 'מפה' },
     sports: {

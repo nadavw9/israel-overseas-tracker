@@ -4,7 +4,7 @@ export type TeamParticipation = Extract<PublicParticipation, { kind: 'team-affil
 export type CircuitParticipation = Extract<PublicParticipation, { kind: 'circuit-activity' }>
 export type CircuitTitleFormatter = (circuit: CircuitParticipation['activity']['circuit']) => string
 
-const englishCircuitTitle: CircuitTitleFormatter = (circuit) => `${circuit} international circuit`
+const englishCircuitTitle: CircuitTitleFormatter = () => 'ATP / ITF international circuit'
 
 export function isTeamParticipation(participation: PublicParticipation): participation is TeamParticipation {
   return participation.kind === 'team-affiliation'
