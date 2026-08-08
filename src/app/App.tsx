@@ -10,6 +10,7 @@ import { Leaderboard } from '../components/Leaderboard'
 import { ViewNav, type TrackerView } from '../components/ViewNav'
 import { I18nContext } from '../i18n/context'
 import { messages, type Locale } from '../i18n/messages'
+import { participationDisplay } from '../services/participation'
 import './styles.css'
 
 type TrackerAppProps = {
@@ -17,15 +18,15 @@ type TrackerAppProps = {
 }
 
 function matchesQuery(athlete: Athlete, query: string): boolean {
+  const participation = participationDisplay(athlete.participation)
   const haystack = [
     athlete.name.en,
     athlete.name.he,
     ...athlete.aliases,
-    athlete.affiliation.organization.name,
-    athlete.affiliation.organization.country,
-    athlete.affiliation.competition,
-    athlete.affiliation.location?.city,
-    athlete.affiliation.location?.country,
+    participation.title,
+    participation.competition,
+    participation.location?.city,
+    participation.location?.country,
   ]
     .filter(Boolean)
     .join(' ')

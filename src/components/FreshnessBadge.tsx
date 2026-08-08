@@ -9,14 +9,15 @@ type FreshnessBadgeProps = { performance: Athlete['performance'] }
 export function FreshnessBadge({ performance }: FreshnessBadgeProps) {
   const { messages } = useI18n()
   const [, updateClock] = useState(0)
+  const retrievedAt = performance.status === 'available' ? performance.source.retrievedAt : undefined
   useEffect(() => {
-    if (performance.status === 'unavailable' || performance.state === 'stale') return
-    const staleAt = new Date(performance.source.retrievedAt).getTime() + PERFORMANCE_RETENTION_MS + 1
+    if (retrievedAt === undefined || performance.state === 'stale') return
+    const staleAt = new Date(retrievedAt).getTime() + PERFORMANCE_RETENTION_MS + 1
     const delay = staleAt - Date.now()
     if (!Number.isFinite(delay) || delay <= 0) return
     const timeout = setTimeout(() => updateClock((clock) => clock + 1), delay)
     return () => clearTimeout(timeout)
-  }, [performance.source.retrievedAt, performance.state, performance.status])
+  }, [retrievedAt, performance.state])
 
   const freshness =
     performance.status === 'unavailable'
@@ -25,7 +26,7 @@ export function FreshnessBadge({ performance }: FreshnessBadgeProps) {
           !isObservationWithinRetention(performance.source.retrievedAt, new Date())
         ? 'stale'
         : 'fresh'
-  const checked = new Intl.DateTimeFormat(messages.locale, {
+  const checked = performance.status === 'available' && new Intl.DateTimeFormat(messages.locale, {
     day: '2-digit',
     month: 'short',
     timeZone: 'UTC',
@@ -38,8 +39,8 @@ export function FreshnessBadge({ performance }: FreshnessBadgeProps) {
       ) : (
         <BadgeCheck size={14} aria-hidden="true" />
       )}
-      {freshness === 'identity-only'
-        ? messages.identityOnly
+      {performance.status === 'unavailable'
+        ? performance.reason === 'not-integrated' ? messages.notIntegrated : messages.providerUnavailable
         : <>{freshness === 'stale' ? messages.lastVerified : messages.sourceChecked} {checked}</>}
     </span>
   )

@@ -3,9 +3,30 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import snapshotJson from '../../public/data/snapshot.json'
 import { TrackerApp } from '../../src/app/App'
-import { snapshotSchema } from '../../src/domain/athlete'
+import { athleteSchema, snapshotSchema } from '../../src/domain/athlete'
+import type { Athlete } from '../../src/domain/athlete'
 
 const snapshot = snapshotSchema.parse(snapshotJson)
+
+function circuitAthlete(): Athlete {
+  return athleteSchema.parse({
+    ...snapshot.athletes[2],
+    id: 'circuit-athlete',
+    name: { en: 'Circuit Athlete', he: 'Circuit Athlete' },
+    sport: 'tennis',
+    discipline: 'singles',
+    tier: 'international-circuit',
+    participation: {
+      kind: 'circuit-activity',
+      activity: {
+        circuit: 'ITF', discipline: 'singles', competition: 'Granby National Bank Championships', season: '2026',
+        activityType: 'ranking', effectiveAt: '2026-08-01T00:00:00.000Z',
+        source: { publisher: 'ITF', sourceUrl: 'https://example.com/itf/circuit-athlete', retrievedAt: '2026-08-03T22:00:00.000Z' },
+      },
+    },
+    performance: { status: 'unavailable', state: 'unavailable', stats: null, reason: 'not-integrated' },
+  })
+}
 
 describe('verified athlete list', () => {
   it('shows the verified count and honest source freshness', () => {
@@ -25,7 +46,7 @@ describe('verified athlete list', () => {
     ).toBeInTheDocument()
     expect(screen.queryByText(/^live$/i)).not.toBeInTheDocument()
     expect(screen.getAllByText(/source checked/i)).toHaveLength(2)
-    expect(screen.getByText(/identity verified · performance unavailable/i)).toBeInTheDocument()
+    expect(screen.getByText(/identity\/activity verified · performance not integrated/i)).toBeInTheDocument()
     vi.useRealTimers()
   })
 
@@ -56,10 +77,11 @@ describe('verified athlete list', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('searches names, aliases, and current affiliation details', async () => {
+  it('searches names, aliases, team participation, and circuit participation', async () => {
     const user = userEvent.setup()
     const aliased = { ...snapshot.athletes[0], aliases: ['Deni Turbo'] }
-    render(<TrackerApp snapshot={{ ...snapshot, athletes: [aliased, ...snapshot.athletes.slice(1)] }} />)
+    const circuit = circuitAthlete()
+    render(<TrackerApp snapshot={{ ...snapshot, athletes: [aliased, ...snapshot.athletes.slice(1), circuit] }} />)
     const search = screen.getByRole('searchbox', { name: /search athletes/i })
 
     for (const term of ['Deni Avdija', 'Deni Turbo', 'Portland Trail Blazers', 'NBA', 'Portland', 'United States']) {
@@ -68,24 +90,29 @@ describe('verified athlete list', () => {
       expect(screen.getByRole('button', { name: /open deni avdija/i })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: /open oscar gloukh/i })).not.toBeInTheDocument()
     }
+    for (const term of ['ITF', 'Granby National Bank Championships']) {
+      await user.clear(search)
+      await user.type(search, term)
+      expect(screen.getByRole('button', { name: /open circuit athlete/i })).toBeInTheDocument()
+    }
   })
 
-  it('searches the authoritative organization country without a location', async () => {
+  it('does not add an organization country as a location search term', async () => {
     const user = userEvent.setup()
     const affiliation = {
-      ...snapshot.athletes[0].affiliation,
+      ...snapshot.athletes[0].participation.affiliation,
       organization: {
-        ...snapshot.athletes[0].affiliation.organization,
+        ...snapshot.athletes[0].participation.affiliation.organization,
         country: 'Cyprus',
       },
     }
     delete affiliation.location
-    const athlete = { ...snapshot.athletes[0], affiliation }
+    const athlete = { ...snapshot.athletes[0], participation: { kind: 'team-affiliation' as const, affiliation } }
     render(<TrackerApp snapshot={{ ...snapshot, athletes: [athlete] }} />)
 
     await user.type(screen.getByRole('searchbox', { name: /search athletes/i }), 'Cyprus')
 
-    expect(screen.getByRole('button', { name: /open deni avdija/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /open deni avdija/i })).not.toBeInTheDocument()
   })
 
   it('filters by tier, gender, and lifecycle status without stale values', async () => {

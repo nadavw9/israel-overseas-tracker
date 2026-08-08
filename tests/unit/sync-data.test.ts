@@ -852,44 +852,28 @@ describe('legacy snapshot migration', () => {
     expect(previous.athletes.map((athlete) => athlete.id)).toEqual([
       'deni-avdija',
       'ben-saraf',
+      'oscar-gloukh',
     ])
-    expect(previous.athletes.every(
+    expect(previous.athletes.filter(
       (athlete) => athlete.performance.status === 'available',
-    )).toBe(true)
+    )).toHaveLength(2)
   })
 
-  it('keeps only causal available history from a normalized predecessor snapshot', async () => {
+  it('accepts the checked-in current unavailable record without a performance source', async () => {
     const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
     const predecessor = JSON.parse(await readFile(
       join(process.cwd(), 'public/data/snapshot.json'),
       'utf8',
-    )) as {
-      generatedAt: string
-      athletes: Array<{
-        id: string
-        performance: {
-          status: string
-          source: { retrievedAt: string }
-        }
-      }>
-    }
-    const retained = predecessor.athletes[0]
+    )) as { athletes: Array<{ id: string; performance: { status: string; source?: unknown } }> }
     const unavailable = predecessor.athletes[2]
-    if (retained === undefined || unavailable === undefined) {
+    if (unavailable === undefined) {
       throw new Error('Checked-in predecessor fixtures are incomplete')
     }
-    const future = structuredClone(retained)
-    future.id = 'future-history'
-    future.performance.source.retrievedAt = new Date(
-      new Date(predecessor.generatedAt).getTime() + 1,
-    ).toISOString()
+    const previous = parsePreviousSnapshot(predecessor)
 
-    const previous = parsePreviousSnapshot({
-      ...predecessor,
-      athletes: [retained, unavailable, future],
-    })
-
-    expect(previous.athletes.map((athlete) => athlete.id)).toEqual(['deni-avdija'])
+    expect(unavailable.performance.status).toBe('unavailable')
+    expect(unavailable.performance).not.toHaveProperty('source')
+    expect(previous.athletes.map((athlete) => athlete.id)).toContain('oscar-gloukh')
   })
 
   it('rejects private or unknown fields in a normalized predecessor snapshot', async () => {

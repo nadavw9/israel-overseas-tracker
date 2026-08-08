@@ -19,7 +19,9 @@
         "publisher": "NBA",
         "retrievedAt": "2026-07-23T08:00:00.000Z"
       },
-      "affiliation": {
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
         "organization": {
           "name": "Portland Trail Blazers",
           "type": "club",
@@ -40,6 +42,7 @@
           "lat": 45.5152,
           "lng": -122.6784
         }
+      }
       },
       "performance": {
         "status": "available",
@@ -78,7 +81,9 @@
         "publisher": "FIBA",
         "retrievedAt": "2026-07-23T08:00:00.000Z"
       },
-      "affiliation": {
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
         "organization": {
           "name": "Brooklyn Nets",
           "type": "club",
@@ -99,6 +104,7 @@
           "lat": 40.6782,
           "lng": -73.9442
         }
+      }
       },
       "performance": {
         "status": "available",
@@ -137,7 +143,9 @@
         "publisher": "Ajax",
         "retrievedAt": "2026-07-23T08:00:00.000Z"
       },
-      "affiliation": {
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
         "organization": {
           "name": "Ajax",
           "type": "club",
@@ -158,18 +166,13 @@
           "lat": 52.3676,
           "lng": 4.9041
         }
+      }
       },
       "performance": {
         "status": "unavailable",
         "state": "unavailable",
         "stats": null,
-        "competition": "Eredivisie",
-        "season": "2025-26",
-        "source": {
-          "provider": "curated",
-          "sourceUrl": "https://english.ajax.nl/teams/ajax-1/oscar-gloukh",
-          "retrievedAt": "2026-07-22T20:30:15.000Z"
-        }
+        "reason": "not-integrated"
       }
     }
   ],

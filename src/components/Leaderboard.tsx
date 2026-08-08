@@ -2,6 +2,7 @@ import { ArrowUpRight, Trophy } from 'lucide-react'
 import type { Athlete } from '../domain/athlete'
 import { primaryMetric, rankAthletesBySport } from '../services/rankings'
 import { useI18n } from '../i18n/context'
+import { participationDisplay } from '../services/participation'
 
 function metricLabel(athlete: Athlete) {
   if (athlete.performance.stats?.kind === 'basketball') return 'PPG'
@@ -34,15 +35,15 @@ export function Leaderboard({ athletes }: { athletes: Athlete[] }) {
             <span className="leaderboard__rank">{String(index + 1).padStart(2, '0')}</span>
             <span className="leaderboard__name">
               <strong>{athlete.name[locale]}</strong>
-              <small>{athlete.affiliation.organization.name} · {athlete.affiliation.competition}</small>
+              <small>{participationDisplay(athlete.participation).title} · {participationDisplay(athlete.participation).competition}</small>
             </span>
             <span className="leaderboard__metric">
               <strong>{primaryMetric(athlete)}</strong>
               <small>{metricLabel(athlete)}</small>
             </span>
-            <a href={athlete.performance.source.sourceUrl} target="_blank" rel="noreferrer" aria-label={messages.rankingSource(athlete.name[locale])}>
+            {athlete.performance.status === 'available' && <a href={athlete.performance.source.sourceUrl} target="_blank" rel="noreferrer" aria-label={messages.rankingSource(athlete.name[locale])}>
               <ArrowUpRight size={18} aria-hidden="true" />
-            </a>
+            </a>}
           </li>
           ))}
           </ol>
