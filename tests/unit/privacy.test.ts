@@ -49,7 +49,9 @@ function assertNoPrivateContent(artifacts: Artifact[], candidates: ReviewCandida
   for (const candidate of candidates) {
     if (content.includes(candidate.id.toLocaleLowerCase())) throw new Error(`Leaked private candidate id: ${candidate.id}`)
     if (content.includes(candidate.name.en.toLocaleLowerCase())) throw new Error(`Leaked private candidate English name: ${candidate.id}`)
-    if (content.includes(candidate.name.he.toLocaleLowerCase())) throw new Error(`Leaked private candidate Hebrew name: ${candidate.id}`)
+    if (candidate.name.he && content.includes(candidate.name.he.toLocaleLowerCase())) {
+      throw new Error(`Leaked private candidate Hebrew name: ${candidate.id}`)
+    }
     for (const signal of candidate.signals) {
       if (content.includes(signal.note.toLocaleLowerCase())) throw new Error(`Leaked private signal note for: ${candidate.id}`)
     }
@@ -78,12 +80,11 @@ describe('privacy defaults', () => {
     const candidates = reviewCandidates()
     const providerIdentifiers = candidateProviderIdentifiers(candidates)
     expect(candidates).not.toHaveLength(0)
-    expect(candidates.map(({ id }) => id)).toEqual(expect.arrayContaining(['danny-wolf', 'zeev-buium']))
-    expect(candidates.every(({ name }) => name.en.trim().length > 0 && name.he.trim().length > 0)).toBe(true)
+    expect(candidates.map(({ id }) => id)).toEqual(expect.arrayContaining(['jordan-hasson', 'shon-abaev', 'zeev-buium']))
+    expect(candidates.every(({ name }) => name.en.trim().length > 0 && (name.he === undefined || name.he.trim().length > 0))).toBe(true)
     expect(candidates.every(({ signals }) => signals.length > 0 && signals.every(({ note }) => note.trim().length > 0))).toBe(true)
     expect(candidates.every(({ reviewerNote }) => reviewerNote.trim().length > 0)).toBe(true)
-    expect(providerIdentifiers).toEqual(expect.arrayContaining(['5107173', '8484798']))
-    expect(providerIdentifiers).not.toHaveLength(0)
+    expect(providerIdentifiers).toEqual(expect.arrayContaining(['8484798']))
 
     expect(() => assertNoPrivateContent([
       { file: 'assets/leak.js', content: `const candidate = '${candidates[0]?.id}'` },
@@ -94,9 +95,12 @@ describe('privacy defaults', () => {
     expect(() => assertNoPrivateContent([
       { file: 'assets/leak.js', content: `const name = '${candidates[0]?.name.en}'` },
     ], candidates)).toThrow(/Leaked private candidate English name/)
-    expect(() => assertNoPrivateContent([
-      { file: 'assets/leak.js', content: `const name = '${candidates[0]?.name.he}'` },
-    ], candidates)).toThrow(/Leaked private candidate Hebrew name/)
+    const candidateWithHebrewName = candidates.find(({ name }) => name.he !== undefined)
+    if (candidateWithHebrewName) {
+      expect(() => assertNoPrivateContent([
+        { file: 'assets/leak.js', content: `const name = '${candidateWithHebrewName.name.he}'` },
+      ], candidates)).toThrow(/Leaked private candidate Hebrew name/)
+    }
     expect(() => assertNoPrivateContent([
       { file: 'assets/leak.js', content: `const providerId = '${providerIdentifiers[0]}'` },
     ], candidates)).toThrow(/Leaked private provider identifier/)

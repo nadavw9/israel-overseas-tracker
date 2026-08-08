@@ -212,7 +212,7 @@ const addDuplicateIdIssues = (
 
 export type RegistryAsOf = Date | string
 /** Required provenance watermark for the normalized registry migration. */
-export const registryMigrationInstant = '2026-07-23T08:00:00.000Z'
+export const registryMigrationInstant = '2026-08-08T08:00:00.000Z'
 
 export function registryInstantMs(value: Date | string) {
   const milliseconds = value instanceof Date ? value.getTime() : new Date(value).getTime()
@@ -500,9 +500,14 @@ const candidateSignalSchema = z.object({
   note: nonEmptyStringSchema,
 }).strict()
 
+const candidateNameSchema = z.object({
+  en: nonEmptyStringSchema,
+  he: nonEmptyStringSchema.optional(),
+}).strict()
+
 export const candidateSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
-  name: localizedNameSchema,
+  name: candidateNameSchema,
   sport: sportSchema,
   tier: athleteTierSchema,
   genderCategory: genderCategorySchema,

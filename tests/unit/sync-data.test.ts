@@ -17,7 +17,7 @@ import {
   writeSnapshotAtomically,
 } from '../../scripts/sync-data'
 
-const generatedAt = '2026-07-23T08:00:00.000Z'
+const generatedAt = '2026-08-08T08:00:00.000Z'
 const coverage = { required: 4, healthy: 0, complete: false } as const
 const entry = publicRegistry[0]
 if (entry?.participation.kind !== 'team-affiliation' || entry.binding === undefined) {
@@ -76,7 +76,7 @@ function availablePerformance() {
     source: {
       provider: 'espn-nba' as const,
       sourceUrl: 'https://example.com/deni',
-      retrievedAt: '2026-07-22T12:00:00.000Z',
+      retrievedAt: '2026-08-07T12:00:00.000Z',
     },
   }
 }
@@ -124,7 +124,7 @@ function previousSnapshot(): AthleteSnapshot {
           rightsHolder: 'Old holder',
           license: 'cc-by',
           usage: 'editorial-display',
-          retrievedAt: '2026-07-22T12:00:00.000Z',
+          retrievedAt: '2026-08-07T12:00:00.000Z',
         },
       },
     ],
@@ -387,12 +387,12 @@ describe('buildSnapshot', () => {
     }],
     ['future observation', (performance: PublicPerformance) => {
       if (performance.status === 'available') {
-        performance.source.retrievedAt = '2026-07-23T08:00:00.001Z'
+        performance.source.retrievedAt = '2026-08-08T08:00:00.001Z'
       }
     }],
     ['expired observation', (performance: PublicPerformance) => {
       if (performance.status === 'available') {
-        performance.source.retrievedAt = '2026-07-21T07:59:59.999Z'
+        performance.source.retrievedAt = '2026-08-06T07:59:59.999Z'
       }
     }],
   ])('does not retain prior performance with a %s', async (_label, mutate) => {
@@ -434,7 +434,7 @@ describe('buildSnapshot', () => {
     const prior = previousSnapshot()
     const performance = prior.athletes[0]?.performance
     if (performance?.status !== 'available') throw new Error('Expected available history')
-    performance.source.retrievedAt = '2026-07-21T08:00:00.000Z'
+    performance.source.retrievedAt = '2026-08-06T08:00:00.000Z'
     const next = await buildSnapshot({
       entries: [entry], previous: prior, coverage,
       fetchRecord: async () => { throw new Error('provider unavailable') },
@@ -545,15 +545,15 @@ describe('buildSnapshot', () => {
       entries: [entry], previous: previousSnapshot(), coverage,
       fetchRecord: async () => ({
         athleteId: entry.id, ...providerContext, stats: null, state: 'final',
-        sourceUrl: 'https://example.com/future', retrievedAt: '2026-07-23T08:00:00.001Z',
+        sourceUrl: 'https://example.com/future', retrievedAt: '2026-08-08T08:00:00.001Z',
       }),
       now: new Date(generatedAt),
     })).rejects.toThrow(/snapshot|generated|future/i)
   })
 
   it.each([
-    ['exact 48-hour boundary', '2026-07-21T08:00:00.000Z'],
-    ['one millisecond inside retention', '2026-07-21T08:00:00.001Z'],
+    ['exact 48-hour boundary', '2026-08-06T08:00:00.000Z'],
+    ['one millisecond inside retention', '2026-08-06T08:00:00.001Z'],
   ])('accepts fulfilled available performance at the %s', async (_case, retrievedAt) => {
     const next = await buildSnapshot({
       entries: [entry], previous: { athletes: [] }, coverage,
@@ -568,8 +568,8 @@ describe('buildSnapshot', () => {
   })
 
   it.each([
-    ['one millisecond outside retention', '2026-07-21T07:59:59.999Z'],
-    ['future available observation', '2026-07-23T08:00:00.001Z'],
+    ['one millisecond outside retention', '2026-08-06T07:59:59.999Z'],
+    ['future available observation', '2026-08-08T08:00:00.001Z'],
   ])('rejects fulfilled %s before it can enter the snapshot', async (_case, retrievedAt) => {
     await expect(buildSnapshot({
       entries: [entry], previous: { athletes: [] }, coverage,
@@ -587,7 +587,7 @@ describe('buildSnapshot', () => {
       fetchRecord: async () => ({
         athleteId: entry.id, ...providerContext, stats: null, state: 'final',
         sourceUrl: 'https://example.com/future-unavailable',
-        retrievedAt: '2026-07-23T08:00:00.001Z',
+        retrievedAt: '2026-08-08T08:00:00.001Z',
       }),
       now: new Date(generatedAt),
     })).rejects.toThrow(/future|snapshot|generated/i)
@@ -802,9 +802,9 @@ describe('writeSnapshotAtomically', () => {
 
 describe('sync clock resolution', () => {
   it('bootstraps only an implicit clock to the migration watermark', () => {
-    const early = new Date('2026-07-22T00:00:00.000Z')
+    const early = new Date('2026-08-07T00:00:00.000Z')
     expect(resolveSyncNow(undefined, early).toISOString()).toBe(generatedAt)
-    expect(resolveSyncNow(early, new Date('2026-07-24T00:00:00.000Z'))).toBe(early)
+    expect(resolveSyncNow(early, new Date('2026-08-09T00:00:00.000Z'))).toBe(early)
   })
 })
 
@@ -919,7 +919,7 @@ describe('legacy snapshot migration', () => {
   it('never publishes future-dated legacy performance through stale fallback', async () => {
     const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
     const legacy = {
-      generatedAt: '2026-07-23T08:00:00.000Z',
+      generatedAt: '2026-08-08T08:00:00.000Z',
       athletes: [{
         id: entry.id,
         name: entry.name,
@@ -929,7 +929,7 @@ describe('legacy snapshot migration', () => {
         stats: availablePerformance().stats,
         source: {
           provider: 'espn-nba', sourceUrl: 'https://example.com/stats',
-          retrievedAt: '2026-07-23T09:00:00.000Z',
+          retrievedAt: '2026-08-08T09:00:00.000Z',
         },
         freshness: 'fresh',
       }],
@@ -943,7 +943,7 @@ describe('legacy snapshot migration', () => {
       previous,
       coverage,
       fetchRecord: async () => { throw new Error('provider unavailable') },
-      now: new Date('2026-07-23T10:00:00.000Z'),
+      now: new Date('2026-08-08T10:00:00.000Z'),
     })
     expect(next.athletes[0]?.performance).toMatchObject({
       status: 'unavailable',

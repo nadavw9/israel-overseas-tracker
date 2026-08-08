@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-23T08:00:00.000Z",
+  "generatedAt": "2026-08-08T08:00:00.000Z",
   "entries": [
     {
       "id": "atp-isr-men",
@@ -11,28 +11,28 @@
       "sourceType": "primary-verification",
       "cadence": "weekly",
       "freshnessWindowDays": 7,
-      "lastAttemptAt": "2026-07-23T08:00:00.000Z",
-      "lastSuccessAt": "2026-07-23T08:00:00.000Z",
-      "health": "partial",
-      "counts": { "observed": 8, "matched": 0, "newCandidates": 8, "conflicts": 0 },
+      "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+      "lastSuccessAt": "2026-08-08T08:00:00.000Z",
+      "health": "healthy",
+      "counts": { "observed": 8, "matched": 5, "newCandidates": 3, "conflicts": 0 },
       "limitations": [
-        "Candidates have not been reconciled to eligibility, overseas activity, and provider bindings; this is not a comprehensive overseas-Israeli census."
+        "This fully classifies only the eight-row ATP singles ISR universe; it is not a complete tennis or global overseas-Israeli census."
       ]
     },
     {
-      "id": "iihf-isr-senior-men-2026",
-      "sport": "hockey",
-      "genderCategory": "men",
-      "tier": "senior-professional",
-      "universe": "IIHF 2026 Israel senior men roster",
-      "sourceUrl": "https://www.iihf.com/en/events/2026/wmiib/teams/roster/68052/israel",
+      "id": "wta-isr-women",
+      "sport": "tennis",
+      "genderCategory": "women",
+      "tier": "international-circuit",
+      "universe": "WTA singles players representing ISR",
+      "sourceUrl": "https://www.wtatennis.com/rankings/singles",
       "sourceType": "primary-verification",
       "cadence": "weekly",
       "freshnessWindowDays": 7,
-      "lastAttemptAt": "2026-07-23T08:00:00.000Z",
+      "lastAttemptAt": "2026-08-08T08:00:00.000Z",
       "health": "partial",
       "limitations": [
-        "The roster has not been scanned or reconciled against overseas club affiliations and eligibility, so it is not a comprehensive overseas-Israeli census."
+        "The WTA ISR universe has not yet been enumerated and independently reconciled, so this entry is not a census."
       ]
     },
     {
@@ -41,14 +41,30 @@
       "genderCategory": "men",
       "tier": "senior-professional",
       "universe": "IFA 2026 senior men roster",
-      "sourceUrl": "https://www.football.org.il/national-team/national-team-players.aspx?national_team_id=558",
+      "sourceUrl": "https://www.football.org.il/en/national-team/?national_team_id=3",
       "sourceType": "primary-verification",
       "cadence": "weekly",
       "freshnessWindowDays": 7,
-      "lastAttemptAt": "2026-07-23T08:00:00.000Z",
+      "lastAttemptAt": "2026-08-08T08:00:00.000Z",
       "health": "partial",
       "limitations": [
-        "Current foreign clubs have not been reconciled to eligibility, and this roster is not a census of all overseas Israelis or a comprehensive coverage claim."
+        "The current IFA roster has not yet been exhaustively reconciled against current foreign-club rosters and is not a census of every eligible footballer abroad."
+      ]
+    },
+    {
+      "id": "ifa-isr-senior-women-2026",
+      "sport": "football",
+      "genderCategory": "women",
+      "tier": "senior-professional",
+      "universe": "IFA 2026 senior women roster",
+      "sourceUrl": "https://www.football.org.il/en/national-team/?national_team_id=377",
+      "sourceType": "primary-verification",
+      "cadence": "weekly",
+      "freshnessWindowDays": 7,
+      "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+      "health": "partial",
+      "limitations": [
+        "The current IFA roster has not yet been exhaustively reconciled against current foreign-club rosters and is not a census of every eligible footballer abroad."
       ]
     },
     {
@@ -61,10 +77,42 @@
       "sourceType": "primary-verification",
       "cadence": "weekly",
       "freshnessWindowDays": 7,
-      "lastAttemptAt": "2026-07-23T08:00:00.000Z",
+      "lastAttemptAt": "2026-08-08T08:00:00.000Z",
       "health": "partial",
       "limitations": [
-        "Senior, youth, women, and club seasons have not been separated and reconciled to overseas affiliations, so this is not a universal or comprehensive coverage claim."
+        "Senior, youth, women, and event rosters have not yet been separated and reconciled against current overseas affiliations, so this is not a census."
+      ]
+    },
+    {
+      "id": "iihf-isr-senior-men-2026",
+      "sport": "hockey",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "universe": "IIHF 2026 Israel senior men roster",
+      "sourceUrl": "https://www.iihf.com/en/events/2026/wmiib/teams/roster/68052/israel",
+      "sourceType": "primary-verification",
+      "cadence": "weekly",
+      "freshnessWindowDays": 7,
+      "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+      "health": "partial",
+      "limitations": [
+        "Tournament-time club fields do not prove a current 2026-27 affiliation; overseas-signalled cases still require current-club reconciliation."
+      ]
+    },
+    {
+      "id": "iihf-isr-senior-women-2026",
+      "sport": "hockey",
+      "genderCategory": "women",
+      "tier": "senior-professional",
+      "universe": "IIHF 2026 Israel senior women roster",
+      "sourceUrl": "https://www.iihf.com/en/events/2026/wwiiib/teams/roster/68222/israel",
+      "sourceType": "primary-verification",
+      "cadence": "weekly",
+      "freshnessWindowDays": 7,
+      "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+      "health": "partial",
+      "limitations": [
+        "Tournament-time club fields do not prove a current 2026-27 affiliation; overseas-signalled cases still require current-club reconciliation."
       ]
     }
   ]

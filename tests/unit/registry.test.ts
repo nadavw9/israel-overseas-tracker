@@ -9,18 +9,38 @@ describe('registry compiler', () => {
     expect(publicRegistry.map((athlete) => athlete.id)).toEqual([
       'deni-avdija',
       'ben-saraf',
+      'danny-wolf',
+      'emanuel-sharp',
+      'yarden-garzon',
+      'gal-raviv',
+      'omer-mayer',
+      'noam-yaacov',
       'oscar-gloukh',
+      'manor-solomon',
+      'daniel-peretz',
+      'talia-sommer',
+      'vital-kats',
+      'amit-vales',
+      'orel-kimhi',
+      'ofek-shimanov',
+      'daniel-cukierman',
+      'yshai-oliel',
     ])
     expect(publicRegistry.every((athlete) => athlete.eligibility.status === 'verified')).toBe(true)
-    expect(publicRegistry.every((athlete) =>
+    expect(publicRegistry.filter((athlete) => athlete.tier === 'international-circuit')).toHaveLength(5)
+    expect(publicRegistry.filter((athlete) => athlete.tier === 'international-circuit').every((athlete) =>
+      athlete.participation.kind === 'circuit-activity' && athlete.participation.activity.circuit === 'ATP',
+    )).toBe(true)
+    expect(publicRegistry.filter((athlete) => athlete.tier !== 'international-circuit').every((athlete) =>
       athlete.participation.kind === 'team-affiliation' && athlete.participation.affiliation.primary,
     )).toBe(true)
   })
 
   it('includes only verified provider bindings', () => {
-    expect(publicRegistry.map((athlete) => athlete.binding?.externalId)).toEqual([
+    expect(publicRegistry.flatMap((athlete) => athlete.binding?.externalId ?? [])).toEqual([
       '4683021',
       '5242502',
+      '5107173',
       'oscar-gloukh',
     ])
   })
@@ -40,8 +60,8 @@ describe('registry compiler', () => {
     if (ben?.participation.kind !== 'team-affiliation') throw new Error('Expected team participation')
     expect(ben.participation.affiliation.source).toEqual({
       publisher: 'NBA',
-      sourceUrl: 'https://www.nba.com/player/1642879/ben-saraf',
-      retrievedAt: '2026-07-23T08:00:00.000Z',
+      sourceUrl: 'https://www.nba.com/team/1610612751/brooklyn-nets',
+      retrievedAt: '2026-08-08T08:00:00.000Z',
     })
   })
 })
@@ -52,26 +72,43 @@ describe('candidate queue', () => {
       JSON.parse(readFileSync('data/review/candidates.json', 'utf8')),
     )
 
-    expect(candidates.map((candidate) => candidate.id)).toEqual(['danny-wolf', 'zeev-buium'])
-    expect(candidates.every((candidate) => candidate.state === 'needs-evidence')).toBe(true)
+    expect(candidates.map((candidate) => candidate.id)).toEqual([
+      'jordan-hasson',
+      'vladimir-bazilevskiy',
+      'tim-vaisman',
+      'shon-abaev',
+      'nir-tichon',
+      'nick-ougortsin',
+      'nikita-zitserman',
+      'shon-kazinets',
+      'itay-kerner',
+      'samson-goldshtein',
+      'pnina-basov',
+      'lior-leshem',
+      'yael-fatiev',
+      'zeev-buium',
+    ])
+    expect(candidates.find(({ id }) => id === 'nir-tichon')?.state).toBe('affiliation-conflict')
+    expect(candidates.find(({ id }) => id === 'pnina-basov')?.state).toBe('affiliation-conflict')
+    expect(candidates.find(({ id }) => id === 'zeev-buium')?.state).toBe('rejected')
+    expect(candidates.filter(({ id }) => !['nir-tichon', 'pnina-basov', 'zeev-buium'].includes(id))
+      .every(({ state }) => state === 'needs-evidence')).toBe(true)
     expect(candidates.every((candidate) => !publicRegistry.some((athlete) => athlete.id === candidate.id))).toBe(true)
   })
 
-  it('retains private discovery identifiers and lifecycle uncertainty', () => {
+  it('classifies the private ATP universe and keeps public and private ids disjoint', () => {
     const candidates = candidateQueueSchema.parse(
       JSON.parse(readFileSync('data/review/candidates.json', 'utf8')),
     )
-    const danny = candidates.find((candidate) => candidate.id === 'danny-wolf')
-    const zeev = candidates.find((candidate) => candidate.id === 'zeev-buium')
+    const publicIds = new Set(publicRegistry.map(({ id }) => id))
+    const zeev = candidates.find(({ id }) => id === 'zeev-buium')
 
-    expect(danny?.signals[0]?.note).toContain('espn-nba provider identity 5107173')
-    expect(zeev?.signals[0]?.note).toContain('nhl provider identity 8484798')
-    expect(danny?.signals[0]?.note).toContain('lifecycle status remains unknown')
-    expect(zeev?.signals[0]?.note).toContain('lifecycle status remains unknown')
-    expect(candidates.every((candidate) => candidate.signals.some((signal) => signal.note.includes('pending represents-israel')))).toBe(true)
-    expect(zeev?.name.he).toBe('זאב ביום')
-    expect(danny?.location).toEqual({ city: 'Brooklyn', country: 'United States', lat: 40.6782, lng: -73.9442 })
-    expect(zeev?.location).toEqual({ city: 'Vancouver', country: 'Canada', lat: 49.2827, lng: -123.1207 })
+    expect(candidates.filter(({ id }) => ['jordan-hasson', 'vladimir-bazilevskiy', 'tim-vaisman'].includes(id)))
+      .toHaveLength(3)
+    expect(candidates.find(({ id }) => id === 'shon-abaev')?.name.he).toBeUndefined()
+    expect(zeev?.signals.some(({ note }) => /USA representation/i.test(note))).toBe(true)
+    expect(zeev?.reviewerNote).toMatch(/rejected/i)
+    expect(candidates.some(({ id }) => publicIds.has(id))).toBe(false)
   })
 })
 

@@ -1,5 +1,6 @@
 [
-  {"id":"deni-avdija-espn-nba","athleteId":"deni-avdija","provider":"espn-nba","externalId":"4683021","sport":"basketball","competition":"NBA","season":"2025-26","status":"verified","matchedOn":["name","team"],"verifiedAt":"2026-07-23T08:00:00.000Z"},
-  {"id":"ben-saraf-espn-nba","athleteId":"ben-saraf","provider":"espn-nba","externalId":"5242502","sport":"basketball","competition":"NBA","season":"2025-26","status":"verified","matchedOn":["name","team"],"verifiedAt":"2026-07-23T08:00:00.000Z"},
-  {"id":"oscar-gloukh-curated","athleteId":"oscar-gloukh","provider":"curated","externalId":"oscar-gloukh","sport":"football","competition":"Eredivisie","season":"2025-26","status":"verified","matchedOn":["name","team"],"verifiedAt":"2026-07-23T08:00:00.000Z"}
+  {"id":"deni-avdija-espn-nba","athleteId":"deni-avdija","provider":"espn-nba","externalId":"4683021","sport":"basketball","competition":"NBA","season":"2025-26","status":"verified","matchedOn":["name","team"],"verifiedAt":"2026-08-08T08:00:00.000Z"},
+  {"id":"ben-saraf-espn-nba","athleteId":"ben-saraf","provider":"espn-nba","externalId":"5242502","sport":"basketball","competition":"NBA","season":"2025-26","status":"verified","matchedOn":["name","team"],"verifiedAt":"2026-08-08T08:00:00.000Z"},
+  {"id":"danny-wolf-espn-nba","athleteId":"danny-wolf","provider":"espn-nba","externalId":"5107173","sport":"basketball","competition":"NBA","season":"2025-26","status":"verified","matchedOn":["name","team"],"verifiedAt":"2026-08-08T08:00:00.000Z"},
+  {"id":"oscar-gloukh-curated","athleteId":"oscar-gloukh","provider":"curated","externalId":"oscar-gloukh","sport":"football","competition":"Eredivisie","season":"2025-26","status":"verified","matchedOn":["name","team"],"verifiedAt":"2026-08-08T08:00:00.000Z"}
 ]

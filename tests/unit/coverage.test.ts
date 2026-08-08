@@ -250,17 +250,24 @@ describe('coverage ledger schema', () => {
       JSON.parse(readFileSync('data/coverage/ledger.json', 'utf8')),
     )
 
-    expect(summarizeCoverage(ledger)).toEqual({ required: 4, healthy: 0, complete: false })
-    expect(ledger.entries).toHaveLength(4)
+    expect(summarizeCoverage(ledger)).toEqual({ required: 7, healthy: 1, complete: false })
+    expect(ledger.entries).toHaveLength(7)
     expect(ledger.entries.map((entry) => entry.id).sort()).toEqual([
       'atp-isr-men',
       'fiba-isr-competition-rosters',
       'ifa-isr-senior-men-2026',
+      'ifa-isr-senior-women-2026',
       'iihf-isr-senior-men-2026',
+      'iihf-isr-senior-women-2026',
+      'wta-isr-women',
     ])
-    expect(ledger.entries.every((entry) => entry.health === 'partial')).toBe(true)
-    expect(ledger.entries[0]?.counts).toEqual({ observed: 8, matched: 0, newCandidates: 8, conflicts: 0 })
-    expect(ledger.entries.slice(1).every((entry) => entry.counts === undefined && entry.lastSuccessAt === undefined)).toBe(true)
-    expect(ledger.entries.every((entry) => entry.limitations.some((limitation) => /reconcil/i.test(limitation)))).toBe(true)
+    expect(ledger.entries.find(({ id }) => id === 'atp-isr-men')).toMatchObject({
+      health: 'healthy',
+      counts: { observed: 8, matched: 5, newCandidates: 3, conflicts: 0 },
+    })
+    expect(ledger.entries.filter(({ id }) => id !== 'atp-isr-men').every((entry) => entry.health === 'partial')).toBe(true)
+    expect(ledger.entries.every((entry) =>
+      entry.id === 'atp-isr-men' || entry.limitations.some((limitation) => /reconcil|not yet|not a census/i.test(limitation)),
+    )).toBe(true)
   })
 })
