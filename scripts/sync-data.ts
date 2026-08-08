@@ -29,44 +29,48 @@ export async function fetchProviderRecord(
   now: Date = new Date(),
 ): Promise<ProviderResult> {
   const retrievedAt = now.toISOString()
+  const binding = entry.binding
+  if (binding === undefined) {
+    throw new Error(`Provider binding required for ${entry.id}`)
+  }
 
-  if (entry.binding.provider === 'curated') {
+  if (binding.provider === 'curated') {
     const records = JSON.parse(await readFile(curatedDataUrl, 'utf8')) as Record<
       string,
       unknown
     >
-    return parseCuratedRecord(entry.id, records[entry.binding.externalId])
+    return parseCuratedRecord(entry.id, records[binding.externalId])
   }
 
-  if (entry.binding.provider === 'espn-nba') {
-    const seasonYear = parseNbaSeasonEndingYear(entry.affiliation.season)
-    const sourceUrl = `https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/${seasonYear}/types/2/athletes/${entry.binding.externalId}/statistics?lang=en&region=us`
+  if (binding.provider === 'espn-nba') {
+    const seasonYear = parseNbaSeasonEndingYear(binding.season)
+    const sourceUrl = `https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/${seasonYear}/types/2/athletes/${binding.externalId}/statistics?lang=en&region=us`
     const response = await fetcher(sourceUrl)
     if (!response.ok) {
       throw new Error(`ESPN returned HTTP ${response.status} for ${entry.id}`)
     }
     return parseNbaFixture(await response.json(), {
       athleteId: entry.id,
-      externalId: entry.binding.externalId,
+      externalId: binding.externalId,
       seasonYear,
-      season: entry.affiliation.season,
+      season: binding.season,
       sourceUrl,
       retrievedAt,
     })
   }
 
-  const sourceUrl = `https://api-web.nhle.com/v1/player/${entry.binding.externalId}/landing`
+  const sourceUrl = `https://api-web.nhle.com/v1/player/${binding.externalId}/landing`
   const response = await fetcher(sourceUrl)
   if (!response.ok) {
     throw new Error(`NHL returned HTTP ${response.status} for ${entry.id}`)
   }
-  const seasonId = Number(entry.affiliation.season.replace('-', '20'))
+  const seasonId = Number(binding.season.replace('-', '20'))
   return parseNhlFixture(await response.json(), {
     athleteId: entry.id,
-    externalId: entry.binding.externalId,
+    externalId: binding.externalId,
     expectedName: entry.name.en,
     seasonId,
-    season: entry.affiliation.season,
+    season: binding.season,
     sourceUrl,
     retrievedAt,
   })

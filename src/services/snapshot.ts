@@ -28,8 +28,52 @@ function normalizeOrganization(value: string) {
     .toLocaleLowerCase('en')
 }
 
+function participationCompetition(entry: RegistryAthlete): string {
+  return entry.participation.kind === 'team-affiliation'
+    ? entry.participation.affiliation.competition
+    : entry.participation.activity.competition
+}
+
+function unavailablePerformance(
+  reason: 'not-integrated' | 'provider-unavailable',
+): PublicPerformance {
+  return {
+    status: 'unavailable',
+    state: 'unavailable',
+    stats: null,
+    reason,
+  }
+}
+
 function publicRegistryFields(entry: RegistryAthlete): Omit<Athlete, 'performance'> {
-  const { eligibility, affiliation, image } = entry
+  const { eligibility, image } = entry
+  const participation = entry.participation.kind === 'team-affiliation'
+    ? {
+        kind: 'team-affiliation' as const,
+        affiliation: {
+          organization: entry.participation.affiliation.organization,
+          competition: entry.participation.affiliation.competition,
+          season: entry.participation.affiliation.season,
+          rosterStatus: entry.participation.affiliation.rosterStatus,
+          countsAsOverseas: true as const,
+          source: entry.participation.affiliation.source,
+          ...(entry.participation.affiliation.location === undefined
+            ? {}
+            : { location: entry.participation.affiliation.location }),
+        },
+      }
+    : {
+        kind: 'circuit-activity' as const,
+        activity: {
+          circuit: entry.participation.activity.circuit,
+          discipline: entry.participation.activity.discipline,
+          competition: entry.participation.activity.competition,
+          season: entry.participation.activity.season,
+          activityType: entry.participation.activity.activityType,
+          effectiveAt: entry.participation.activity.effectiveAt,
+          source: entry.participation.activity.source,
+        },
+      }
   return {
     id: entry.id,
     name: entry.name,
@@ -46,15 +90,7 @@ function publicRegistryFields(entry: RegistryAthlete): Omit<Athlete, 'performanc
       sourceUrl: eligibility.sourceUrl,
       retrievedAt: eligibility.retrievedAt,
     },
-    affiliation: {
-      organization: affiliation.organization,
-      competition: affiliation.competition,
-      season: affiliation.season,
-      rosterStatus: affiliation.rosterStatus,
-      countsAsOverseas: true,
-      source: affiliation.source,
-      ...(affiliation.location === undefined ? {} : { location: affiliation.location }),
-    },
+    participation,
     ...(image === undefined
       ? {}
       : {
@@ -74,6 +110,10 @@ function publicRegistryFields(entry: RegistryAthlete): Omit<Athlete, 'performanc
 }
 
 function normalizeRecord(entry: RegistryAthlete, result: ProviderResult, now: Date): Athlete {
+  const binding = entry.binding
+  if (binding === undefined) {
+    throw new Error(`Provider binding required for ${entry.id}`)
+  }
   result = providerResultSchema.parse(result)
   const retrievedMilliseconds = new Date(result.retrievedAt).getTime()
   if (retrievedMilliseconds > now.getTime()) {
@@ -88,38 +128,32 @@ function normalizeRecord(entry: RegistryAthlete, result: ProviderResult, now: Da
     )
   }
 
-  if (result.sport !== entry.sport || result.sport !== entry.binding.sport ||
-      result.competition !== entry.affiliation.competition ||
-      result.competition !== entry.binding.competition ||
-      result.season !== entry.affiliation.season) {
+  if (result.sport !== entry.sport || result.sport !== binding.sport ||
+      result.competition !== participationCompetition(entry) ||
+      result.competition !== binding.competition ||
+      result.season !== binding.season) {
     throw new Error(`Provider context mismatch for ${entry.id}`)
   }
 
   if (
+    entry.participation.kind === 'team-affiliation' &&
     result.observedOrganization !== undefined &&
     normalizeOrganization(result.observedOrganization) !==
-      normalizeOrganization(entry.affiliation.organization.name)
+      normalizeOrganization(entry.participation.affiliation.organization.name)
   ) {
     throw new Error(
-      `Provider organization mismatch for ${entry.id}: expected ${entry.affiliation.organization.name}, received ${result.observedOrganization}`,
+      `Provider organization mismatch for ${entry.id}: expected ${entry.participation.affiliation.organization.name}, received ${result.observedOrganization}`,
     )
   }
 
   const source = {
-    provider: entry.binding.provider,
+    provider: binding.provider,
     sourceUrl: result.sourceUrl,
     retrievedAt: result.retrievedAt,
   }
   const performance: PublicPerformance =
     result.stats === null
-      ? {
-          status: 'unavailable',
-          state: 'unavailable',
-          competition: result.competition,
-          season: result.season,
-          stats: null,
-          source,
-        }
+      ? unavailablePerformance('not-integrated')
       : {
           status: 'available',
           state: result.state,
@@ -135,23 +169,29 @@ function normalizeRecord(entry: RegistryAthlete, result: ProviderResult, now: Da
 function staleRecord(
   entry: RegistryAthlete,
   previous: PreviousSnapshot,
-  reason: unknown,
   now: Date,
 ): Athlete {
+  const binding = entry.binding
   const previousPerformance = previous.athletes.find(
     (athlete) => athlete.id === entry.id,
   )?.performance
 
   if (
+    binding === undefined ||
     previousPerformance?.status !== 'available' ||
     previousPerformance.stats === null ||
     previousPerformance.stats.kind !== entry.sport ||
-    previousPerformance.competition !== entry.affiliation.competition ||
-    previousPerformance.season !== entry.affiliation.season ||
+    previousPerformance.stats.kind !== binding.sport ||
+    previousPerformance.source.provider !== binding.provider ||
+    previousPerformance.competition !== binding.competition ||
+    previousPerformance.competition !== participationCompetition(entry) ||
+    previousPerformance.season !== binding.season ||
     !isObservationWithinRetention(previousPerformance.source.retrievedAt, now)
   ) {
-    const message = reason instanceof Error ? reason.message : String(reason)
-    throw new Error(`No verified data available for ${entry.id}: ${message}`)
+    return {
+      ...publicRegistryFields(entry),
+      performance: unavailablePerformance('provider-unavailable'),
+    }
   }
 
   return {
@@ -170,13 +210,24 @@ export async function buildSnapshot({
   fetchRecord,
   now,
 }: BuildSnapshotOptions): Promise<AthleteSnapshot> {
-  const settled = await Promise.allSettled(entries.map(fetchRecord))
+  const settled = await Promise.allSettled(entries.map((entry) =>
+    entry.binding === undefined ? Promise.resolve(null) : fetchRecord(entry)))
   const athletes = settled.map((result, index) => {
     const entry = entries[index]
     if (entry === undefined) throw new Error(`Missing registry entry at index ${index}`)
-    return result.status === 'fulfilled'
-      ? normalizeRecord(entry, result.value, now)
-      : staleRecord(entry, previous, result.reason, now)
+    if (entry.binding === undefined) {
+      return {
+        ...publicRegistryFields(entry),
+        performance: unavailablePerformance('not-integrated'),
+      }
+    }
+    if (result.status === 'rejected') {
+      return staleRecord(entry, previous, now)
+    }
+    if (result.value === null) {
+      throw new Error(`Missing provider result for ${entry.id}`)
+    }
+    return normalizeRecord(entry, result.value, now)
   })
 
   return snapshotSchema.parse({ generatedAt: now.toISOString(), athletes, coverage })
