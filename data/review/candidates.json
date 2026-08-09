@@ -105,6 +105,651 @@
     "reviewerNote": "Keep private until a second approved primary source corroborates Israeli eligibility and identity, then decide whether to publish WTA circuit activity without numerical ranking data."
   },
   {
+    "id": "omri-glazer",
+    "name": { "en": "Omri Glazer" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "ido-shahar-football",
+    "name": { "en": "Ido Shahar" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "asaf-tzur",
+    "name": { "en": "Asaf Tzur" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "or-blorian",
+    "name": { "en": "Or Blorian" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "eli-dasa",
+    "name": { "en": "Eli Dasa" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "stav-lemkin",
+    "name": { "en": "Stav Lemkin" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "guy-mizrahi",
+    "name": { "en": "Guy Mizrahi" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "idan-nachmias",
+    "name": { "en": "Idan Nachmias" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "roy-revivo",
+    "name": { "en": "Roy Revivo" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "itay-rotman",
+    "name": { "en": "Itay Rotman" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "nikita-stoioanov",
+    "name": { "en": "Nikita Stoioanov" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "tai-abed",
+    "name": { "en": "Tai Abed" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "gavriel-kanikovsky",
+    "name": { "en": "Gavriel Kanikovsky" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "neta-lavi",
+    "name": { "en": "Neta Lavi" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "yarin-levi",
+    "name": { "en": "Yarin Levi" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "eliel-peretz",
+    "name": { "en": "Eliel Peretz" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "yarden-shua",
+    "name": { "en": "Yarden Shua" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "sayd-abu-farhi",
+    "name": { "en": "Sayd Abu Farhi" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "idan-gurno",
+    "name": { "en": "Idan Gurno" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "dor-turgeman",
+    "name": { "en": "Dor Turgeman" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "stav-turiel",
+    "name": { "en": "Stav Turiel" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "men",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "amit-beilin",
+    "name": { "en": "Amit Beilin" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "agam-haviv",
+    "name": { "en": "Agam Haviv" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "fortun-rubin",
+    "name": { "en": "Fortun Rubin" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "itaf-alkisi",
+    "name": { "en": "Itaf Alkisi" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "shani-david",
+    "name": { "en": "Shani David" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "asia-derksan",
+    "name": { "en": "Asia Derksan" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "or-divan",
+    "name": { "en": "Or Divan" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "tal-fainegezicht",
+    "name": { "en": "Tal Fainegezicht" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "tamar-lipstik-geva",
+    "name": { "en": "Tamar Lipstik Geva" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "hili-shalom",
+    "name": { "en": "Hili Shalom" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "mia-shvil",
+    "name": { "en": "Mia Shvil" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "maya-sirota",
+    "name": { "en": "Maya Sirota" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "maya-cabrera",
+    "name": { "en": "Maya Cabrera" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "talna-tal",
+    "name": { "en": "Talna Tal" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "mihala-worko",
+    "name": { "en": "Mihala Worko" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "maria-almzri",
+    "name": { "en": "Maria Almzri" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "elis-blokhin",
+    "name": { "en": "Elis Blokhin" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "smadar-cohen",
+    "name": { "en": "Smadar Cohen" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "zohar-cohen",
+    "name": { "en": "Zohar Cohen" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "shahar-nakav",
+    "name": { "en": "Shahar Nakav" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "rachel-shteinshneider",
+    "name": { "en": "Rachel Shteinshneider" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster as Shteinshneider RACHEL; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
+    "id": "noa-selimhodzic",
+    "name": { "en": "Noa Selimhodzic" },
+    "sport": "football",
+    "tier": "senior-professional",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T14:35:00.000Z",
+      "note": "Observed in the official IFA 2026 senior women's Team Squad roster; current overseas affiliation has not yet been independently verified."
+    }],
+    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
+  },
+  {
     "id": "shon-abaev",
     "name": { "en": "Shon Abaev" },
     "sport": "basketball",

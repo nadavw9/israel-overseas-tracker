@@ -70,7 +70,10 @@ describe('coverage ledger schema', () => {
 
     expect(coverage).toMatchObject({ required: 1, healthy: 1, complete: true })
     expect(coverage.entries).toHaveLength(1)
-    expect(coverage.entries?.[0]).toEqual(healthyEntry)
+    expect(coverage.entries?.[0]).toEqual({
+      ...healthyEntry,
+      counts: { ...healthyEntry.counts, outOfScope: 0, unresolved: 0 },
+    })
     expect(Object.keys(coverage.entries?.[0] ?? {}).sort()).toEqual([
       'cadence',
       'counts',
@@ -136,7 +139,7 @@ describe('coverage ledger schema', () => {
     ).toBe(false)
   })
 
-  it('requires all count fields when counts are present', () => {
+  it('requires the non-default count fields when counts are present', () => {
     const { conflicts: _, ...incompleteCounts } = healthyEntry.counts
     expect(coverageEntrySchema.safeParse({ ...healthyEntry, counts: incompleteCounts }).success).toBe(false)
   })
@@ -158,6 +161,53 @@ describe('coverage ledger schema', () => {
       coverageEntrySchema.safeParse({
         ...healthyEntry,
         counts: { observed: 8, matched: 4, newCandidates: 4, conflicts: 1 },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('supports explicit out-of-scope and unresolved classification buckets', () => {
+    expect(
+      coverageEntrySchema.safeParse({
+        ...healthyEntry,
+        health: 'partial',
+        counts: {
+          observed: 24,
+          matched: 3,
+          newCandidates: 5,
+          outOfScope: 11,
+          unresolved: 5,
+          conflicts: 0,
+        },
+      }).success,
+    ).toBe(true)
+    expect(
+      coverageEntrySchema.safeParse({
+        ...healthyEntry,
+        health: 'partial',
+        counts: {
+          observed: 24,
+          matched: 3,
+          newCandidates: 5,
+          outOfScope: 11,
+          unresolved: 4,
+          conflicts: 0,
+        },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects healthy coverage with unresolved observed rows', () => {
+    expect(
+      coverageEntrySchema.safeParse({
+        ...healthyEntry,
+        counts: {
+          observed: 8,
+          matched: 5,
+          newCandidates: 2,
+          outOfScope: 0,
+          unresolved: 1,
+          conflicts: 0,
+        },
       }).success,
     ).toBe(false)
   })
@@ -313,10 +363,18 @@ describe('coverage ledger schema', () => {
       counts: { observed: 4, matched: 0, newCandidates: 4, conflicts: 0 },
       sourceUrl: 'https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf',
     })
+    expect(ledger.entries.find(({ id }) => id === 'ifa-isr-senior-men-2026')).toMatchObject({
+      health: 'partial',
+      counts: { observed: 24, matched: 3, newCandidates: 21, outOfScope: 0, unresolved: 0, conflicts: 0 },
+    })
+    expect(ledger.entries.find(({ id }) => id === 'ifa-isr-senior-women-2026')).toMatchObject({
+      health: 'partial',
+      counts: { observed: 24, matched: 2, newCandidates: 22, outOfScope: 0, unresolved: 0, conflicts: 0 },
+    })
     expect(ledger.entries.filter(({ id }) => !['atp-isr-men', 'wta-isr-women'].includes(id)).every((entry) => entry.health === 'partial')).toBe(true)
     expect(ledger.entries.every((entry) =>
       ['atp-isr-men', 'wta-isr-women'].includes(entry.id) ||
-      entry.limitations.some((limitation) => /reconcil|not yet|not a census/i.test(limitation)),
+      entry.limitations.some((limitation) => /reconcil|not yet|not a census|verification/i.test(limitation)),
     )).toBe(true)
   })
 })

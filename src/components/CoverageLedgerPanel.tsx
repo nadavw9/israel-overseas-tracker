@@ -21,6 +21,8 @@ function coverageCounts(entry: PublicCoverageEntry, messages: ReturnType<typeof 
     entry.counts.observed,
     entry.counts.matched,
     entry.counts.newCandidates,
+    entry.counts.outOfScope,
+    entry.counts.unresolved,
     entry.counts.conflicts,
   )
 }

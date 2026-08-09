@@ -10,6 +10,13 @@ const snapshot = snapshotSchema.parse(snapshotJson)
 const deni = snapshot.athletes.find((athlete) => athlete.id === 'deni-avdija')!
 
 describe('Hebrew experience', () => {
+  it('summarizes nonzero coverage classification buckets', () => {
+    expect(messages.en.coverageCounts(24, 3, 5, 11, 5, 0)).toBe(
+      '3/24 matched · 5 new · 11 out · 5 unresolved · 0 conflicts',
+    )
+    expect(messages.he.coverageCounts(24, 3, 5, 11, 5, 0)).toContain('5')
+  })
+
   it('uses mixed-season wording and localizes nationality evidence in both locales', async () => {
     const user = userEvent.setup()
     const nationalityAthlete = athleteSchema.parse({ ...deni, eligibility: { ...deni.eligibility, basis: 'nationality' } })

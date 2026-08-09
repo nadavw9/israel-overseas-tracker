@@ -177,6 +177,8 @@ describe('verified athlete list', () => {
     expect(screen.getByText('5/8 matched · 3 new · 0 conflicts')).toBeVisible()
     expect(screen.getByText('WTA Singles Rankings numeric PDF ISR rows as of 03 August 2026')).toBeVisible()
     expect(screen.getByText('0/4 matched · 4 new · 0 conflicts')).toBeVisible()
+    expect(screen.getByText(messages.en.coverageCounts(24, 3, 21, 0, 0, 0))).toBeVisible()
+    expect(screen.getByText(messages.en.coverageCounts(24, 2, 22, 0, 0, 0))).toBeVisible()
     expect(screen.getAllByText('Healthy')).toHaveLength(2)
     expect(screen.getAllByText('Partial')).toHaveLength(5)
     expect(screen.getAllByText('Open source universe')).toHaveLength(7)

@@ -16,7 +16,7 @@ The current census and participation registry is manual. ESPN NBA performance co
 | Sport | Bounded discovery and verification sources | Recommended public metrics | Target refresh | Current integration | Fail-closed behavior |
 | --- | --- | --- | --- | --- | --- |
 | Basketball | Per-event FIBA Israel rosters/player records for eligibility; current NBA, club, and university rosters for affiliation | GP, PPG, RPG, APG | Near-live or daily scheduled after licensed/approved access; manual roster checks | Three 2025-26 ESPN NBA bindings; other verified athletes are identity-only | Provider failure preserves the athlete. Reuse only an exact matching observation within 48 hours; otherwise show `provider-unavailable`. No binding means `not-integrated`. |
-| Football | IFA senior men and women rosters for eligibility; current club rosters and official transfers for affiliation | APP, G, A | Near-live after a licensed statistics feed; weekly/manual roster reconciliation | No totals feed. Oscar's curated binding currently yields no public totals; all football athletes may be identity-only | Never infer totals from news or carry totals across club, competition, or season changes. Publish unavailable performance without a statistics source. |
+| Football | IFA senior men and women rosters for eligibility; current club rosters and official transfers for affiliation | APP, G, A | Near-live after a licensed statistics feed; weekly/manual roster reconciliation | IFA senior men and women identities are enumerated into public matches plus review candidates; no football totals feed is integrated. Oscar's curated binding currently yields no public totals; all football athletes may be identity-only | Never infer totals from news or carry totals across club, competition, or season changes. Publish unavailable performance without a statistics source. |
 | Tennis | ATP ISR men and WTA numeric-ranking ISR rows for circuit discovery; ITA/Davis, Billie Jean King Cup, federation, or equivalent evidence for independent eligibility | Rank, points, YTD W-L only after licensed access | Near-live/daily if licensed; weekly manual activity check | Current ATP activity only for five independently corroborated players; four WTA rows are private review candidates; no numeric performance data | Never model a tour as a club or fixed location. No scraping or copied rank/points/W-L. If licensed data is absent, publish only sourced circuit activity. |
 | Hockey | IIHF Israel men and women event rosters for eligibility; current foreign-club rosters for affiliation | GP, G, A, PTS | Near-live/daily after licensed or explicitly permitted access; manual club reconciliation | No public hockey athletes or active statistics bindings in this batch | Tournament-time club fields do not establish current affiliation. Unresolved or conflicting cases remain private; statistics cannot promote a candidate. |
 
@@ -29,7 +29,7 @@ The current census and participation registry is manual. ESPN NBA performance co
 5. Publish the identity even when no statistics binding exists; emit the explicit `not-integrated` state.
 6. Connect a performance adapter only after provider identity, sport, competition, season, access rights, and output metrics are approved.
 
-The coverage ledger is honest about boundaries. A healthy ATP-men entry means its eight observed rows were classified; it does not establish WTA, junior, doubles, team-sport, or global completeness.
+The coverage ledger is honest about boundaries. A healthy ATP-men entry means its eight observed rows were classified; it does not establish junior, doubles, team-sport, or global completeness. The healthy WTA entry means only that the 3 August 2026 numeric-ranking ISR rows were classified into review candidates. The partial IFA entries now classify all official senior-squad rows into public matches or review candidates, but they remain partial because current foreign-club verification is still missing for non-public rows.
 
 ## Access and licensing risk
 
@@ -40,7 +40,7 @@ Potential licensed options include Sportradar Tennis for tennis and Stats Perfor
 ## Next bounded investigations
 
 - Promote or reject the four WTA ISR numeric-ranking candidates only after independent eligibility and localized-name corroboration.
-- Reconcile every current IFA senior men's and women's roster identity against an official current foreign-club source.
+- Promote or reject the 43 IFA senior men/women review candidates only after current foreign-club evidence and localized names are independently verified.
 - Process FIBA rosters per named event, age group, and gender rather than treating the mixed team landing page as one census.
 - Reconcile IIHF senior men's and women's overseas-signalled players against current club rosters; resolve the two recorded affiliation conflicts before publication.
 - Maintain an explicit rejected disposition when official evidence contradicts the eligibility policy.

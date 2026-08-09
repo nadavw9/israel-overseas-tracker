@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-09T10:00:00.000Z",
+  "generatedAt": "2026-08-09T14:35:00.000Z",
   "entries": [
     {
       "id": "atp-isr-men",
@@ -43,14 +43,16 @@
       "genderCategory": "men",
       "tier": "senior-professional",
       "universe": "IFA 2026 senior men roster",
-      "sourceUrl": "https://www.football.org.il/en/national-team/?national_team_id=3",
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
       "sourceType": "primary-verification",
       "cadence": "weekly",
       "freshnessWindowDays": 7,
-      "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+      "lastAttemptAt": "2026-08-09T14:35:00.000Z",
+      "lastSuccessAt": "2026-08-09T14:35:00.000Z",
       "health": "partial",
+      "counts": { "observed": 24, "matched": 3, "newCandidates": 21, "outOfScope": 0, "unresolved": 0, "conflicts": 0 },
       "limitations": [
-        "The current IFA roster has not yet been exhaustively reconciled against current foreign-club rosters and is not a census of every eligible footballer abroad."
+        "The official IFA senior men's roster has been enumerated into public matches and review-queue candidates, but non-public rows still require independent current foreign-club verification before publication."
       ]
     },
     {
@@ -59,14 +61,16 @@
       "genderCategory": "women",
       "tier": "senior-professional",
       "universe": "IFA 2026 senior women roster",
-      "sourceUrl": "https://www.football.org.il/en/national-team/?national_team_id=377",
+      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377",
       "sourceType": "primary-verification",
       "cadence": "weekly",
       "freshnessWindowDays": 7,
-      "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+      "lastAttemptAt": "2026-08-09T14:35:00.000Z",
+      "lastSuccessAt": "2026-08-09T14:35:00.000Z",
       "health": "partial",
+      "counts": { "observed": 24, "matched": 2, "newCandidates": 22, "outOfScope": 0, "unresolved": 0, "conflicts": 0 },
       "limitations": [
-        "The current IFA roster has not yet been exhaustively reconciled against current foreign-club rosters and is not a census of every eligible footballer abroad."
+        "The official IFA senior women's roster has been enumerated into public matches and review-queue candidates, but non-public rows still require independent current foreign-club verification before publication."
       ]
     },
     {

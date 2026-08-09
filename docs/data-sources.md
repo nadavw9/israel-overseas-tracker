@@ -34,6 +34,7 @@ The official [WTA Singles Rankings numeric PDF](https://wtafiles.wtatennis.com/p
 
 - Shon Abaev has an official [FIBA nationality record](https://www.fiba.basketball/en/players/362507-shon-abaev), but the approved localized Hebrew name and current affiliation are not yet independently verified.
 - Lina Glushko, Maayan Laron, Mika Buchnik, and Sofiia Nagornaia have official WTA numeric-ranking rows with `Nat ISR`, but independent eligibility and localized-name corroboration have not yet been captured for public promotion.
+- The official IFA [senior men's Team Squad](https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3) and [senior women's Team Squad](https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377) have been enumerated into public matches and review-queue candidates. Non-public rows still require independent current foreign-club verification before publication.
 - The [2026 IIHF Israel men's roster](https://www.iihf.com/en/events/2026/wmiib/teams/roster/68052/israel) and [women's roster](https://www.iihf.com/en/events/2026/wwiiib/teams/roster/68222/israel) are eligibility signals. Tournament-time club fields are not treated as proof of a current 2026-27 club.
 - Zeev Buium is rejected: [USA Hockey](https://teamusa.usahockey.com/page/show/9227779-2025-u-s-men-s-national-team-roster) establishes USA representation, while the [NHL profile](https://www.nhl.com/player/zeev-buium-8484798) establishes affiliation but no qualifying Israeli evidence was found.
 
@@ -41,7 +42,7 @@ Review data is not imported by the public application and must not appear in `pu
 
 ## Coverage universes
 
-The ledger declares seven bounded universes: ATP men, WTA women, IFA senior men and women, per-event FIBA rosters, and IIHF senior men and women. ATP men is healthy with `8 observed / 5 matched / 3 new candidates / 0 conflicts`; WTA women is healthy for the 3 August 2026 numeric PDF with `4 observed / 0 matched / 4 new candidates / 0 conflicts`. Overall coverage remains incomplete. No statement in the UI or documentation should call the 18-athlete batch a complete census.
+The ledger declares seven bounded universes: ATP men, WTA women, IFA senior men and women, per-event FIBA rosters, and IIHF senior men and women. ATP men is healthy with `8 observed / 5 matched / 3 new candidates / 0 out-of-scope / 0 unresolved / 0 conflicts`; WTA women is healthy for the 3 August 2026 numeric PDF with `4 observed / 0 matched / 4 new candidates / 0 out-of-scope / 0 unresolved / 0 conflicts`. IFA men and women are enumerated but partial: men has `24 observed / 3 matched / 21 review candidates`, women has `24 observed / 2 matched / 22 review candidates`; those non-public rows still need current foreign-club verification. Overall coverage remains incomplete. No statement in the UI or documentation should call the 18-athlete batch a complete census.
 
 ## Performance retention and rights
 

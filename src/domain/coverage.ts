@@ -34,11 +34,19 @@ const coverageCountsSchema = z
     observed: z.number().int().nonnegative(),
     matched: z.number().int().nonnegative(),
     newCandidates: z.number().int().nonnegative(),
+    outOfScope: z.number().int().nonnegative().default(0),
+    unresolved: z.number().int().nonnegative().default(0),
     conflicts: z.number().int().nonnegative(),
   })
   .strict()
   .superRefine((counts, context) => {
-    const classifications = ['matched', 'newCandidates', 'conflicts'] as const
+    const classifications = [
+      'matched',
+      'newCandidates',
+      'outOfScope',
+      'unresolved',
+      'conflicts',
+    ] as const
 
     classifications.forEach((field) => {
       if (counts[field] > counts.observed) {
@@ -50,10 +58,12 @@ const coverageCountsSchema = z
       }
     })
 
-    if (counts.matched + counts.newCandidates + counts.conflicts !== counts.observed) {
+    const classified = counts.matched + counts.newCandidates + counts.outOfScope +
+      counts.unresolved + counts.conflicts
+    if (classified !== counts.observed) {
       context.addIssue({
         code: 'custom',
-        message: 'matched, newCandidates, and conflicts must classify every observed record',
+        message: 'matched, newCandidates, outOfScope, unresolved, and conflicts must classify every observed record',
         path: ['observed'],
       })
     }
@@ -107,6 +117,14 @@ export const coverageEntrySchema = z
         code: 'custom',
         message: 'Healthy coverage entries require classification counts',
         path: ['counts'],
+      })
+    }
+
+    if (entry.health === 'healthy' && entry.counts && entry.counts.unresolved > 0) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Healthy coverage entries cannot contain unresolved observed records',
+        path: ['counts', 'unresolved'],
       })
     }
   })

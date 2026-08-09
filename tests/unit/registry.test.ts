@@ -87,6 +87,49 @@ describe('candidate queue', () => {
       'maayan-laron',
       'mika-buchnik',
       'sofiia-nagornaia',
+      'omri-glazer',
+      'ido-shahar-football',
+      'asaf-tzur',
+      'or-blorian',
+      'eli-dasa',
+      'stav-lemkin',
+      'guy-mizrahi',
+      'idan-nachmias',
+      'roy-revivo',
+      'itay-rotman',
+      'nikita-stoioanov',
+      'tai-abed',
+      'gavriel-kanikovsky',
+      'neta-lavi',
+      'yarin-levi',
+      'eliel-peretz',
+      'yarden-shua',
+      'sayd-abu-farhi',
+      'idan-gurno',
+      'dor-turgeman',
+      'stav-turiel',
+      'amit-beilin',
+      'agam-haviv',
+      'fortun-rubin',
+      'itaf-alkisi',
+      'shani-david',
+      'asia-derksan',
+      'or-divan',
+      'tal-fainegezicht',
+      'tamar-lipstik-geva',
+      'hili-shalom',
+      'mia-shvil',
+      'maya-sirota',
+      'maya-cabrera',
+      'talna-tal',
+      'mihala-worko',
+      'maria-almzri',
+      'elis-blokhin',
+      'smadar-cohen',
+      'zohar-cohen',
+      'shahar-nakav',
+      'rachel-shteinshneider',
+      'noa-selimhodzic',
       'shon-abaev',
       'nir-tichon',
       'nick-ougortsin',
@@ -120,6 +163,10 @@ describe('candidate queue', () => {
       .toHaveLength(4)
     expect(candidates.find(({ id }) => id === 'lina-glushko')?.signals[0]?.sourceUrl)
       .toBe('https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf')
+    expect(candidates.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'men'))
+      .toHaveLength(21)
+    expect(candidates.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'women'))
+      .toHaveLength(22)
     expect(candidates.find(({ id }) => id === 'shon-abaev')?.name.he).toBeUndefined()
     expect(zeev?.signals.some(({ note }) => /USA representation/i.test(note))).toBe(true)
     expect(zeev?.reviewerNote).toMatch(/rejected/i)
