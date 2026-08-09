@@ -32,9 +32,9 @@
       "lastAttemptAt": "2026-08-09T10:00:00.000Z",
       "lastSuccessAt": "2026-08-09T10:00:00.000Z",
       "health": "healthy",
-      "counts": { "observed": 4, "matched": 0, "newCandidates": 4, "conflicts": 0 },
+      "counts": { "observed": 4, "matched": 3, "newCandidates": 1, "conflicts": 0 },
       "limitations": [
-        "This classifies only ISR rows in the 03 August 2026 WTA singles numeric ranking PDF; independent eligibility and localized-name corroboration are still required before publication, and it is not a complete women's tennis census."
+        "This classifies only ISR rows in the 03 August 2026 WTA singles numeric ranking PDF; one remaining WTA review row still requires independent eligibility and localized-name corroboration before publication, and it is not a complete women's tennis census."
       ]
     },
     {

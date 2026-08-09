@@ -30,6 +30,9 @@ describe('registry compiler', () => {
       'mahmoud-jaber',
       'talia-sommer',
       'vital-kats',
+      'lina-glushko',
+      'maayan-laron',
+      'mika-buchnik',
       'amit-vales',
       'orel-kimhi',
       'ofek-shimanov',
@@ -37,10 +40,14 @@ describe('registry compiler', () => {
       'yshai-oliel',
     ])
     expect(publicRegistry.every((athlete) => athlete.eligibility.status === 'verified')).toBe(true)
-    expect(publicRegistry.filter((athlete) => athlete.tier === 'international-circuit')).toHaveLength(5)
-    expect(publicRegistry.filter((athlete) => athlete.tier === 'international-circuit').every((athlete) =>
+    const circuitAthletes = publicRegistry.filter((athlete) => athlete.tier === 'international-circuit')
+    expect(circuitAthletes).toHaveLength(8)
+    expect(circuitAthletes.filter((athlete) =>
       athlete.participation.kind === 'circuit-activity' && athlete.participation.activity.circuit === 'ATP',
-    )).toBe(true)
+    )).toHaveLength(5)
+    expect(circuitAthletes.filter((athlete) =>
+      athlete.participation.kind === 'circuit-activity' && athlete.participation.activity.circuit === 'WTA',
+    )).toHaveLength(3)
     expect(publicRegistry.filter((athlete) => athlete.tier !== 'international-circuit').every((athlete) =>
       athlete.participation.kind === 'team-affiliation' && athlete.participation.affiliation.primary,
     )).toBe(true)
@@ -60,6 +67,37 @@ describe('registry compiler', () => {
 
     expect(amit?.name.he).toBe('עמית ולס')
     expect(amit?.eligibility.publisher).toBe('Israel Tennis Association')
+  })
+
+  it('promotes WTA women only after eligibility and localized names are independently corroborated', () => {
+    expect(publicRegistry.filter(({ sport, tier, genderCategory }) =>
+      sport === 'tennis' && tier === 'international-circuit' && genderCategory === 'women',
+    )).toHaveLength(3)
+
+    for (const [id, he, eligibilitySource] of [
+      ['lina-glushko', 'לינה גלושקו', 'https://www.billiejeankingcup.com/en/players/12a2778d-1ba0-4057-a65a-f684257482ca'],
+      ['maayan-laron', 'מעיין לרון', 'https://www.billiejeankingcup.com/en/players/034f313c-d61a-4988-a02f-9e06456ed25f'],
+      ['mika-buchnik', 'מיקה בוחניק', 'https://www.billiejeankingcup.com/en/players/2bbcaf7b-d899-4980-879a-989420656aaf'],
+    ] as const) {
+      expect(publicRegistry.find((athlete) => athlete.id === id)).toMatchObject({
+        name: { he },
+        eligibility: {
+          publisher: 'Billie Jean King Cup',
+          sourceUrl: eligibilitySource,
+        },
+        participation: {
+          kind: 'circuit-activity',
+          activity: {
+            circuit: 'WTA',
+            competition: 'WTA Singles Rankings numeric PDF — ISR',
+            source: {
+              publisher: 'WTA',
+              sourceUrl: 'https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf',
+            },
+          },
+        },
+      })
+    }
   })
 
   it('does not publish media without approved rights', () => {
@@ -243,9 +281,6 @@ describe('candidate queue', () => {
       'jordan-hasson',
       'vladimir-bazilevskiy',
       'tim-vaisman',
-      'lina-glushko',
-      'maayan-laron',
-      'mika-buchnik',
       'sofiia-nagornaia',
       'omri-glazer',
       'ido-shahar-football',
@@ -315,8 +350,8 @@ describe('candidate queue', () => {
     expect(candidates.filter(({ id }) => ['jordan-hasson', 'vladimir-bazilevskiy', 'tim-vaisman'].includes(id)))
       .toHaveLength(3)
     expect(candidates.filter(({ id }) => ['lina-glushko', 'maayan-laron', 'mika-buchnik', 'sofiia-nagornaia'].includes(id)))
-      .toHaveLength(4)
-    expect(candidates.find(({ id }) => id === 'lina-glushko')?.signals[0]?.sourceUrl)
+      .toHaveLength(1)
+    expect(candidates.find(({ id }) => id === 'sofiia-nagornaia')?.signals[0]?.sourceUrl)
       .toBe('https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf')
     expect(candidates.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'men'))
       .toHaveLength(16)

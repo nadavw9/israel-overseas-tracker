@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-09T15:15:00.000Z",
+  "generatedAt": "2026-08-09T15:16:49.941Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -59,7 +59,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-09T15:15:00.000Z"
+          "retrievedAt": "2026-08-09T15:16:49.941Z"
         }
       }
     },
@@ -121,7 +121,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5242502/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-09T15:15:00.000Z"
+          "retrievedAt": "2026-08-09T15:16:49.941Z"
         }
       }
     },
@@ -179,7 +179,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5107173/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-09T15:15:00.000Z"
+          "retrievedAt": "2026-08-09T15:16:49.941Z"
         }
       }
     },
@@ -1082,6 +1082,132 @@
       }
     },
     {
+      "id": "lina-glushko",
+      "name": {
+        "en": "Lina Glushko",
+        "he": "לינה גלושקו"
+      },
+      "aliases": [],
+      "sport": "tennis",
+      "discipline": "singles",
+      "genderCategory": "women",
+      "tier": "international-circuit",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.billiejeankingcup.com/en/players/12a2778d-1ba0-4057-a65a-f684257482ca",
+        "publisher": "Billie Jean King Cup",
+        "retrievedAt": "2026-08-09T10:00:00.000Z"
+      },
+      "participation": {
+        "kind": "circuit-activity",
+        "activity": {
+          "circuit": "WTA",
+          "discipline": "singles",
+          "competition": "WTA Singles Rankings numeric PDF — ISR",
+          "season": "2026",
+          "activityType": "ranking",
+          "effectiveAt": "2026-08-09T10:00:00.000Z",
+          "source": {
+            "publisher": "WTA",
+            "sourceUrl": "https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf",
+            "retrievedAt": "2026-08-09T10:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "maayan-laron",
+      "name": {
+        "en": "Maayan Laron",
+        "he": "מעיין לרון"
+      },
+      "aliases": [],
+      "sport": "tennis",
+      "discipline": "singles",
+      "genderCategory": "women",
+      "tier": "international-circuit",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.billiejeankingcup.com/en/players/034f313c-d61a-4988-a02f-9e06456ed25f",
+        "publisher": "Billie Jean King Cup",
+        "retrievedAt": "2026-08-09T10:00:00.000Z"
+      },
+      "participation": {
+        "kind": "circuit-activity",
+        "activity": {
+          "circuit": "WTA",
+          "discipline": "singles",
+          "competition": "WTA Singles Rankings numeric PDF — ISR",
+          "season": "2026",
+          "activityType": "ranking",
+          "effectiveAt": "2026-08-09T10:00:00.000Z",
+          "source": {
+            "publisher": "WTA",
+            "sourceUrl": "https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf",
+            "retrievedAt": "2026-08-09T10:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "mika-buchnik",
+      "name": {
+        "en": "Mika Buchnik",
+        "he": "מיקה בוחניק"
+      },
+      "aliases": [],
+      "sport": "tennis",
+      "discipline": "singles",
+      "genderCategory": "women",
+      "tier": "international-circuit",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.billiejeankingcup.com/en/players/2bbcaf7b-d899-4980-879a-989420656aaf",
+        "publisher": "Billie Jean King Cup",
+        "retrievedAt": "2026-08-09T10:00:00.000Z"
+      },
+      "participation": {
+        "kind": "circuit-activity",
+        "activity": {
+          "circuit": "WTA",
+          "discipline": "singles",
+          "competition": "WTA Singles Rankings numeric PDF — ISR",
+          "season": "2026",
+          "activityType": "ranking",
+          "effectiveAt": "2026-08-09T10:00:00.000Z",
+          "source": {
+            "publisher": "WTA",
+            "sourceUrl": "https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf",
+            "retrievedAt": "2026-08-09T10:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
       "id": "amit-vales",
       "name": {
         "en": "Amit Vales",
@@ -1341,14 +1467,14 @@
         "health": "healthy",
         "counts": {
           "observed": 4,
-          "matched": 0,
-          "newCandidates": 4,
+          "matched": 3,
+          "newCandidates": 1,
           "outOfScope": 0,
           "unresolved": 0,
           "conflicts": 0
         },
         "limitations": [
-          "This classifies only ISR rows in the 03 August 2026 WTA singles numeric ranking PDF; independent eligibility and localized-name corroboration are still required before publication, and it is not a complete women's tennis census."
+          "This classifies only ISR rows in the 03 August 2026 WTA singles numeric ranking PDF; one remaining WTA review row still requires independent eligibility and localized-name corroboration before publication, and it is not a complete women's tennis census."
         ]
       },
       {

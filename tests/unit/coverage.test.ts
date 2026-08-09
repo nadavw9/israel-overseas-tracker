@@ -360,7 +360,7 @@ describe('coverage ledger schema', () => {
     })
     expect(ledger.entries.find(({ id }) => id === 'wta-isr-women')).toMatchObject({
       health: 'healthy',
-      counts: { observed: 4, matched: 0, newCandidates: 4, conflicts: 0 },
+      counts: { observed: 4, matched: 3, newCandidates: 1, conflicts: 0 },
       sourceUrl: 'https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf',
     })
     expect(ledger.entries.find(({ id }) => id === 'ifa-isr-senior-men-2026')).toMatchObject({
