@@ -8,11 +8,20 @@ export function AthletePhoto({ athlete, attributionMode = 'link' }: { athlete: A
   const { messages } = useI18n()
   const parsedImage = publicMediaSchema.safeParse(athlete.image)
   const image = parsedImage.success ? parsedImage.data : undefined
+  const initials = athlete.name.en
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toLocaleUpperCase()
 
   if (!image || failedUrl === image.url) {
     return (
       <div className="athlete-photo athlete-photo--fallback" aria-label={messages.photoUnavailable}>
-        <UserRound size={76} strokeWidth={1.2} aria-hidden="true" />
+        <UserRound size={64} strokeWidth={1.1} aria-hidden="true" />
+        <span className="athlete-photo__initials" aria-hidden="true">{initials}</span>
+        <span className="athlete-photo__fallback-note">{messages.photoRightsPending}</span>
       </div>
     )
   }

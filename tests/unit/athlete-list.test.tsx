@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import snapshotJson from '../../public/data/snapshot.json'
@@ -60,6 +60,28 @@ describe('verified athlete list', () => {
     expect(screen.getAllByText(/source checked/i)).toHaveLength(3)
     expect(screen.getAllByText(messages.en.notIntegrated)).not.toHaveLength(0)
     vi.useRealTimers()
+  })
+
+  it('summarizes the public registry shape before the directory controls', () => {
+    render(<TrackerApp snapshot={snapshot} />)
+
+    const board = screen.getByRole('region', { name: /verified registry board/i })
+    expect(within(board).getByText('Verified records, visible limits')).toBeInTheDocument()
+    expect(within(board).getByText(/missing stats and photos stay explicit/i)).toBeInTheDocument()
+
+    for (const [label, count] of [
+      ['Basketball', '8'],
+      ['Football', '5'],
+      ['Tennis', '5'],
+      ['Women', '4'],
+      ['Circuit', '5'],
+      ['Stats', '3'],
+      ['Mapped', '3'],
+    ] as const) {
+      const row = within(board).getByText(label).closest('div')
+      expect(row).not.toBeNull()
+      expect(within(row as HTMLElement).getByText(count)).toBeInTheDocument()
+    }
   })
 
   it('filters by athlete, team, competition, and sport', async () => {
@@ -152,6 +174,7 @@ describe('verified athlete list', () => {
   it('uses a local fallback without a broken or unapproved remote image', () => {
     render(<TrackerApp snapshot={snapshot} />)
     expect(screen.getAllByLabelText('Photo unavailable')).toHaveLength(snapshot.athletes.length)
+    expect(screen.getAllByText('Image rights pending')).toHaveLength(snapshot.athletes.length)
     expect(screen.queryByRole('img')).not.toBeInTheDocument()
   })
 

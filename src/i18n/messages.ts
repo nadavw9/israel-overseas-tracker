@@ -17,6 +17,16 @@ export const messages = {
     snapshotGenerated: 'Snapshot generated',
     noInvented: 'No invented records',
     snapshotStatus: 'Snapshot status',
+    registryBoard: 'Verified registry board',
+    registryBoardKicker: 'Public census shape',
+    registryBoardTitle: 'Verified records, visible limits',
+    registryBoardNote: 'Counts show public records only; missing stats and photos stay explicit until sourced.',
+    registrySignals: {
+      women: 'Women',
+      circuit: 'Circuit',
+      sourcedStats: 'Stats',
+      mapped: 'Mapped',
+    },
     coverageLedger: 'Coverage ledger',
     coverageStatus: (healthy: number, required: number, complete: boolean) => complete
       ? `Coverage healthy: ${healthy} of ${required} universes healthy`
@@ -94,6 +104,7 @@ export const messages = {
       'represents-israel': 'This is verified sporting representation, not a claim about citizenship.',
     },
     photoUnavailable: 'Photo unavailable',
+    photoRightsPending: 'Image rights pending',
     statLabels: {
       games: 'Games',
       pointsPerGame: 'Points / game',
@@ -121,6 +132,16 @@ export const messages = {
     snapshotGenerated: 'הצילום נוצר',
     noInvented: 'ללא נתונים מומצאים',
     snapshotStatus: 'מצב הנתונים',
+    registryBoard: 'לוח מאגר מאומת',
+    registryBoardKicker: 'מבנה המאגר הציבורי',
+    registryBoardTitle: 'רשומות מאומתות, גבולות גלויים',
+    registryBoardNote: 'הספירה כוללת רשומות ציבוריות בלבד; סטטיסטיקה ותמונות חסרות נשארות מסומנות עד אימות מקור.',
+    registrySignals: {
+      women: 'נשים',
+      circuit: 'סבב',
+      sourcedStats: 'סטט׳',
+      mapped: 'מפה',
+    },
     coverageLedger: 'יומן כיסוי',
     coverageStatus: (healthy: number, required: number, complete: boolean) => complete
       ? `כיסוי תקין: ${healthy} מתוך ${required} מאגרי סריקה תקינים`
@@ -198,6 +219,7 @@ export const messages = {
       'represents-israel': 'זהו ייצוג ספורטיבי מאומת, ולא טענה לגבי אזרחות.',
     },
     photoUnavailable: 'התמונה אינה זמינה',
+    photoRightsPending: 'זכויות תמונה בבדיקה',
     statLabels: {
       games: 'משחקים',
       pointsPerGame: 'נקודות למשחק',

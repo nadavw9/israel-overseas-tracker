@@ -7,6 +7,7 @@ import { AthleteMap } from '../components/AthleteMap'
 import { CoverageStatus } from '../components/CoverageStatus'
 import { FilterBar, type DirectoryFilters } from '../components/FilterBar'
 import { Leaderboard } from '../components/Leaderboard'
+import { RegistryBoard } from '../components/RegistryBoard'
 import { ViewNav, type TrackerView } from '../components/ViewNav'
 import { I18nContext } from '../i18n/context'
 import { messages, type Locale } from '../i18n/messages'
@@ -133,6 +134,7 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
         </section>
 
         <section className="content" aria-label={copy.explorer}>
+          <RegistryBoard athletes={snapshot.athletes} sports={sports} />
           <ViewNav view={view} onChange={setView} />
 
           {view === 'athletes' && (
