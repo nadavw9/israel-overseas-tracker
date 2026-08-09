@@ -18,6 +18,11 @@ describe('registry compiler', () => {
       'oscar-gloukh',
       'manor-solomon',
       'daniel-peretz',
+      'stav-lemkin',
+      'tai-abed',
+      'neta-lavi',
+      'dor-turgeman',
+      'idan-toklomati',
       'talia-sommer',
       'vital-kats',
       'amit-vales',
@@ -71,6 +76,75 @@ describe('registry compiler', () => {
       retrievedAt: '2026-08-08T08:00:00.000Z',
     })
   })
+
+  it('promotes IFA men only when current overseas affiliation is independently verified', () => {
+    expect(publicRegistry.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'men'))
+      .toHaveLength(8)
+
+    expect(publicRegistry.find(({ id }) => id === 'stav-lemkin')).toMatchObject({
+      name: { en: 'Stav Lemkin', he: 'סתיו למקין' },
+      eligibility: {
+        publisher: 'Israel Football Association',
+        sourceUrl: 'https://www.football.org.il/national-team-player/?player_id=132052',
+      },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'FC Twente', country: 'Netherlands' },
+          competition: 'Eredivisie',
+          rosterStatus: 'active',
+          source: { publisher: 'FC Twente', sourceUrl: 'https://fctwente.nl/teams/eerste-selectie/spelers' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'tai-abed')).toMatchObject({
+      aliases: ['Tay Abed', 'Tai Abed Kassus'],
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'Levante UD', country: 'Spain' },
+          competition: 'LaLiga',
+          source: { publisher: 'Levante UD', sourceUrl: 'https://www.levanteud.com/en/players/tay-abed' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'neta-lavi')).toMatchObject({
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'FC Machida Zelvia', country: 'Japan' },
+          competition: 'J1 League',
+          source: { publisher: 'FC Machida Zelvia', sourceUrl: 'https://www.zelvia.co.jp/club/clubteam/355524/' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'dor-turgeman')).toMatchObject({
+      aliases: ['Dor David Turgeman'],
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'New England Revolution', country: 'United States' },
+          competition: 'MLS',
+          source: { publisher: 'New England Revolution', sourceUrl: 'https://www.revolutionsoccer.net/players/dor-turgeman/' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'idan-toklomati')).toMatchObject({
+      aliases: ['Idan Gurno', 'Idan Toklomati Gurno'],
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'Charlotte FC', country: 'United States' },
+          competition: 'MLS',
+          source: { publisher: 'Charlotte FC', sourceUrl: 'https://www.charlottefootballclub.com/roster/' },
+        },
+      },
+    })
+  })
 })
 
 describe('candidate queue', () => {
@@ -92,21 +166,16 @@ describe('candidate queue', () => {
       'asaf-tzur',
       'or-blorian',
       'eli-dasa',
-      'stav-lemkin',
       'guy-mizrahi',
       'idan-nachmias',
       'roy-revivo',
       'itay-rotman',
       'nikita-stoioanov',
-      'tai-abed',
       'gavriel-kanikovsky',
-      'neta-lavi',
       'yarin-levi',
       'eliel-peretz',
       'yarden-shua',
       'sayd-abu-farhi',
-      'idan-gurno',
-      'dor-turgeman',
       'stav-turiel',
       'amit-beilin',
       'agam-haviv',
@@ -164,7 +233,7 @@ describe('candidate queue', () => {
     expect(candidates.find(({ id }) => id === 'lina-glushko')?.signals[0]?.sourceUrl)
       .toBe('https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf')
     expect(candidates.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'men'))
-      .toHaveLength(21)
+      .toHaveLength(16)
     expect(candidates.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'women'))
       .toHaveLength(22)
     expect(candidates.find(({ id }) => id === 'shon-abaev')?.name.he).toBeUndefined()

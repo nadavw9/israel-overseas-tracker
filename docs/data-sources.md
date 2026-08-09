@@ -1,6 +1,6 @@
 # Data-source register
 
-Checked 8-9 August 2026. Registry source observations use the research watermark `2026-08-08T08:00:00.000Z` unless a record explicitly uses a published transaction date as its affiliation start date.
+Checked 8-9 August 2026. Registry source observations keep per-record retrieval timestamps; the current registry watermark is `2026-08-09T15:15:00.000Z`.
 
 Eligibility and current participation are separate claims. A federation or FIBA record can establish Israeli eligibility; a current club, league, or university roster establishes participation. A provider binding, when present, describes a separate performance season and never substitutes for either claim.
 
@@ -19,6 +19,11 @@ Eligibility and current participation are separate claims. A federation or FIBA 
 | Oscar Gloukh | [Ajax player profile](https://english.ajax.nl/teams/ajax-1/oscar-gloukh) | Ajax, 2026-27, on the same profile | Curated 2025-26 observation is currently unavailable; no totals are published |
 | Manor Solomon | [Israel men's national-team roster](https://www.football.org.il/en/national-team/?national_team_id=3) | [Tottenham Hotspur 2026-27 squad](https://www.tottenhamhotspur.com/teams/mens/squad) and [player profile](https://www.tottenhamhotspur.com/player/235674/manor-solomon) | Not integrated |
 | Daniel Peretz | [Israel men's national-team roster](https://www.football.org.il/en/national-team/?national_team_id=3) | [Southampton men](https://www.southamptonfc.com/en/teams/mens-team) and [permanent transfer, 5 June 2026](https://www.southamptonfc.com/en/news/article/saints-seal-permanent-peretz-signing) | Not integrated |
+| Stav Lemkin | [IFA player record](https://www.football.org.il/national-team-player/?player_id=132052) | [FC Twente first-team roster](https://fctwente.nl/teams/eerste-selectie/spelers) | Not integrated |
+| Tai Abed | [IFA player record](https://www.football.org.il/national-team-player/?player_id=148028) | [Levante UD player profile](https://www.levanteud.com/en/players/tay-abed) | Not integrated |
+| Neta Lavi | [IFA player record](https://www.football.org.il/national-team-player/?player_id=115951) | [FC Machida Zelvia 2026/27 profile](https://www.zelvia.co.jp/club/clubteam/355524/) and [2025 transfer notice](https://www.zelvia.co.jp/news/news-317597/) | Not integrated |
+| Dor Turgeman | [IFA player record](https://www.football.org.il/national-team-player/?player_id=126467) | [New England Revolution player profile](https://www.revolutionsoccer.net/players/dor-turgeman/) | Not integrated |
+| Idan Toklomati | [IFA player record](https://www.football.org.il/national-team-player/?player_id=136386) | [Charlotte FC roster](https://www.charlottefootballclub.com/roster/) and [player profile](https://www.charlottefootballclub.com/players/idan-toklomati/) | Not integrated |
 | Talia Sommer | [Official Israel call-up](https://www.gothamfc.com/news/five-gotham-fc-players-earn-international-callups-for-june-fifa-window) | [Gotham player profile](https://www.gothamfc.com/roster/talia-sommer-14) and [2026 roster](https://www.gothamfc.com/news/gotham-fc-announces-leadership-group-roster-ahead-of-2026-season) | Not integrated |
 | Vital Kats | [Israel national-team match record](https://www.football.org.il/en/national-team-game/?game_id=9272&national_team_id=377) | [Mainz renewal for 2026-27](https://www.mainz05.de/news/vital-kats-bleibt-dem-fsv-treu) | Not integrated |
 
@@ -42,7 +47,7 @@ Review data is not imported by the public application and must not appear in `pu
 
 ## Coverage universes
 
-The ledger declares seven bounded universes: ATP men, WTA women, IFA senior men and women, per-event FIBA rosters, and IIHF senior men and women. ATP men is healthy with `8 observed / 5 matched / 3 new candidates / 0 out-of-scope / 0 unresolved / 0 conflicts`; WTA women is healthy for the 3 August 2026 numeric PDF with `4 observed / 0 matched / 4 new candidates / 0 out-of-scope / 0 unresolved / 0 conflicts`. IFA men and women are enumerated but partial: men has `24 observed / 3 matched / 21 review candidates`, women has `24 observed / 2 matched / 22 review candidates`; those non-public rows still need current foreign-club verification. Overall coverage remains incomplete. No statement in the UI or documentation should call the 18-athlete batch a complete census.
+The ledger declares seven bounded universes: ATP men, WTA women, IFA senior men and women, per-event FIBA rosters, and IIHF senior men and women. ATP men is healthy with `8 observed / 5 matched / 3 new candidates / 0 out-of-scope / 0 unresolved / 0 conflicts`; WTA women is healthy for the 3 August 2026 numeric PDF with `4 observed / 0 matched / 4 new candidates / 0 out-of-scope / 0 unresolved / 0 conflicts`. IFA men and women are enumerated but partial: men has `24 observed / 8 matched / 16 review candidates`, women has `24 observed / 2 matched / 22 review candidates`; those non-public rows still need current foreign-club verification. Overall coverage remains incomplete. No statement in the UI or documentation should call the 23-athlete batch a complete census.
 
 ## Performance retention and rights
 

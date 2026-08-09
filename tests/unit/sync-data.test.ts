@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import type { AthleteSnapshot, PublicPerformance } from '../../src/domain/athlete'
 import { compileRegistryBundle, publicRegistry } from '../../src/data/registry'
 import type { RegistryAthlete } from '../../src/data/registry'
-import type { RegistryBundleInput } from '../../src/domain/registry'
+import { registryMigrationInstant, type RegistryBundleInput } from '../../src/domain/registry'
 import { rankAthletesBySport } from '../../src/services/rankings'
 import { buildSnapshot } from '../../src/services/snapshot'
 import { registryBundleFixture } from '../fixtures/registry'
@@ -803,7 +803,7 @@ describe('writeSnapshotAtomically', () => {
 describe('sync clock resolution', () => {
   it('bootstraps only an implicit clock to the migration watermark', () => {
     const early = new Date('2026-08-07T00:00:00.000Z')
-    expect(resolveSyncNow(undefined, early).toISOString()).toBe(generatedAt)
+    expect(resolveSyncNow(undefined, early).toISOString()).toBe(registryMigrationInstant)
     expect(resolveSyncNow(early, new Date('2026-08-09T00:00:00.000Z'))).toBe(early)
   })
 })
@@ -849,7 +849,7 @@ describe('legacy snapshot migration', () => {
 
     const previous = parsePreviousSnapshot(predecessor)
 
-    expect(previous.athletes).toHaveLength(18)
+    expect(previous.athletes).toHaveLength(publicRegistry.length)
     expect(previous.athletes.map((athlete) => athlete.id)).toEqual(
       predecessor.athletes.map((athlete: { id: string }) => athlete.id),
     )
