@@ -365,7 +365,7 @@ describe('coverage ledger schema', () => {
     })
     expect(ledger.entries.find(({ id }) => id === 'ifa-isr-senior-men-2026')).toMatchObject({
       health: 'partial',
-      counts: { observed: 24, matched: 8, newCandidates: 16, outOfScope: 0, unresolved: 0, conflicts: 0 },
+      counts: { observed: 24, matched: 10, newCandidates: 14, outOfScope: 0, unresolved: 0, conflicts: 0 },
     })
     expect(ledger.entries.find(({ id }) => id === 'ifa-isr-senior-women-2026')).toMatchObject({
       health: 'partial',

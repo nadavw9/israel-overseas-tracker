@@ -28,6 +28,9 @@ describe('registry compiler', () => {
       'tai-baribo',
       'omri-gandelman',
       'mahmoud-jaber',
+      'idan-nachmias',
+      'gavriel-kanikovsky',
+      'anan-khalaili',
       'talia-sommer',
       'vital-kats',
       'lina-glushko',
@@ -122,7 +125,7 @@ describe('registry compiler', () => {
 
   it('publishes football men only when eligibility and current overseas affiliation are independently verified', () => {
     expect(publicRegistry.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'men'))
-      .toHaveLength(13)
+      .toHaveLength(16)
 
     expect(publicRegistry.find(({ id }) => id === 'stav-lemkin')).toMatchObject({
       name: { en: 'Stav Lemkin', he: 'סתיו למקין' },
@@ -268,6 +271,54 @@ describe('registry compiler', () => {
         },
       },
     })
+
+    expect(publicRegistry.find(({ id }) => id === 'idan-nachmias')).toMatchObject({
+      name: { en: 'Idan Nachmias' },
+      eligibility: {
+        publisher: 'Israel Football Association',
+        sourceUrl: 'https://www.football.org.il/national-team-player/?player_id=114368',
+      },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'PFC Ludogorets', country: 'Bulgaria' },
+          competition: 'Bulgarian First League',
+          source: { publisher: 'PFC Ludogorets', sourceUrl: 'https://www.ludogorets.com/en/a-team/' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'gavriel-kanikovsky')).toMatchObject({
+      aliases: ['Gabi Kanichowsky', 'Gavriel Kanichowsky', 'Gavriel Kanikovszki'],
+      eligibility: {
+        publisher: 'Israel Football Association',
+        sourceUrl: 'https://www.football.org.il/national-team-player/?player_id=77673',
+      },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'Ferencvárosi TC', country: 'Hungary' },
+          competition: 'Nemzeti Bajnokság I',
+          source: { publisher: 'Ferencvárosi TC', sourceUrl: 'https://www.fradi.hu/en/football/men-s/squad' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'anan-khalaili')).toMatchObject({
+      aliases: ['Anan Khlaili'],
+      eligibility: {
+        publisher: 'Israel Football Association',
+        sourceUrl: 'https://www.football.org.il/national-team-player/?player_id=137896',
+      },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'Royale Union Saint-Gilloise', country: 'Belgium' },
+          competition: 'Belgian Pro League',
+          source: { publisher: 'Royale Union Saint-Gilloise', sourceUrl: 'https://rusg.brussels/en/team/anan-khalaili' },
+        },
+      },
+    })
   })
 })
 
@@ -288,11 +339,9 @@ describe('candidate queue', () => {
       'or-blorian',
       'eli-dasa',
       'guy-mizrahi',
-      'idan-nachmias',
       'roy-revivo',
       'itay-rotman',
       'nikita-stoioanov',
-      'gavriel-kanikovsky',
       'yarin-levi',
       'eliel-peretz',
       'yarden-shua',
@@ -354,7 +403,7 @@ describe('candidate queue', () => {
     expect(candidates.find(({ id }) => id === 'sofiia-nagornaia')?.signals[0]?.sourceUrl)
       .toBe('https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf')
     expect(candidates.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'men'))
-      .toHaveLength(16)
+      .toHaveLength(14)
     expect(candidates.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'women'))
       .toHaveLength(22)
     expect(candidates.find(({ id }) => id === 'shon-abaev')?.name.he).toBeUndefined()
