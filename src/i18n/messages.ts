@@ -31,6 +31,41 @@ export const messages = {
     coverageStatus: (healthy: number, required: number, complete: boolean) => complete
       ? `Coverage healthy: ${healthy} of ${required} universes healthy`
       : `Coverage incomplete: ${healthy} of ${required} universes healthy`,
+    coverageDetailsTitle: 'Coverage ledger details',
+    coverageDetailsSummary: (healthy: number, required: number, complete: boolean) => complete
+      ? `${healthy}/${required} universes healthy`
+      : `${healthy}/${required} healthy · open gaps listed`,
+    coverageDetailsHint: 'Open to see universe health, scan cadence, and remaining limits.',
+    coverageHealth: {
+      healthy: 'Healthy',
+      partial: 'Partial',
+      stale: 'Stale',
+      blocked: 'Blocked',
+      'not-configured': 'Not configured',
+    },
+    coverageSourceTypes: {
+      'primary-verification': 'Primary verification',
+      'licensed-statistics': 'Licensed statistics',
+      'discovery-only': 'Discovery only',
+      media: 'Media',
+    },
+    coverageCadences: {
+      daily: 'Daily',
+      weekly: 'Weekly',
+      monthly: 'Monthly',
+      manual: 'Manual',
+    },
+    coverageLabels: {
+      cadence: 'Cadence',
+      sourceType: 'Source type',
+      lastScan: 'Last scan',
+      counts: 'Classified',
+      limitations: 'Coverage limitations',
+    },
+    coverageCounts: (observed: number, matched: number, newCandidates: number, conflicts: number) =>
+      `${matched}/${observed} matched · ${newCandidates} new · ${conflicts} conflicts`,
+    coverageCountsPending: 'Not classified yet',
+    coverageSourceCta: 'Open source universe',
     explorer: 'Tracker explorer',
     directory: 'Verified directory',
     athletesAbroad: 'Athletes abroad',
@@ -146,6 +181,41 @@ export const messages = {
     coverageStatus: (healthy: number, required: number, complete: boolean) => complete
       ? `כיסוי תקין: ${healthy} מתוך ${required} מאגרי סריקה תקינים`
       : `הכיסוי חלקי: ${healthy} מתוך ${required} מאגרי סריקה תקינים`,
+    coverageDetailsTitle: 'פירוט יומן כיסוי',
+    coverageDetailsSummary: (healthy: number, required: number, complete: boolean) => complete
+      ? `${healthy}/${required} מאגרים תקינים`
+      : `${healthy}/${required} תקינים · הפערים מפורטים`,
+    coverageDetailsHint: 'פתחו כדי לראות מצב מאגר, קצב סריקה ומגבלות שנותרו.',
+    coverageHealth: {
+      healthy: 'תקין',
+      partial: 'חלקי',
+      stale: 'מיושן',
+      blocked: 'חסום',
+      'not-configured': 'לא מוגדר',
+    },
+    coverageSourceTypes: {
+      'primary-verification': 'אימות ראשי',
+      'licensed-statistics': 'סטטיסטיקה מורשית',
+      'discovery-only': 'איתור בלבד',
+      media: 'מדיה',
+    },
+    coverageCadences: {
+      daily: 'יומי',
+      weekly: 'שבועי',
+      monthly: 'חודשי',
+      manual: 'ידני',
+    },
+    coverageLabels: {
+      cadence: 'קצב',
+      sourceType: 'סוג מקור',
+      lastScan: 'סריקה אחרונה',
+      counts: 'סיווג',
+      limitations: 'מגבלות כיסוי',
+    },
+    coverageCounts: (observed: number, matched: number, newCandidates: number, conflicts: number) =>
+      `${matched}/${observed} שויכו · ${newCandidates} חדשים · ${conflicts} סתירות`,
+    coverageCountsPending: 'טרם סווג',
+    coverageSourceCta: 'פתיחת מקור המאגר',
     explorer: 'סייר המעקב',
     directory: 'מאגר מאומת',
     athletesAbroad: 'ספורטאים בחו״ל',

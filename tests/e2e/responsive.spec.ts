@@ -54,6 +54,11 @@ test('mobile layout has no page-level horizontal overflow', async ({ page }) => 
   const filterBar = page.locator('.filter-bar')
   await expect(filterBar).toBeVisible()
   expect(await filterBar.evaluate((element) => getComputedStyle(element).position)).toBe('static')
+  await page.getByText('Coverage ledger details').scrollIntoViewIfNeeded()
+  await page.getByText('Coverage ledger details').click()
+  await expect(page.getByText('WTA singles players representing ISR')).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
+
   const lifecycle = page.getByRole('combobox', { name: /lifecycle status/i })
   await lifecycle.scrollIntoViewIfNeeded()
   await expect(lifecycle).toBeVisible()

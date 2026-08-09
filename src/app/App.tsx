@@ -4,6 +4,7 @@ import { AppHeader } from '../components/AppHeader'
 import { AthleteCard } from '../components/AthleteCard'
 import { AthleteDrawer } from '../components/AthleteDrawer'
 import { AthleteMap } from '../components/AthleteMap'
+import { CoverageLedgerPanel } from '../components/CoverageLedgerPanel'
 import { CoverageStatus } from '../components/CoverageStatus'
 import { FilterBar, type DirectoryFilters } from '../components/FilterBar'
 import { Leaderboard } from '../components/Leaderboard'
@@ -135,6 +136,7 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
 
         <section className="content" aria-label={copy.explorer}>
           <RegistryBoard athletes={snapshot.athletes} sports={sports} />
+          <CoverageLedgerPanel coverage={snapshot.coverage} />
           <ViewNav view={view} onChange={setView} />
 
           {view === 'athletes' && (

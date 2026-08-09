@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-09T07:05:39.194Z",
+  "generatedAt": "2026-08-09T10:00:51.302Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -59,7 +59,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-09T07:05:39.194Z"
+          "retrievedAt": "2026-08-09T10:00:51.302Z"
         }
       }
     },
@@ -121,7 +121,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5242502/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-09T07:05:39.194Z"
+          "retrievedAt": "2026-08-09T10:00:51.302Z"
         }
       }
     },
@@ -179,7 +179,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5107173/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-09T07:05:39.194Z"
+          "retrievedAt": "2026-08-09T10:00:51.302Z"
         }
       }
     },
@@ -851,6 +851,127 @@
   "coverage": {
     "required": 7,
     "healthy": 1,
-    "complete": false
+    "complete": false,
+    "entries": [
+      {
+        "id": "atp-isr-men",
+        "sport": "tennis",
+        "genderCategory": "men",
+        "tier": "international-circuit",
+        "universe": "ATP singles players filtered to ISR",
+        "sourceUrl": "https://www.atptour.com/en/rankings/singles?RankRange=0-5000&Region=ISR",
+        "sourceType": "primary-verification",
+        "cadence": "weekly",
+        "freshnessWindowDays": 7,
+        "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+        "lastSuccessAt": "2026-08-08T08:00:00.000Z",
+        "health": "healthy",
+        "counts": {
+          "observed": 8,
+          "matched": 5,
+          "newCandidates": 3,
+          "conflicts": 0
+        },
+        "limitations": [
+          "This fully classifies only the eight-row ATP singles ISR universe; it is not a complete tennis or global overseas-Israeli census."
+        ]
+      },
+      {
+        "id": "wta-isr-women",
+        "sport": "tennis",
+        "genderCategory": "women",
+        "tier": "international-circuit",
+        "universe": "WTA singles players representing ISR",
+        "sourceUrl": "https://www.wtatennis.com/rankings/singles",
+        "sourceType": "primary-verification",
+        "cadence": "weekly",
+        "freshnessWindowDays": 7,
+        "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+        "health": "partial",
+        "limitations": [
+          "The WTA ISR universe has not yet been enumerated and independently reconciled, so this entry is not a census."
+        ]
+      },
+      {
+        "id": "ifa-isr-senior-men-2026",
+        "sport": "football",
+        "genderCategory": "men",
+        "tier": "senior-professional",
+        "universe": "IFA 2026 senior men roster",
+        "sourceUrl": "https://www.football.org.il/en/national-team/?national_team_id=3",
+        "sourceType": "primary-verification",
+        "cadence": "weekly",
+        "freshnessWindowDays": 7,
+        "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+        "health": "partial",
+        "limitations": [
+          "The current IFA roster has not yet been exhaustively reconciled against current foreign-club rosters and is not a census of every eligible footballer abroad."
+        ]
+      },
+      {
+        "id": "ifa-isr-senior-women-2026",
+        "sport": "football",
+        "genderCategory": "women",
+        "tier": "senior-professional",
+        "universe": "IFA 2026 senior women roster",
+        "sourceUrl": "https://www.football.org.il/en/national-team/?national_team_id=377",
+        "sourceType": "primary-verification",
+        "cadence": "weekly",
+        "freshnessWindowDays": 7,
+        "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+        "health": "partial",
+        "limitations": [
+          "The current IFA roster has not yet been exhaustively reconciled against current foreign-club rosters and is not a census of every eligible footballer abroad."
+        ]
+      },
+      {
+        "id": "fiba-isr-competition-rosters",
+        "sport": "basketball",
+        "genderCategory": "mixed",
+        "tier": "senior-professional",
+        "universe": "FIBA Israel competition rosters",
+        "sourceUrl": "https://www.fiba.basketball/en/teams/82-israel",
+        "sourceType": "primary-verification",
+        "cadence": "weekly",
+        "freshnessWindowDays": 7,
+        "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+        "health": "partial",
+        "limitations": [
+          "Senior, youth, women, and event rosters have not yet been separated and reconciled against current overseas affiliations, so this is not a census."
+        ]
+      },
+      {
+        "id": "iihf-isr-senior-men-2026",
+        "sport": "hockey",
+        "genderCategory": "men",
+        "tier": "senior-professional",
+        "universe": "IIHF 2026 Israel senior men roster",
+        "sourceUrl": "https://www.iihf.com/en/events/2026/wmiib/teams/roster/68052/israel",
+        "sourceType": "primary-verification",
+        "cadence": "weekly",
+        "freshnessWindowDays": 7,
+        "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+        "health": "partial",
+        "limitations": [
+          "Tournament-time club fields do not prove a current 2026-27 affiliation; overseas-signalled cases still require current-club reconciliation."
+        ]
+      },
+      {
+        "id": "iihf-isr-senior-women-2026",
+        "sport": "hockey",
+        "genderCategory": "women",
+        "tier": "senior-professional",
+        "universe": "IIHF 2026 Israel senior women roster",
+        "sourceUrl": "https://www.iihf.com/en/events/2026/wwiiib/teams/roster/68222/israel",
+        "sourceType": "primary-verification",
+        "cadence": "weekly",
+        "freshnessWindowDays": 7,
+        "lastAttemptAt": "2026-08-08T08:00:00.000Z",
+        "health": "partial",
+        "limitations": [
+          "Tournament-time club fields do not prove a current 2026-27 affiliation; overseas-signalled cases still require current-club reconciliation."
+        ]
+      }
+    ]
   }
 }

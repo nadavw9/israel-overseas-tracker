@@ -6,6 +6,7 @@ import {
   coverageLedgerSchema,
   coverageSourceTypeSchema,
   coverageCadenceSchema,
+  publicCoverageFromLedger,
   summarizeCoverage,
 } from '../../src/domain/coverage'
 
@@ -61,6 +62,45 @@ describe('coverage ledger schema', () => {
       complete: false,
     })
     expect(summarizeCoverage(ledger, new Date('2026-07-30T08:00:00.000Z')).healthy).toBe(1)
+  })
+
+  it('publishes public-safe coverage entries alongside the summary', () => {
+    const ledger = coverageLedgerSchema.parse(healthyLedger)
+    const coverage = publicCoverageFromLedger(ledger)
+
+    expect(coverage).toMatchObject({ required: 1, healthy: 1, complete: true })
+    expect(coverage.entries).toHaveLength(1)
+    expect(coverage.entries?.[0]).toEqual(healthyEntry)
+    expect(Object.keys(coverage.entries?.[0] ?? {}).sort()).toEqual([
+      'cadence',
+      'counts',
+      'freshnessWindowDays',
+      'genderCategory',
+      'health',
+      'id',
+      'lastAttemptAt',
+      'lastSuccessAt',
+      'limitations',
+      'sourceType',
+      'sourceUrl',
+      'sport',
+      'tier',
+      'universe',
+    ])
+  })
+
+  it('marks an aged public coverage entry stale instead of presenting it as healthy', () => {
+    const ledger = coverageLedgerSchema.parse(healthyLedger)
+    const coverage = publicCoverageFromLedger(ledger, new Date('2026-07-30T08:00:00.001Z'))
+
+    expect(coverage).toMatchObject({ required: 1, healthy: 0, complete: false })
+    expect(coverage.entries?.[0]).toMatchObject({
+      health: 'stale',
+      counts: healthyEntry.counts,
+    })
+    expect(coverage.entries?.[0]?.limitations).toContain(
+      'The latest successful scan is outside this universe freshness window.',
+    )
   })
 
   it('rejects summarizing a ledger from the future', () => {
@@ -251,6 +291,9 @@ describe('coverage ledger schema', () => {
     )
 
     expect(summarizeCoverage(ledger)).toEqual({ required: 7, healthy: 1, complete: false })
+    const coverage = publicCoverageFromLedger(ledger)
+    expect(coverage.entries).toHaveLength(7)
+    expect(JSON.stringify(coverage.entries)).not.toMatch(/reviewNote|candidateIds|internal|private/i)
     expect(ledger.entries).toHaveLength(7)
     expect(ledger.entries.map((entry) => entry.id).sort()).toEqual([
       'atp-isr-men',

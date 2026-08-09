@@ -21,7 +21,7 @@ import {
 import {
   coverageLedgerSchema,
   coverageSummarySchema,
-  summarizeCoverage,
+  publicCoverageFromLedger,
 } from '../src/domain/coverage'
 import {
   athleteTierSchema,
@@ -341,7 +341,7 @@ export async function syncData(now?: Date): Promise<AthleteSnapshot> {
   const coverageLedger = coverageLedgerSchema.parse(
     JSON.parse(await readFile(coverageLedgerUrl, 'utf8')),
   )
-  const coverage = summarizeCoverage(coverageLedger, effectiveNow)
+  const coverage = publicCoverageFromLedger(coverageLedger, effectiveNow)
   const next = await buildSnapshot({
     entries,
     previous,
