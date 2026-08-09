@@ -27,7 +27,7 @@ pnpm test:e2e
 ## Trust and scope
 
 - The public snapshot is separate from the private review registry. Candidates and review notes never appear in public counts, filters, rankings, map locations, or browser artifacts.
-- The coverage ledger is currently incomplete. Its visible summary describes declared universe health and is not a promise of no missed athletes.
+- The current review snapshot contains 18 verified athletes. The coverage ledger is currently incomplete, so this is not a complete census and its visible summary is not a promise of no missed athletes.
 - Snapshot generation time is not a claim that every provider refreshed successfully. Each public record keeps its own source URL, source timestamp, and freshness state.
 - Identity-only athletes are published without invented zero statistics.
 - The public seed has zero approved athlete portraits. Cards and profiles use neutral local fallbacks until rights metadata approves an image.

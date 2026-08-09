@@ -849,14 +849,13 @@ describe('legacy snapshot migration', () => {
 
     const previous = parsePreviousSnapshot(predecessor)
 
-    expect(previous.athletes.map((athlete) => athlete.id)).toEqual([
-      'deni-avdija',
-      'ben-saraf',
-      'oscar-gloukh',
-    ])
+    expect(previous.athletes).toHaveLength(18)
+    expect(previous.athletes.map((athlete) => athlete.id)).toEqual(
+      predecessor.athletes.map((athlete: { id: string }) => athlete.id),
+    )
     expect(previous.athletes.filter(
       (athlete) => athlete.performance.status === 'available',
-    )).toHaveLength(2)
+    )).toHaveLength(3)
   })
 
   it('accepts the checked-in current unavailable record without a performance source', async () => {
@@ -865,7 +864,7 @@ describe('legacy snapshot migration', () => {
       join(process.cwd(), 'public/data/snapshot.json'),
       'utf8',
     )) as { athletes: Array<{ id: string; performance: { status: string; source?: unknown } }> }
-    const unavailable = predecessor.athletes[2]
+    const unavailable = predecessor.athletes.find((athlete) => athlete.id === 'emanuel-sharp')
     if (unavailable === undefined) {
       throw new Error('Checked-in predecessor fixtures are incomplete')
     }
@@ -873,7 +872,7 @@ describe('legacy snapshot migration', () => {
 
     expect(unavailable.performance.status).toBe('unavailable')
     expect(unavailable.performance).not.toHaveProperty('source')
-    expect(previous.athletes.map((athlete) => athlete.id)).toContain('oscar-gloukh')
+    expect(previous.athletes.map((athlete) => athlete.id)).toContain('emanuel-sharp')
   })
 
   it('rejects private or unknown fields in a normalized predecessor snapshot', async () => {

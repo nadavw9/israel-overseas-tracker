@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-03T22:48:54.317Z",
+  "generatedAt": "2026-08-09T06:56:27.144Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -17,36 +17,38 @@
         "basis": "citizenship",
         "sourceUrl": "https://www.nba.com/player/1630166/deni-avdija",
         "publisher": "NBA",
-        "retrievedAt": "2026-07-23T08:00:00.000Z"
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
       },
       "participation": {
         "kind": "team-affiliation",
         "affiliation": {
-        "organization": {
-          "name": "Portland Trail Blazers",
-          "type": "club",
-          "country": "United States"
-        },
-        "competition": "NBA",
-        "season": "2025-26",
-        "rosterStatus": "active",
-        "countsAsOverseas": true,
-        "source": {
-          "publisher": "NBA",
-          "sourceUrl": "https://www.nba.com/player/1630166/deni-avdija",
-          "retrievedAt": "2026-07-23T08:00:00.000Z"
-        },
-        "location": {
-          "city": "Portland",
-          "country": "United States",
-          "lat": 45.5152,
-          "lng": -122.6784
+          "organization": {
+            "name": "Portland Trail Blazers",
+            "type": "club",
+            "country": "United States"
+          },
+          "competition": "NBA",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "NBA",
+            "sourceUrl": "https://www.nba.com/player/1630166/deni-avdija",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          },
+          "location": {
+            "city": "Portland",
+            "country": "United States",
+            "lat": 45.5152,
+            "lng": -122.6784
+          }
         }
-      }
       },
       "performance": {
         "status": "available",
         "state": "final",
+        "competition": "NBA",
+        "season": "2025-26",
         "stats": {
           "kind": "basketball",
           "games": 66,
@@ -54,12 +56,10 @@
           "reboundsPerGame": 6.9,
           "assistsPerGame": 6.7
         },
-        "competition": "NBA",
-        "season": "2025-26",
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-03T22:48:54.317Z"
+          "retrievedAt": "2026-08-09T06:56:27.144Z"
         }
       }
     },
@@ -79,36 +79,38 @@
         "basis": "represents-israel",
         "sourceUrl": "https://reports.fiba.basketball/reports/2025/FIBA%20U19%20Basketball%20World%20Cup/rosters.pdf",
         "publisher": "FIBA",
-        "retrievedAt": "2026-07-23T08:00:00.000Z"
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
       },
       "participation": {
         "kind": "team-affiliation",
         "affiliation": {
-        "organization": {
-          "name": "Brooklyn Nets",
-          "type": "club",
-          "country": "United States"
-        },
-        "competition": "NBA",
-        "season": "2025-26",
-        "rosterStatus": "active",
-        "countsAsOverseas": true,
-        "source": {
-          "publisher": "NBA",
-          "sourceUrl": "https://www.nba.com/player/1642879/ben-saraf",
-          "retrievedAt": "2026-07-23T08:00:00.000Z"
-        },
-        "location": {
-          "city": "Brooklyn",
-          "country": "United States",
-          "lat": 40.6782,
-          "lng": -73.9442
+          "organization": {
+            "name": "Brooklyn Nets",
+            "type": "club",
+            "country": "United States"
+          },
+          "competition": "NBA",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "NBA",
+            "sourceUrl": "https://www.nba.com/team/1610612751/brooklyn-nets",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          },
+          "location": {
+            "city": "Brooklyn",
+            "country": "United States",
+            "lat": 40.6782,
+            "lng": -73.9442
+          }
         }
-      }
       },
       "performance": {
         "status": "available",
         "state": "final",
+        "competition": "NBA",
+        "season": "2025-26",
         "stats": {
           "kind": "basketball",
           "games": 44,
@@ -116,13 +118,293 @@
           "reboundsPerGame": 2.1,
           "assistsPerGame": 3.3
         },
-        "competition": "NBA",
-        "season": "2025-26",
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5242502/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-03T22:48:54.317Z"
+          "retrievedAt": "2026-08-09T06:56:27.144Z"
         }
+      }
+    },
+    {
+      "id": "danny-wolf",
+      "name": {
+        "en": "Danny Wolf",
+        "he": "דני וולף"
+      },
+      "aliases": [
+        "Daniel Wolf"
+      ],
+      "sport": "basketball",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "nationality",
+        "sourceUrl": "https://www.fiba.basketball/en/players/344261-daniel-wolf",
+        "publisher": "FIBA",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "Brooklyn Nets",
+            "type": "club",
+            "country": "United States"
+          },
+          "competition": "NBA",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "NBA",
+            "sourceUrl": "https://www.nba.com/team/1610612751/brooklyn-nets",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "available",
+        "state": "final",
+        "competition": "NBA",
+        "season": "2025-26",
+        "stats": {
+          "kind": "basketball",
+          "games": 57,
+          "pointsPerGame": 8.9,
+          "reboundsPerGame": 4.9,
+          "assistsPerGame": 2.2
+        },
+        "source": {
+          "provider": "espn-nba",
+          "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5107173/statistics?lang=en&region=us",
+          "retrievedAt": "2026-08-09T06:56:27.144Z"
+        }
+      }
+    },
+    {
+      "id": "emanuel-sharp",
+      "name": {
+        "en": "Emanuel Sharp",
+        "he": "עמנואל שארפ"
+      },
+      "aliases": [
+        "Emanuel Christopher Sharp"
+      ],
+      "sport": "basketball",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "nationality",
+        "sourceUrl": "https://www.fiba.basketball/en/players/271529-emanuel-christopher-sharp",
+        "publisher": "FIBA",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "Sacramento Kings",
+            "type": "club",
+            "country": "United States"
+          },
+          "competition": "NBA",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "NBA",
+            "sourceUrl": "https://www.nba.com/team/1610612758",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "yarden-garzon",
+      "name": {
+        "en": "Yarden Garzon",
+        "he": "ירדן גרזון"
+      },
+      "aliases": [],
+      "sport": "basketball",
+      "genderCategory": "women",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.fiba.basketball/en/players/254610-yarden-garzon",
+        "publisher": "FIBA",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "Casademont Zaragoza",
+            "type": "club",
+            "country": "Spain"
+          },
+          "competition": "Liga Femenina Endesa",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "Casademont Zaragoza",
+            "sourceUrl": "https://www.casademontzaragoza.es/equipo-femenino",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "gal-raviv",
+      "name": {
+        "en": "Gal Raviv",
+        "he": "גל רביב"
+      },
+      "aliases": [],
+      "sport": "basketball",
+      "genderCategory": "women",
+      "tier": "college",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.fiba.basketball/en/players/295728-gal-raviv",
+        "publisher": "FIBA",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "University of Miami",
+            "type": "college",
+            "country": "United States"
+          },
+          "competition": "NCAA Division I",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "Miami Hurricanes",
+            "sourceUrl": "https://miamihurricanes.com/sports/wbball/roster/",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "omer-mayer",
+      "name": {
+        "en": "Omer Mayer",
+        "he": "עומר מאייר"
+      },
+      "aliases": [],
+      "sport": "basketball",
+      "genderCategory": "men",
+      "tier": "college",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.fiba.basketball/en/news/player-spotlight-omer-mayer-emerging-as-israels-next-star",
+        "publisher": "FIBA",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "Purdue University",
+            "type": "college",
+            "country": "United States"
+          },
+          "competition": "NCAA Division I",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "Purdue Boilermakers",
+            "sourceUrl": "https://purduesports.com/sports/mens-basketball/roster",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "noam-yaacov",
+      "name": {
+        "en": "Noam Yaacov",
+        "he": "נועם יעקב"
+      },
+      "aliases": [
+        "Noam Yaakov"
+      ],
+      "sport": "basketball",
+      "genderCategory": "men",
+      "tier": "college",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.fiba.basketball/el/player/300962/Noam-Yaacov",
+        "publisher": "FIBA",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "University of Utah",
+            "type": "college",
+            "country": "United States"
+          },
+          "competition": "NCAA Division I",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "Utah Utes",
+            "sourceUrl": "https://utahutes.com/sports/mens-basketball/roster/noam-yaacov/17764",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
       }
     },
     {
@@ -141,32 +423,422 @@
         "basis": "citizenship",
         "sourceUrl": "https://english.ajax.nl/teams/ajax-1/oscar-gloukh",
         "publisher": "Ajax",
-        "retrievedAt": "2026-07-23T08:00:00.000Z"
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
       },
       "participation": {
         "kind": "team-affiliation",
         "affiliation": {
-        "organization": {
-          "name": "Ajax",
-          "type": "club",
-          "country": "Netherlands"
-        },
-        "competition": "Eredivisie",
-        "season": "2025-26",
-        "rosterStatus": "active",
-        "countsAsOverseas": true,
-        "source": {
-          "publisher": "Ajax",
-          "sourceUrl": "https://english.ajax.nl/teams/ajax-1/oscar-gloukh",
-          "retrievedAt": "2026-07-23T08:00:00.000Z"
-        },
-        "location": {
-          "city": "Amsterdam",
-          "country": "Netherlands",
-          "lat": 52.3676,
-          "lng": 4.9041
+          "organization": {
+            "name": "Ajax",
+            "type": "club",
+            "country": "Netherlands"
+          },
+          "competition": "Eredivisie",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "Ajax",
+            "sourceUrl": "https://english.ajax.nl/teams/ajax-1/oscar-gloukh",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          },
+          "location": {
+            "city": "Amsterdam",
+            "country": "Netherlands",
+            "lat": 52.3676,
+            "lng": 4.9041
+          }
         }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
       }
+    },
+    {
+      "id": "manor-solomon",
+      "name": {
+        "en": "Manor Solomon",
+        "he": "מנור סולומון"
+      },
+      "aliases": [],
+      "sport": "football",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.football.org.il/en/national-team/?national_team_id=3",
+        "publisher": "Israel Football Association",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "Tottenham Hotspur",
+            "type": "club",
+            "country": "England"
+          },
+          "competition": "Premier League",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "Tottenham Hotspur",
+            "sourceUrl": "https://www.tottenhamhotspur.com/teams/mens/squad",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "daniel-peretz",
+      "name": {
+        "en": "Daniel Peretz",
+        "he": "דניאל פרץ"
+      },
+      "aliases": [],
+      "sport": "football",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.football.org.il/en/national-team/?national_team_id=3",
+        "publisher": "Israel Football Association",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "Southampton FC",
+            "type": "club",
+            "country": "England"
+          },
+          "competition": "EFL Championship",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "Southampton FC",
+            "sourceUrl": "https://www.southamptonfc.com/en/teams/mens-team",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "talia-sommer",
+      "name": {
+        "en": "Talia Sommer",
+        "he": "טליה זומר"
+      },
+      "aliases": [],
+      "sport": "football",
+      "genderCategory": "women",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.gothamfc.com/news/five-gotham-fc-players-earn-international-callups-for-june-fifa-window",
+        "publisher": "Gotham FC",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "Gotham FC",
+            "type": "club",
+            "country": "United States"
+          },
+          "competition": "NWSL",
+          "season": "2026",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "Gotham FC",
+            "sourceUrl": "https://www.gothamfc.com/roster/talia-sommer-14",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "vital-kats",
+      "name": {
+        "en": "Vital Kats",
+        "he": "ויטל כץ"
+      },
+      "aliases": [],
+      "sport": "football",
+      "genderCategory": "women",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.football.org.il/en/national-team-game/?game_id=9272&national_team_id=377",
+        "publisher": "Israel Football Association",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "1. FSV Mainz 05",
+            "type": "club",
+            "country": "Germany"
+          },
+          "competition": "Frauen-Bundesliga",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "1. FSV Mainz 05",
+            "sourceUrl": "https://www.mainz05.de/news/vital-kats-bleibt-dem-fsv-treu",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "amit-vales",
+      "name": {
+        "en": "Amit Vales",
+        "he": "עמית ולס"
+      },
+      "aliases": [],
+      "sport": "tennis",
+      "discipline": "singles",
+      "genderCategory": "men",
+      "tier": "international-circuit",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://ita.co.il/%D7%A0%D7%91%D7%97%D7%A8%D7%AA-%D7%94%D7%93%D7%99%D7%95%D7%95%D7%99%D7%A1/",
+        "publisher": "Israel Tennis Association",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "circuit-activity",
+        "activity": {
+          "circuit": "ATP",
+          "discipline": "singles",
+          "competition": "ATP Singles Rankings — Israel",
+          "season": "2026",
+          "activityType": "ranking",
+          "effectiveAt": "2026-08-08T08:00:00.000Z",
+          "source": {
+            "publisher": "ATP Tour",
+            "sourceUrl": "https://www.atptour.com/en/rankings/singles?RankRange=0-5000&Region=ISR",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "orel-kimhi",
+      "name": {
+        "en": "Orel Kimhi",
+        "he": "אוראל קמחי"
+      },
+      "aliases": [],
+      "sport": "tennis",
+      "discipline": "singles",
+      "genderCategory": "men",
+      "tier": "international-circuit",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://ita.co.il/%D7%A0%D7%91%D7%97%D7%A8%D7%AA-%D7%94%D7%93%D7%99%D7%95%D7%95%D7%99%D7%A1/",
+        "publisher": "Israel Tennis Association",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "circuit-activity",
+        "activity": {
+          "circuit": "ATP",
+          "discipline": "singles",
+          "competition": "ATP Singles Rankings — Israel",
+          "season": "2026",
+          "activityType": "ranking",
+          "effectiveAt": "2026-08-08T08:00:00.000Z",
+          "source": {
+            "publisher": "ATP Tour",
+            "sourceUrl": "https://www.atptour.com/en/rankings/singles?RankRange=0-5000&Region=ISR",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "ofek-shimanov",
+      "name": {
+        "en": "Ofek Shimanov",
+        "he": "אופק שימנוב"
+      },
+      "aliases": [],
+      "sport": "tennis",
+      "discipline": "singles",
+      "genderCategory": "men",
+      "tier": "international-circuit",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://ita.co.il/%D7%A0%D7%91%D7%97%D7%A8%D7%AA-%D7%94%D7%93%D7%99%D7%95%D7%95%D7%99%D7%A1/",
+        "publisher": "Israel Tennis Association",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "circuit-activity",
+        "activity": {
+          "circuit": "ATP",
+          "discipline": "singles",
+          "competition": "ATP Singles Rankings — Israel",
+          "season": "2026",
+          "activityType": "ranking",
+          "effectiveAt": "2026-08-08T08:00:00.000Z",
+          "source": {
+            "publisher": "ATP Tour",
+            "sourceUrl": "https://www.atptour.com/en/rankings/singles?RankRange=0-5000&Region=ISR",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "daniel-cukierman",
+      "name": {
+        "en": "Daniel Cukierman",
+        "he": "דניאל צוקרמן"
+      },
+      "aliases": [
+        "Daniel Zuckerman"
+      ],
+      "sport": "tennis",
+      "discipline": "singles",
+      "genderCategory": "men",
+      "tier": "international-circuit",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://ita.co.il/%D7%A0%D7%91%D7%97%D7%A8%D7%AA-%D7%94%D7%93%D7%99%D7%95%D7%95%D7%99%D7%A1/",
+        "publisher": "Israel Tennis Association",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "circuit-activity",
+        "activity": {
+          "circuit": "ATP",
+          "discipline": "singles",
+          "competition": "ATP Singles Rankings — Israel",
+          "season": "2026",
+          "activityType": "ranking",
+          "effectiveAt": "2026-08-08T08:00:00.000Z",
+          "source": {
+            "publisher": "ATP Tour",
+            "sourceUrl": "https://www.atptour.com/en/rankings/singles?RankRange=0-5000&Region=ISR",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "yshai-oliel",
+      "name": {
+        "en": "Yshai Oliel",
+        "he": "ישי עוליאל"
+      },
+      "aliases": [
+        "Yishai Oliel"
+      ],
+      "sport": "tennis",
+      "discipline": "singles",
+      "genderCategory": "men",
+      "tier": "international-circuit",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://ita.co.il/%D7%A0%D7%91%D7%97%D7%A8%D7%AA-%D7%94%D7%93%D7%99%D7%95%D7%95%D7%99%D7%A1/",
+        "publisher": "Israel Tennis Association",
+        "retrievedAt": "2026-08-08T08:00:00.000Z"
+      },
+      "participation": {
+        "kind": "circuit-activity",
+        "activity": {
+          "circuit": "ATP",
+          "discipline": "singles",
+          "competition": "ATP Singles Rankings — Israel",
+          "season": "2026",
+          "activityType": "ranking",
+          "effectiveAt": "2026-08-08T08:00:00.000Z",
+          "source": {
+            "publisher": "ATP Tour",
+            "sourceUrl": "https://www.atptour.com/en/rankings/singles?RankRange=0-5000&Region=ISR",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
+          }
+        }
       },
       "performance": {
         "status": "unavailable",
@@ -177,8 +849,8 @@
     }
   ],
   "coverage": {
-    "required": 4,
-    "healthy": 0,
+    "required": 7,
+    "healthy": 1,
     "complete": false
   }
 }

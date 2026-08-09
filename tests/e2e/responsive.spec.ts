@@ -19,6 +19,7 @@ function manySportSnapshot() {
       id: `responsive-${sport}`,
       name: { en: `Responsive Athlete ${index + 1}`, he: `Responsive Athlete ${index + 1}` },
       sport,
+      performance: { status: 'unavailable' as const, state: 'unavailable' as const, stats: null, reason: 'not-integrated' as const },
     })),
   }
 }
@@ -144,4 +145,58 @@ test('desktop and Hebrew RTL controls remain usable', async ({ page }) => {
     'חיפוש ספורטאים, קבוצות ותחרויות…',
   )
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
+})
+
+test('expanded review snapshot distinguishes team, circuit, identity-only, and locationless records', async ({ page }) => {
+  expect(snapshotJson.athletes).toHaveLength(18)
+  expect(snapshotJson.coverage.complete).toBe(false)
+
+  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.goto('/')
+
+  await expect(page.getByText('18 verified athletes', { exact: true })).toBeVisible()
+  await expect(page.getByRole('status', { name: 'Coverage incomplete: 1 of 7 universes healthy' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Deni Avdija' })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Open Deni Avdija' }).click()
+  const teamProfile = page.getByRole('dialog')
+  await expect(teamProfile.getByRole('link', { name: 'Current team source' })).toHaveAttribute(
+    'href',
+    'https://www.nba.com/player/1630166/deni-avdija',
+  )
+  await page.getByRole('button', { name: 'Close Deni Avdija details' }).click()
+
+  await page.getByRole('button', { name: 'Tennis' }).click()
+  const tier = page.getByRole('combobox', { name: 'Athlete tier' })
+  await tier.selectOption('international-circuit')
+  await expect(page.getByRole('heading', { name: 'Amit Vales' })).toBeVisible()
+  await page.getByRole('button', { name: 'Open Amit Vales' }).click()
+  const circuitProfile = page.getByRole('dialog')
+  await expect(circuitProfile.getByRole('link', { name: 'Circuit activity source' })).toHaveAttribute(
+    'href',
+    'https://www.atptour.com/en/rankings/singles?RankRange=0-5000&Region=ISR',
+  )
+  await expect(circuitProfile.getByText('Stats source pending')).toBeVisible()
+  await page.getByRole('button', { name: 'Close Amit Vales details' }).click()
+
+  await page.getByRole('button', { name: 'Basketball' }).click()
+  await tier.selectOption('all')
+  const gender = page.getByRole('combobox', { name: 'Gender category' })
+  await gender.selectOption('women')
+  await expect(page.getByRole('heading', { name: 'Yarden Garzon' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Deni Avdija' })).toHaveCount(0)
+  await tier.selectOption('college')
+  await expect(page.getByRole('heading', { name: 'Gal Raviv' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Yarden Garzon' })).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'All sports' }).click()
+  await tier.selectOption('all')
+  await gender.selectOption('all')
+  await page.getByRole('button', { name: 'Rankings' }).click()
+  await expect(page.getByText('Rankings only include sourced season totals. Identity-only records stay out until their statistics are verified.')).toBeVisible()
+  await expect(page.getByText('Amit Vales', { exact: true })).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'Map' }).click()
+  await expect(page.getByRole('button', { name: 'Open Amit Vales from map' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Open Deni Avdija from map' })).toBeVisible()
 })
