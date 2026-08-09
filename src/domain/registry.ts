@@ -14,6 +14,7 @@ import {
   verificationStatusSchema,
   visibilitySchema,
 } from './taxonomy'
+import { isCanonicalNbaSeason } from './nba-season'
 
 export {
   eligibilityBasisSchema,
@@ -160,12 +161,7 @@ export const providerBindingSchema = z
   .superRefine((binding, context) => {
     if (binding.provider !== 'espn-nba') return
 
-    const season = /^(\d{4})-(\d{2})$/.exec(binding.season)
-    const startYear = season?.[1]
-    const endYear = season?.[2]
-    const expectedEndYear = startYear === undefined ? undefined : (Number(startYear) + 1) % 100
-
-    if (endYear === undefined || expectedEndYear !== Number(endYear)) {
+    if (!isCanonicalNbaSeason(binding.season)) {
       context.addIssue({
         code: 'custom',
         message: 'ESPN NBA seasons must use canonical consecutive YYYY-YY format',

@@ -156,6 +156,9 @@ describe('normalized registry schemas', () => {
     '2025-2026',
     '2025-27',
     '2025-25',
+    '1945-46',
+    '9999-00',
+    '0000-01',
   ])('rejects malformed ESPN NBA binding season %s', (season) => {
     expect(providerBindingSchema.safeParse({
       ...registryBundleFixture.providerBindings[0],
@@ -166,13 +169,13 @@ describe('normalized registry schemas', () => {
     }).success).toBe(false)
   })
 
-  it('accepts a canonical ESPN NBA binding season', () => {
+  it.each(['1946-47', '2025-26', '2099-00'])('accepts canonical ESPN NBA binding season %s', (season) => {
     expect(providerBindingSchema.safeParse({
       ...registryBundleFixture.providerBindings[0],
       provider: 'espn-nba',
       sport: 'basketball',
       competition: 'NBA',
-      season: '2025-26',
+      season,
     }).success).toBe(true)
   })
 

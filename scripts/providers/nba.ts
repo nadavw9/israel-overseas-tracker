@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { NBA_SEASON_START_YEAR, isCanonicalNbaSeason } from '../../src/domain/nba-season'
 import { providerResultSchema, type ProviderResult } from './types'
 
 const referenceSchema = z.object({ $ref: z.url() })
@@ -34,22 +35,11 @@ const fields = {
   avgAssists: 'assistsPerGame',
 } as const
 
-/** The NBA/BAA historical record begins in 1946; future canonical seasons remain valid. */
-export const NBA_SEASON_START_YEAR = 1946
+export { NBA_SEASON_START_YEAR }
 
 export function parseNbaSeasonEndingYear(season: string): number {
-  const match = /^(\d{4})-(\d{2})$/.exec(season)
-  if (!match) throw new Error(`Unsupported NBA season: ${season}`)
-
-  const startYear = Number(match[1])
-  if (startYear < NBA_SEASON_START_YEAR || startYear > 9998) {
-    throw new Error(`Unsupported NBA season: ${season}`)
-  }
-  const endingYear = startYear + 1
-  if (match[2] !== String(endingYear).slice(-2)) {
-    throw new Error(`Unsupported NBA season: ${season}`)
-  }
-  return endingYear
+  if (!isCanonicalNbaSeason(season)) throw new Error(`Unsupported NBA season: ${season}`)
+  return Number(season.slice(0, 4)) + 1
 }
 
 function referenceMatches(reference: string, expectedPath: string): boolean {
