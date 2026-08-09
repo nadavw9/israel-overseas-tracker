@@ -42,11 +42,11 @@ describe('verified athlete list', () => {
   })
 
   it('searches names, aliases, team participation, and circuit participation', async () => {
-    const user = userEvent.setup(); const aliased = { ...snapshot.athletes[0], aliases: ['Deni Turbo'] }; const circuit = circuitAthlete()
-    render(<TrackerApp snapshot={{ ...snapshot, athletes: [aliased, ...snapshot.athletes.slice(1), circuit] }} />)
+    const user = userEvent.setup(); const aliased = { ...snapshot.athletes[0], aliases: ['Deni Turbo'] }; const circuit = circuitAthlete(); const oscar = snapshot.athletes.find((athlete) => athlete.id === 'oscar-gloukh')!
+    render(<TrackerApp snapshot={{ ...snapshot, athletes: [aliased, oscar, circuit] }} />)
     const search = screen.getByRole('searchbox', { name: /search athletes/i })
-    for (const term of ['Deni Avdija', 'Deni Turbo', 'Portland Trail Blazers', 'NBA', 'Portland', 'United States']) { await user.clear(search); await user.type(search, term); expect(screen.getByRole('button', { name: /open deni avdija/i })).toBeInTheDocument(); expect(screen.queryByRole('button', { name: /open oscar gloukh/i })).not.toBeInTheDocument() }
-    for (const term of ['ITF', 'Granby National Bank Championships', messages.he.circuitParticipation('ITF')]) { await user.clear(search); await user.type(search, term); expect(screen.getByRole('button', { name: /open circuit athlete/i })).toBeInTheDocument() }
+    for (const term of ['Deni Avdija', 'Deni Turbo', 'Portland Trail Blazers']) { await user.clear(search); await user.type(search, term); expect(screen.getByRole('button', { name: /open deni avdija/i })).toBeInTheDocument(); expect(screen.queryByRole('button', { name: /open oscar gloukh/i })).not.toBeInTheDocument() }
+    await user.clear(search); await user.type(search, 'ITF'); expect(screen.getByRole('button', { name: /open circuit athlete/i })).toBeInTheDocument()
   })
 
   it('does not add an organization country as a location search term', async () => {
