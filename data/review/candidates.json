@@ -45,6 +45,66 @@
     "reviewerNote": "Keep private until a second approved primary source corroborates Israeli eligibility and identity."
   },
   {
+    "id": "lina-glushko",
+    "name": { "en": "Lina Glushko" },
+    "sport": "tennis",
+    "tier": "international-circuit",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T10:00:00.000Z",
+      "note": "Observed in the official WTA Singles Rankings numeric PDF as of 03 August 2026 at rank 528 with Nat ISR; independent Israeli eligibility and localized-name corroboration remain unresolved."
+    }],
+    "reviewerNote": "Keep private until a second approved primary source corroborates Israeli eligibility and identity, then decide whether to publish WTA circuit activity without numerical ranking data."
+  },
+  {
+    "id": "maayan-laron",
+    "name": { "en": "Maayan Laron" },
+    "sport": "tennis",
+    "tier": "international-circuit",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T10:00:00.000Z",
+      "note": "Observed in the official WTA Singles Rankings numeric PDF as of 03 August 2026 at rank 903 with Nat ISR; independent Israeli eligibility and localized-name corroboration remain unresolved."
+    }],
+    "reviewerNote": "Keep private until a second approved primary source corroborates Israeli eligibility and identity, then decide whether to publish WTA circuit activity without numerical ranking data."
+  },
+  {
+    "id": "mika-buchnik",
+    "name": { "en": "Mika Buchnik" },
+    "sport": "tennis",
+    "tier": "international-circuit",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T10:00:00.000Z",
+      "note": "Observed in the official WTA Singles Rankings numeric PDF as of 03 August 2026 at rank 975 with Nat ISR; independent Israeli eligibility and localized-name corroboration remain unresolved."
+    }],
+    "reviewerNote": "Keep private until a second approved primary source corroborates Israeli eligibility and identity, then decide whether to publish WTA circuit activity without numerical ranking data."
+  },
+  {
+    "id": "sofiia-nagornaia",
+    "name": { "en": "Sofiia Nagornaia" },
+    "sport": "tennis",
+    "tier": "international-circuit",
+    "genderCategory": "women",
+    "state": "needs-evidence",
+    "signals": [{
+      "sourceUrl": "https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-09T10:00:00.000Z",
+      "note": "Observed in the official WTA Singles Rankings numeric PDF as of 03 August 2026 at rank 1429 with Nat ISR; independent Israeli eligibility and localized-name corroboration remain unresolved."
+    }],
+    "reviewerNote": "Keep private until a second approved primary source corroborates Israeli eligibility and identity, then decide whether to publish WTA circuit activity without numerical ranking data."
+  },
+  {
     "id": "shon-abaev",
     "name": { "en": "Shon Abaev" },
     "sport": "basketball",

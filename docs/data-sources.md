@@ -1,6 +1,6 @@
 # Data-source register
 
-Checked 8 August 2026. Registry source observations use the research watermark `2026-08-08T08:00:00.000Z` unless a record explicitly uses a published transaction date as its affiliation start date.
+Checked 8-9 August 2026. Registry source observations use the research watermark `2026-08-08T08:00:00.000Z` unless a record explicitly uses a published transaction date as its affiliation start date.
 
 Eligibility and current participation are separate claims. A federation or FIBA record can establish Israeli eligibility; a current club, league, or university roster establishes participation. A provider binding, when present, describes a separate performance season and never substitutes for either claim.
 
@@ -28,9 +28,12 @@ The exact [ATP singles ISR universe](https://www.atptour.com/en/rankings/singles
 
 No ATP rank, points, win-loss record, fake club, or fixed location is published. The ATP page is manual evidence of current circuit activity, not an integrated statistics feed.
 
+The official [WTA Singles Rankings numeric PDF](https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf) dated 3 August 2026 contains four ISR rows: Lina Glushko, Maayan Laron, Mika Buchnik, and Sofiia Nagornaia. All four remain private review candidates until independent eligibility and localized-name corroboration is captured. No WTA rank, points, win-loss record, fake club, or fixed location is published.
+
 ## Private review inputs
 
 - Shon Abaev has an official [FIBA nationality record](https://www.fiba.basketball/en/players/362507-shon-abaev), but the approved localized Hebrew name and current affiliation are not yet independently verified.
+- Lina Glushko, Maayan Laron, Mika Buchnik, and Sofiia Nagornaia have official WTA numeric-ranking rows with `Nat ISR`, but independent eligibility and localized-name corroboration have not yet been captured for public promotion.
 - The [2026 IIHF Israel men's roster](https://www.iihf.com/en/events/2026/wmiib/teams/roster/68052/israel) and [women's roster](https://www.iihf.com/en/events/2026/wwiiib/teams/roster/68222/israel) are eligibility signals. Tournament-time club fields are not treated as proof of a current 2026-27 club.
 - Zeev Buium is rejected: [USA Hockey](https://teamusa.usahockey.com/page/show/9227779-2025-u-s-men-s-national-team-roster) establishes USA representation, while the [NHL profile](https://www.nhl.com/player/zeev-buium-8484798) establishes affiliation but no qualifying Israeli evidence was found.
 
@@ -38,7 +41,7 @@ Review data is not imported by the public application and must not appear in `pu
 
 ## Coverage universes
 
-The ledger declares seven bounded universes: ATP men, WTA women, IFA senior men and women, per-event FIBA rosters, and IIHF senior men and women. Only ATP men is currently healthy, with `8 observed / 5 matched / 3 new candidates / 0 conflicts`. Overall coverage remains incomplete. No statement in the UI or documentation should call the 18-athlete batch a complete census.
+The ledger declares seven bounded universes: ATP men, WTA women, IFA senior men and women, per-event FIBA rosters, and IIHF senior men and women. ATP men is healthy with `8 observed / 5 matched / 3 new candidates / 0 conflicts`; WTA women is healthy for the 3 August 2026 numeric PDF with `4 observed / 0 matched / 4 new candidates / 0 conflicts`. Overall coverage remains incomplete. No statement in the UI or documentation should call the 18-athlete batch a complete census.
 
 ## Performance retention and rights
 

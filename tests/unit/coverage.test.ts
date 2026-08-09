@@ -290,7 +290,7 @@ describe('coverage ledger schema', () => {
       JSON.parse(readFileSync('data/coverage/ledger.json', 'utf8')),
     )
 
-    expect(summarizeCoverage(ledger)).toEqual({ required: 7, healthy: 1, complete: false })
+    expect(summarizeCoverage(ledger)).toEqual({ required: 7, healthy: 2, complete: false })
     const coverage = publicCoverageFromLedger(ledger)
     expect(coverage.entries).toHaveLength(7)
     expect(JSON.stringify(coverage.entries)).not.toMatch(/reviewNote|candidateIds|internal|private/i)
@@ -308,9 +308,15 @@ describe('coverage ledger schema', () => {
       health: 'healthy',
       counts: { observed: 8, matched: 5, newCandidates: 3, conflicts: 0 },
     })
-    expect(ledger.entries.filter(({ id }) => id !== 'atp-isr-men').every((entry) => entry.health === 'partial')).toBe(true)
+    expect(ledger.entries.find(({ id }) => id === 'wta-isr-women')).toMatchObject({
+      health: 'healthy',
+      counts: { observed: 4, matched: 0, newCandidates: 4, conflicts: 0 },
+      sourceUrl: 'https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf',
+    })
+    expect(ledger.entries.filter(({ id }) => !['atp-isr-men', 'wta-isr-women'].includes(id)).every((entry) => entry.health === 'partial')).toBe(true)
     expect(ledger.entries.every((entry) =>
-      entry.id === 'atp-isr-men' || entry.limitations.some((limitation) => /reconcil|not yet|not a census/i.test(limitation)),
+      ['atp-isr-men', 'wta-isr-women'].includes(entry.id) ||
+      entry.limitations.some((limitation) => /reconcil|not yet|not a census/i.test(limitation)),
     )).toBe(true)
   })
 })

@@ -168,15 +168,17 @@ describe('verified athlete list', () => {
   it('shows the seeded incomplete coverage ledger exactly', async () => {
     const user = userEvent.setup()
     render(<TrackerApp snapshot={snapshot} />)
-    expect(screen.getByText('Coverage incomplete: 1 of 7 universes healthy')).toBeInTheDocument()
-    expect(screen.getByText('1/7 healthy · open gaps listed')).toBeInTheDocument()
+    expect(screen.getByText('Coverage incomplete: 2 of 7 universes healthy')).toBeInTheDocument()
+    expect(screen.getByText('2/7 healthy · open gaps listed')).toBeInTheDocument()
 
     await user.click(screen.getByText('Coverage ledger details'))
 
     expect(screen.getByText('ATP singles players filtered to ISR')).toBeVisible()
     expect(screen.getByText('5/8 matched · 3 new · 0 conflicts')).toBeVisible()
-    expect(screen.getByText('WTA singles players representing ISR')).toBeVisible()
-    expect(screen.getAllByText('Partial')).toHaveLength(6)
+    expect(screen.getByText('WTA Singles Rankings numeric PDF ISR rows as of 03 August 2026')).toBeVisible()
+    expect(screen.getByText('0/4 matched · 4 new · 0 conflicts')).toBeVisible()
+    expect(screen.getAllByText('Healthy')).toHaveLength(2)
+    expect(screen.getAllByText('Partial')).toHaveLength(5)
     expect(screen.getAllByText('Open source universe')).toHaveLength(7)
     expect(screen.queryByText(/complete coverage|all universes healthy|no misses/i)).not.toBeInTheDocument()
   })

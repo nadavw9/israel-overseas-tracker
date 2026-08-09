@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-09T10:00:51.302Z",
+  "generatedAt": "2026-08-09T10:06:35.117Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -59,7 +59,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-09T10:00:51.302Z"
+          "retrievedAt": "2026-08-09T10:06:35.117Z"
         }
       }
     },
@@ -121,7 +121,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5242502/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-09T10:00:51.302Z"
+          "retrievedAt": "2026-08-09T10:06:35.117Z"
         }
       }
     },
@@ -179,7 +179,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5107173/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-09T10:00:51.302Z"
+          "retrievedAt": "2026-08-09T10:06:35.117Z"
         }
       }
     },
@@ -850,7 +850,7 @@
   ],
   "coverage": {
     "required": 7,
-    "healthy": 1,
+    "healthy": 2,
     "complete": false,
     "entries": [
       {
@@ -881,15 +881,22 @@
         "sport": "tennis",
         "genderCategory": "women",
         "tier": "international-circuit",
-        "universe": "WTA singles players representing ISR",
-        "sourceUrl": "https://www.wtatennis.com/rankings/singles",
+        "universe": "WTA Singles Rankings numeric PDF ISR rows as of 03 August 2026",
+        "sourceUrl": "https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf",
         "sourceType": "primary-verification",
         "cadence": "weekly",
         "freshnessWindowDays": 7,
-        "lastAttemptAt": "2026-08-08T08:00:00.000Z",
-        "health": "partial",
+        "lastAttemptAt": "2026-08-09T10:00:00.000Z",
+        "lastSuccessAt": "2026-08-09T10:00:00.000Z",
+        "health": "healthy",
+        "counts": {
+          "observed": 4,
+          "matched": 0,
+          "newCandidates": 4,
+          "conflicts": 0
+        },
         "limitations": [
-          "The WTA ISR universe has not yet been enumerated and independently reconciled, so this entry is not a census."
+          "This classifies only ISR rows in the 03 August 2026 WTA singles numeric ranking PDF; independent eligibility and localized-name corroboration are still required before publication, and it is not a complete women's tennis census."
         ]
       },
       {

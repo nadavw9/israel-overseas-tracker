@@ -83,6 +83,10 @@ describe('candidate queue', () => {
       'jordan-hasson',
       'vladimir-bazilevskiy',
       'tim-vaisman',
+      'lina-glushko',
+      'maayan-laron',
+      'mika-buchnik',
+      'sofiia-nagornaia',
       'shon-abaev',
       'nir-tichon',
       'nick-ougortsin',
@@ -103,7 +107,7 @@ describe('candidate queue', () => {
     expect(candidates.every((candidate) => !publicRegistry.some((athlete) => athlete.id === candidate.id))).toBe(true)
   })
 
-  it('classifies the private ATP universe and keeps public and private ids disjoint', () => {
+  it('classifies the private ATP and WTA tennis universes while keeping public and private ids disjoint', () => {
     const candidates = candidateQueueSchema.parse(
       JSON.parse(readFileSync('data/review/candidates.json', 'utf8')),
     )
@@ -112,6 +116,10 @@ describe('candidate queue', () => {
 
     expect(candidates.filter(({ id }) => ['jordan-hasson', 'vladimir-bazilevskiy', 'tim-vaisman'].includes(id)))
       .toHaveLength(3)
+    expect(candidates.filter(({ id }) => ['lina-glushko', 'maayan-laron', 'mika-buchnik', 'sofiia-nagornaia'].includes(id)))
+      .toHaveLength(4)
+    expect(candidates.find(({ id }) => id === 'lina-glushko')?.signals[0]?.sourceUrl)
+      .toBe('https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf')
     expect(candidates.find(({ id }) => id === 'shon-abaev')?.name.he).toBeUndefined()
     expect(zeev?.signals.some(({ note }) => /USA representation/i.test(note))).toBe(true)
     expect(zeev?.reviewerNote).toMatch(/rejected/i)

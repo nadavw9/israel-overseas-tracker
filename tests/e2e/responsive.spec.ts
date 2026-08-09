@@ -56,7 +56,7 @@ test('mobile layout has no page-level horizontal overflow', async ({ page }) => 
   expect(await filterBar.evaluate((element) => getComputedStyle(element).position)).toBe('static')
   await page.getByText('Coverage ledger details').scrollIntoViewIfNeeded()
   await page.getByText('Coverage ledger details').click()
-  await expect(page.getByText('WTA singles players representing ISR')).toBeVisible()
+  await expect(page.getByText('WTA Singles Rankings numeric PDF ISR rows as of 03 August 2026')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
 
   const lifecycle = page.getByRole('combobox', { name: /lifecycle status/i })
@@ -160,7 +160,7 @@ test('expanded review snapshot distinguishes team, circuit, identity-only, and l
   await page.goto('/')
 
   await expect(page.getByText('18 verified athletes', { exact: true })).toBeVisible()
-  await expect(page.getByRole('status', { name: 'Coverage incomplete: 1 of 7 universes healthy' })).toBeVisible()
+  await expect(page.getByRole('status', { name: 'Coverage incomplete: 2 of 7 universes healthy' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Deni Avdija' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Open Deni Avdija' }).click()

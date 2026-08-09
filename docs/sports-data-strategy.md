@@ -1,6 +1,6 @@
 # Sports data strategy
 
-Checked 8 August 2026. This document separates census discovery, eligibility, current participation, and performance observations. Each concern has independent provenance and may fail independently.
+Checked 8-9 August 2026. This document separates census discovery, eligibility, current participation, and performance observations. Each concern has independent provenance and may fail independently.
 
 ## Refresh classes
 
@@ -17,7 +17,7 @@ The current census and participation registry is manual. ESPN NBA performance co
 | --- | --- | --- | --- | --- | --- |
 | Basketball | Per-event FIBA Israel rosters/player records for eligibility; current NBA, club, and university rosters for affiliation | GP, PPG, RPG, APG | Near-live or daily scheduled after licensed/approved access; manual roster checks | Three 2025-26 ESPN NBA bindings; other verified athletes are identity-only | Provider failure preserves the athlete. Reuse only an exact matching observation within 48 hours; otherwise show `provider-unavailable`. No binding means `not-integrated`. |
 | Football | IFA senior men and women rosters for eligibility; current club rosters and official transfers for affiliation | APP, G, A | Near-live after a licensed statistics feed; weekly/manual roster reconciliation | No totals feed. Oscar's curated binding currently yields no public totals; all football athletes may be identity-only | Never infer totals from news or carry totals across club, competition, or season changes. Publish unavailable performance without a statistics source. |
-| Tennis | ATP ISR men and, next, WTA ISR women for circuit discovery; ITA/Davis or federation evidence for independent eligibility | Rank, points, YTD W-L only after licensed access | Near-live/daily if licensed; weekly manual activity check | Current ATP activity only for five independently corroborated players; no numeric performance data | Never model a tour as a club or fixed location. No scraping or copied rank/points/W-L. If licensed data is absent, publish only sourced circuit activity. |
+| Tennis | ATP ISR men and WTA numeric-ranking ISR rows for circuit discovery; ITA/Davis, Billie Jean King Cup, federation, or equivalent evidence for independent eligibility | Rank, points, YTD W-L only after licensed access | Near-live/daily if licensed; weekly manual activity check | Current ATP activity only for five independently corroborated players; four WTA rows are private review candidates; no numeric performance data | Never model a tour as a club or fixed location. No scraping or copied rank/points/W-L. If licensed data is absent, publish only sourced circuit activity. |
 | Hockey | IIHF Israel men and women event rosters for eligibility; current foreign-club rosters for affiliation | GP, G, A, PTS | Near-live/daily after licensed or explicitly permitted access; manual club reconciliation | No public hockey athletes or active statistics bindings in this batch | Tournament-time club fields do not establish current affiliation. Unresolved or conflicting cases remain private; statistics cannot promote a candidate. |
 
 ## Census pipeline
@@ -39,7 +39,7 @@ Potential licensed options include Sportradar Tennis for tennis and Stats Perfor
 
 ## Next bounded investigations
 
-- Enumerate and reconcile the WTA ISR singles universe without claiming WTA completeness beforehand.
+- Promote or reject the four WTA ISR numeric-ranking candidates only after independent eligibility and localized-name corroboration.
 - Reconcile every current IFA senior men's and women's roster identity against an official current foreign-club source.
 - Process FIBA rosters per named event, age group, and gender rather than treating the mixed team landing page as one census.
 - Reconcile IIHF senior men's and women's overseas-signalled players against current club rosters; resolve the two recorded affiliation conflicts before publication.
