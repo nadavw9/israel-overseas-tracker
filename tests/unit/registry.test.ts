@@ -23,6 +23,11 @@ describe('registry compiler', () => {
       'neta-lavi',
       'dor-turgeman',
       'idan-toklomati',
+      'liel-abada',
+      'ilay-feingold',
+      'tai-baribo',
+      'omri-gandelman',
+      'mahmoud-jaber',
       'talia-sommer',
       'vital-kats',
       'amit-vales',
@@ -77,9 +82,9 @@ describe('registry compiler', () => {
     })
   })
 
-  it('promotes IFA men only when current overseas affiliation is independently verified', () => {
+  it('publishes football men only when eligibility and current overseas affiliation are independently verified', () => {
     expect(publicRegistry.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'men'))
-      .toHaveLength(8)
+      .toHaveLength(13)
 
     expect(publicRegistry.find(({ id }) => id === 'stav-lemkin')).toMatchObject({
       name: { en: 'Stav Lemkin', he: 'סתיו למקין' },
@@ -141,6 +146,87 @@ describe('registry compiler', () => {
           organization: { name: 'Charlotte FC', country: 'United States' },
           competition: 'MLS',
           source: { publisher: 'Charlotte FC', sourceUrl: 'https://www.charlottefootballclub.com/roster/' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'liel-abada')).toMatchObject({
+      name: { en: 'Liel Abada' },
+      eligibility: {
+        publisher: 'Israel Football Association',
+        sourceUrl: 'https://www.football.org.il/national-team-player/?player_id=113648',
+      },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'Charlotte FC', country: 'United States' },
+          competition: 'MLS',
+          rosterStatus: 'active',
+          source: { publisher: 'Charlotte FC', sourceUrl: 'https://www.charlottefootballclub.com/players/liel-abada/' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'ilay-feingold')).toMatchObject({
+      name: { en: 'Ilay Feingold' },
+      eligibility: {
+        publisher: 'Israel Football Association',
+        sourceUrl: 'https://www.football.org.il/national-team-player/?player_id=133617',
+      },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'New England Revolution', country: 'United States' },
+          competition: 'MLS',
+          source: { publisher: 'New England Revolution', sourceUrl: 'https://www.revolutionsoccer.net/players/ilay-feingold/' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'tai-baribo')).toMatchObject({
+      name: { en: 'Tai Baribo' },
+      eligibility: {
+        publisher: 'Israel Football Association',
+        sourceUrl: 'https://www.football.org.il/national-team-player/?player_id=103224',
+      },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'D.C. United', country: 'United States' },
+          competition: 'MLS',
+          source: { publisher: 'D.C. United', sourceUrl: 'https://www.dcunited.com/players/tai-baribo/' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'omri-gandelman')).toMatchObject({
+      name: { en: 'Omri Gandelman' },
+      eligibility: {
+        publisher: 'Israel Football Association',
+        sourceUrl: 'https://www.football.org.il/en/players/player/?player_id=101021&season_id=23',
+      },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'U.S. Lecce', country: 'Italy' },
+          competition: 'Serie A',
+          source: { publisher: 'U.S. Lecce', sourceUrl: 'https://uslecce.it/giocatori/omri-gandelman/' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'mahmoud-jaber')).toMatchObject({
+      name: { en: 'Mahmoud Jaber' },
+      eligibility: {
+        publisher: 'Israel Football Association',
+        sourceUrl: 'https://www.football.org.il/national-team-player/?player_id=89351',
+      },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'AS Saint-Étienne', country: 'France' },
+          competition: 'Ligue 2',
+          source: { publisher: 'AS Saint-Étienne', sourceUrl: 'https://www.asse.fr/en/club/saison-2026-2027/effectif/jaber-mahmoud-j251' },
         },
       },
     })

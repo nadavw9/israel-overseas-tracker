@@ -774,6 +774,226 @@
       }
     },
     {
+      "id": "liel-abada",
+      "name": {
+        "en": "Liel Abada",
+        "he": "ליאל עבדה"
+      },
+      "aliases": [],
+      "sport": "football",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.football.org.il/national-team-player/?player_id=113648",
+        "publisher": "Israel Football Association",
+        "retrievedAt": "2026-08-09T15:15:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "Charlotte FC",
+            "type": "club",
+            "country": "United States"
+          },
+          "competition": "MLS",
+          "season": "2026",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "Charlotte FC",
+            "sourceUrl": "https://www.charlottefootballclub.com/players/liel-abada/",
+            "retrievedAt": "2026-08-09T15:15:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "ilay-feingold",
+      "name": {
+        "en": "Ilay Feingold",
+        "he": "עילי פיינגולד"
+      },
+      "aliases": [],
+      "sport": "football",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.football.org.il/national-team-player/?player_id=133617",
+        "publisher": "Israel Football Association",
+        "retrievedAt": "2026-08-09T15:15:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "New England Revolution",
+            "type": "club",
+            "country": "United States"
+          },
+          "competition": "MLS",
+          "season": "2026",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "New England Revolution",
+            "sourceUrl": "https://www.revolutionsoccer.net/players/ilay-feingold/",
+            "retrievedAt": "2026-08-09T15:15:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "tai-baribo",
+      "name": {
+        "en": "Tai Baribo",
+        "he": "תאי בריבו"
+      },
+      "aliases": [],
+      "sport": "football",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.football.org.il/national-team-player/?player_id=103224",
+        "publisher": "Israel Football Association",
+        "retrievedAt": "2026-08-09T15:15:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "D.C. United",
+            "type": "club",
+            "country": "United States"
+          },
+          "competition": "MLS",
+          "season": "2026",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "D.C. United",
+            "sourceUrl": "https://www.dcunited.com/players/tai-baribo/",
+            "retrievedAt": "2026-08-09T15:15:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "omri-gandelman",
+      "name": {
+        "en": "Omri Gandelman",
+        "he": "עמרי גנדלמן"
+      },
+      "aliases": [],
+      "sport": "football",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "nationality",
+        "sourceUrl": "https://www.football.org.il/en/players/player/?player_id=101021&season_id=23",
+        "publisher": "Israel Football Association",
+        "retrievedAt": "2026-08-09T15:15:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "U.S. Lecce",
+            "type": "club",
+            "country": "Italy"
+          },
+          "competition": "Serie A",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "U.S. Lecce",
+            "sourceUrl": "https://uslecce.it/giocatori/omri-gandelman/",
+            "retrievedAt": "2026-08-09T15:15:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "mahmoud-jaber",
+      "name": {
+        "en": "Mahmoud Jaber",
+        "he": "מחמוד ג'אבר"
+      },
+      "aliases": [],
+      "sport": "football",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.football.org.il/national-team-player/?player_id=89351",
+        "publisher": "Israel Football Association",
+        "retrievedAt": "2026-08-09T15:15:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "AS Saint-Étienne",
+            "type": "club",
+            "country": "France"
+          },
+          "competition": "Ligue 2",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "AS Saint-Étienne",
+            "sourceUrl": "https://www.asse.fr/en/club/saison-2026-2027/effectif/jaber-mahmoud-j251",
+            "retrievedAt": "2026-08-09T15:15:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
       "id": "talia-sommer",
       "name": {
         "en": "Talia Sommer",
