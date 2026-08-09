@@ -186,11 +186,24 @@ describe('injectable registry compiler', () => {
     bundle.providerBindings[0].provider = 'espn-nba'
     bundle.providerBindings[0].sport = 'basketball'
     bundle.providerBindings[0].competition = 'NBA'
+    bundle.providerBindings[0].season = '2025-26'
 
     expect(compileRegistryBundle(bundle, '2026-07-23')[0]?.participation).toMatchObject({
       kind: 'team-affiliation',
       affiliation: { rosterStatus: 'released' },
     })
+  })
+
+  it('rejects malformed ESPN NBA binding seasons before compiling a snapshot', () => {
+    const bundle = structuredClone(registryBundleFixture)
+    bundle.athletes[0].sport = 'basketball'
+    bundle.affiliations[0].competition = 'NBA'
+    bundle.providerBindings[0].provider = 'espn-nba'
+    bundle.providerBindings[0].sport = 'basketball'
+    bundle.providerBindings[0].competition = 'NBA'
+    bundle.providerBindings[0].season = 'NBA-2025-26'
+
+    expect(() => compileRegistryBundle(bundle, '2026-07-23T08:00:00.000Z')).toThrow(/ESPN NBA seasons/i)
   })
 
   it('selects the newest evidence, matching binding, and approved media deterministically', () => {
@@ -200,6 +213,7 @@ describe('injectable registry compiler', () => {
     bundle.providerBindings[0].provider = 'espn-nba'
     bundle.providerBindings[0].sport = 'basketball'
     bundle.providerBindings[0].competition = 'NBA'
+    bundle.providerBindings[0].season = '2025-26'
     bundle.evidence[0].retrievedAt = '2026-07-23T07:00:00.000Z'
     bundle.providerBindings[0].verifiedAt = '2026-07-23T07:00:00.000Z'
     bundle.media[0].retrievedAt = '2026-07-23T07:00:00.000Z'
@@ -220,6 +234,7 @@ describe('injectable registry compiler', () => {
     future.providerBindings[0].provider = 'espn-nba'
     future.providerBindings[0].sport = 'basketball'
     future.providerBindings[0].competition = 'NBA'
+    future.providerBindings[0].season = '2025-26'
     future.evidence[0].retrievedAt = '2026-07-24T08:00:00.000Z'
     future.providerBindings[0].verifiedAt = '2026-07-24T08:00:00.000Z'
 
@@ -288,6 +303,7 @@ describe('injectable registry compiler', () => {
     bundle.providerBindings[0].provider = 'espn-nba'
     bundle.providerBindings[0].sport = 'basketball'
     bundle.providerBindings[0].competition = 'NBA'
+    bundle.providerBindings[0].season = '2025-26'
     bundle.evidence[0].retrievedAt = '2026-07-23T08:00:00Z'
     bundle.providerBindings[0].verifiedAt = '2026-07-23T08:00:00Z'
     bundle.affiliations[0].source.retrievedAt = '2026-07-23T08:00:00Z'
@@ -304,6 +320,7 @@ describe('injectable registry compiler', () => {
     bundle.providerBindings[0].provider = 'espn-nba'
     bundle.providerBindings[0].sport = 'basketball'
     bundle.providerBindings[0].competition = 'NBA'
+    bundle.providerBindings[0].season = '2025-26'
     bundle.affiliations[0].source.retrievedAt = '2026-07-23T08:00:00.500Z'
 
     expect(() => compileRegistryBundle(bundle, '2026-07-23T08:00:00Z')).toThrow(/affiliation/i)

@@ -138,23 +138,41 @@ export const affiliationSchema = z
     }
   })
 
-export const providerBindingSchema = z.object({
-  id: recordIdSchema,
-  athleteId: athleteIdSchema,
-  provider: providerSchema,
-  externalId: nonEmptyStringSchema,
-  sport: sportSchema,
-  competition: nonEmptyStringSchema,
-  season: nonEmptyStringSchema,
-  status: verificationStatusSchema,
-  matchedOn: z
-    .array(identityMatchFieldSchema)
-    .min(2)
-    .refine((fields) => new Set(fields).size === fields.length, {
-      message: 'Provider identity matches must use distinct fields',
-    }),
-  verifiedAt: z.iso.datetime(),
-}).strict()
+export const providerBindingSchema = z
+  .object({
+    id: recordIdSchema,
+    athleteId: athleteIdSchema,
+    provider: providerSchema,
+    externalId: nonEmptyStringSchema,
+    sport: sportSchema,
+    competition: nonEmptyStringSchema,
+    season: nonEmptyStringSchema,
+    status: verificationStatusSchema,
+    matchedOn: z
+      .array(identityMatchFieldSchema)
+      .min(2)
+      .refine((fields) => new Set(fields).size === fields.length, {
+        message: 'Provider identity matches must use distinct fields',
+      }),
+    verifiedAt: z.iso.datetime(),
+  })
+  .strict()
+  .superRefine((binding, context) => {
+    if (binding.provider !== 'espn-nba') return
+
+    const season = /^(\d{4})-(\d{2})$/.exec(binding.season)
+    const startYear = season?.[1]
+    const endYear = season?.[2]
+    const expectedEndYear = startYear === undefined ? undefined : (Number(startYear) + 1) % 100
+
+    if (endYear === undefined || expectedEndYear !== Number(endYear)) {
+      context.addIssue({
+        code: 'custom',
+        message: 'ESPN NBA seasons must use canonical consecutive YYYY-YY format',
+        path: ['season'],
+      })
+    }
+  })
 
 export const mediaAssetSchema = z
   .object({
