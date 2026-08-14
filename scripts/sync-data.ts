@@ -4,6 +4,11 @@ import { dirname, extname, join, basename } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { z } from 'zod'
 import { defaultProviderAdapters } from './providers/registry'
+import {
+  summarizeProviderSettledResults,
+  writeRefreshManifestAtomically,
+  type ProviderAttemptOutcome,
+} from './refresh/manifest'
 import type { ProviderAdapterMap, ProviderResult } from './providers/types'
 import { compilePublicRegistry, type RegistryAthlete } from '../src/data/registry'
 import { registryMigrationInstant } from '../src/domain/registry'
@@ -32,6 +37,7 @@ import {
 import { buildSnapshot, type PreviousSnapshot } from '../src/services/snapshot'
 
 const snapshotUrl = new URL('../public/data/snapshot.json', import.meta.url)
+const refreshManifestUrl = new URL('../public/data/refresh-manifest.json', import.meta.url)
 const coverageLedgerUrl = new URL('../data/coverage/ledger.json', import.meta.url)
 
 export async function fetchProviderRecord(
@@ -233,9 +239,9 @@ export function parsePreviousSnapshot(input: unknown): PreviousSnapshot {
   }
 }
 
-async function readPreviousSnapshot(): Promise<PreviousSnapshot> {
+async function readPreviousSnapshot(snapshotPath: string | URL = snapshotUrl): Promise<PreviousSnapshot> {
   try {
-    const input: unknown = JSON.parse(await readFile(snapshotUrl, 'utf8'))
+    const input: unknown = JSON.parse(await readFile(snapshotPath, 'utf8'))
     return parsePreviousSnapshot(input)
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
@@ -295,26 +301,87 @@ export function resolveSyncNow(explicitNow: Date | undefined, systemNow: Date): 
   return systemNow.getTime() < migrationMilliseconds ? new Date(migrationMilliseconds) : systemNow
 }
 
-export async function syncData(now?: Date): Promise<AthleteSnapshot> {
-  // The initial data is deliberately watermarked; only implicit CLI runs bootstrap to it.
-  const effectiveNow = resolveSyncNow(now, new Date())
-  const previous = await readPreviousSnapshot()
+export type PerformanceRefreshOptions = {
+  now?: Date
+  fetcher?: typeof fetch
+  adapters?: ProviderAdapterMap
+  snapshotPath?: string | URL
+  manifestPath?: string | URL
+  coveragePath?: string | URL
+}
+
+export async function runPerformanceRefresh(
+  options: PerformanceRefreshOptions = {},
+): Promise<{ snapshot: AthleteSnapshot; manifest: import('../src/domain/refresh').RefreshManifest }> {
+  const startedAt = Date.now()
+  const effectiveNow = resolveSyncNow(options.now, new Date())
+  const snapshotPath = options.snapshotPath ?? snapshotUrl
+  const manifestPath = options.manifestPath ?? refreshManifestUrl
+  const coveragePath = options.coveragePath ?? coverageLedgerUrl
+  const fetcher = options.fetcher ?? fetch
+  const previous = await readPreviousSnapshot(snapshotPath)
   const entries = compilePublicRegistry(effectiveNow)
   const coverageLedger = coverageLedgerSchema.parse(
-    JSON.parse(await readFile(coverageLedgerUrl, 'utf8')),
+    JSON.parse(await readFile(coveragePath, 'utf8')),
   )
   const coverage = publicCoverageFromLedger(coverageLedger, effectiveNow)
+  const outcomes: ProviderAttemptOutcome[] = []
+  let unboundSkipped = 0
+
+  for (const entry of entries) {
+    if (entry.binding === undefined) unboundSkipped += 1
+  }
+
   const next = await buildSnapshot({
     entries,
     previous,
     coverage,
-    fetchRecord: (entry) => fetchProviderRecord(entry, fetch, effectiveNow),
+    fetchRecord: async (entry) => {
+      const binding = entry.binding
+      if (binding === undefined) {
+        throw new Error(`Provider binding required for ${entry.id}`)
+      }
+      const attemptStartedAt = Date.now()
+      try {
+        const result = await fetchProviderRecord(entry, fetcher, effectiveNow, {
+          adapters: options.adapters,
+        })
+        outcomes.push({
+          provider: binding.provider,
+          status: 'succeeded',
+          durationMs: Math.max(0, Date.now() - attemptStartedAt),
+        })
+        return result
+      } catch (error) {
+        outcomes.push({
+          provider: binding.provider,
+          status: 'failed',
+          durationMs: Math.max(0, Date.now() - attemptStartedAt),
+        })
+        throw error
+      }
+    },
     now: effectiveNow,
   })
 
-  await mkdir(new URL('../public/data/', import.meta.url), { recursive: true })
-  await writeSnapshotAtomically(snapshotUrl, next)
-  return next
+  const manifest = {
+    generatedAt: effectiveNow.toISOString(),
+    snapshotGeneratedAt: next.generatedAt,
+    durationMs: Math.max(0, Date.now() - startedAt),
+    unboundSkipped,
+    providers: summarizeProviderSettledResults(outcomes),
+  }
+
+  const target = snapshotPathname(snapshotPath)
+  await mkdir(dirname(target), { recursive: true })
+  await writeSnapshotAtomically(snapshotPath, next)
+  await writeRefreshManifestAtomically(manifestPath, manifest)
+  return { snapshot: next, manifest }
+}
+
+export async function syncData(now?: Date): Promise<AthleteSnapshot> {
+  // The initial data is deliberately watermarked; only implicit CLI runs bootstrap to it.
+  return (await runPerformanceRefresh({ now })).snapshot
 }
 
 const invokedPath = process.argv[1]

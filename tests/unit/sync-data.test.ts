@@ -14,6 +14,7 @@ import zeevFixture from '../../data/fixtures/nhl-zeev.json'
 import {
   fetchProviderRecord,
   resolveSyncNow,
+  runPerformanceRefresh,
   writeSnapshotAtomically,
 } from '../../scripts/sync-data'
 import type { ProviderAdapterMap } from '../../scripts/providers/types'
@@ -763,6 +764,108 @@ describe('fetchProviderRecord', () => {
     )
 
     expect(result).toMatchObject({ competition: 'NHL', season: '2025-26' })
+  })
+})
+
+describe('performance refresh', () => {
+  it('refreshes bound entries, skips unbound entries, and writes a manifest', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'performance-refresh-'))
+    const snapshotPath = join(directory, 'snapshot.json')
+    const manifestPath = join(directory, 'refresh-manifest.json')
+    const adapters: ProviderAdapterMap = {
+      curated: async ({ entry: current, now }) => ({
+        athleteId: current.id,
+        sport: current.sport,
+        competition: current.binding!.competition,
+        season: current.binding!.season,
+        stats: null,
+        state: 'final',
+        sourceUrl: 'https://example.com/curated',
+        retrievedAt: now.toISOString(),
+      }),
+      'espn-nba': async ({ entry: current, now }) => ({
+        athleteId: current.id,
+        sport: current.sport,
+        competition: current.binding!.competition,
+        season: current.binding!.season,
+        stats: null,
+        state: 'final',
+        sourceUrl: 'https://example.com/espn',
+        retrievedAt: now.toISOString(),
+      }),
+      nhl: async ({ entry: current, now }) => ({
+        athleteId: current.id,
+        sport: current.sport,
+        competition: current.binding!.competition,
+        season: current.binding!.season,
+        stats: null,
+        state: 'final',
+        sourceUrl: 'https://example.com/nhl',
+        retrievedAt: now.toISOString(),
+      }),
+    }
+
+    try {
+      const result = await runPerformanceRefresh({
+        now: new Date('2026-08-14T06:00:00.000Z'),
+        snapshotPath,
+        manifestPath,
+        coveragePath: join(process.cwd(), 'data/coverage/ledger.json'),
+        adapters,
+        fetcher: async () => new Response(null, { status: 200 }),
+      })
+
+      expect(result.snapshot.athletes).toHaveLength(publicRegistry.length)
+      expect(result.snapshot.athletes.every((athlete) => athlete.performance)).toBe(true)
+      expect(result.manifest.unboundSkipped).toBeGreaterThan(0)
+      expect(result.manifest.providers.length).toBeGreaterThan(0)
+      expect(JSON.parse(await readFile(manifestPath, 'utf8'))).toMatchObject({
+        unboundSkipped: result.manifest.unboundSkipped,
+      })
+    } finally {
+      await rm(directory, { recursive: true, force: true })
+    }
+  })
+
+  it('preserves provider-unavailable when a bound adapter rejects', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'performance-refresh-failure-'))
+    try {
+      const result = await runPerformanceRefresh({
+        now: new Date('2026-08-14T06:00:00.000Z'),
+        snapshotPath: join(directory, 'snapshot.json'),
+        manifestPath: join(directory, 'refresh-manifest.json'),
+        coveragePath: join(process.cwd(), 'data/coverage/ledger.json'),
+        adapters: {
+          curated: async ({ entry: current, now }) => ({
+            athleteId: current.id,
+            sport: current.sport,
+            competition: current.binding!.competition,
+            season: current.binding!.season,
+            stats: null,
+            state: 'final',
+            sourceUrl: 'https://example.com/curated',
+            retrievedAt: now.toISOString(),
+          }),
+          'espn-nba': async () => { throw new Error('provider unavailable') },
+          nhl: async ({ entry: current, now }) => ({
+            athleteId: current.id,
+            sport: current.sport,
+            competition: current.binding!.competition,
+            season: current.binding!.season,
+            stats: null,
+            state: 'final',
+            sourceUrl: 'https://example.com/nhl',
+            retrievedAt: now.toISOString(),
+          }),
+        },
+      })
+
+      const failed = result.snapshot.athletes.filter((athlete) => athlete.performance.status === 'unavailable' && athlete.performance.reason === 'provider-unavailable')
+      expect(failed.length).toBeGreaterThan(0)
+      expect(result.manifest.providers.find((provider) => provider.provider === 'espn-nba')?.failed).toBeGreaterThan(0)
+    } finally {
+      await rm(directory, { recursive: true, force: true })
+    }
   })
 })
 

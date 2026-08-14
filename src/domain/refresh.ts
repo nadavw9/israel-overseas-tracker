@@ -60,6 +60,7 @@ export const refreshManifestSchema = z.object({
   generatedAt: z.iso.datetime(),
   snapshotGeneratedAt: z.iso.datetime(),
   durationMs: nonNegativeIntegerSchema,
+  unboundSkipped: nonNegativeIntegerSchema.default(0),
   providers: z.array(refreshProviderAttemptSchema),
 }).strict()
 
