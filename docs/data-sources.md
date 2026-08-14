@@ -1,39 +1,67 @@
 # Data-source register
 
-Checked 4 August 2026.
+Checked 8-14 August 2026. Registry source observations keep per-record retrieval timestamps; the current registry watermark is `2026-08-14T04:16:00.000Z`.
 
-| Athlete | Public status | Eligibility / affiliation | Statistics | Image | Limitation |
-| --- | --- | --- | --- | --- | --- |
-| Deni Avdija | Verified | NBA player profile for citizenship evidence and current Portland affiliation | ESPN NBA 2025-26 regular-season statistics, identity- and season-bound to ESPN player `4683021` | Neutral fallback; none approved | Scheduled snapshot, not live play-by-play |
-| Ben Saraf | Verified | FIBA U19 roster for represents-Israel evidence; NBA profile for current Brooklyn/NBA affiliation | ESPN NBA 2025-26 regular-season statistics, identity- and season-bound to ESPN player `5242502` | Neutral fallback; none approved | Scheduled snapshot, not live play-by-play |
-| Oscar Gloukh | Verified | Ajax first-team profile for citizenship evidence and current affiliation | None published | Neutral fallback; none approved | Identity-only until a suitable statistics source is connected |
-| Danny Wolf | Review | NBA profile under review | Not public | Not public | Excluded until Israeli eligibility evidence is approved |
-| Zeev Buium | Review | NHL profile under review | Fixture-tested NHL adapter, not public | Not public | Excluded until Israeli eligibility evidence is approved |
+Eligibility and current participation are separate claims. A federation or FIBA record can establish Israeli eligibility; a current club, league, or university roster establishes participation. A provider binding, when present, describes a separate performance season and never substitutes for either claim.
 
-The current public snapshot contains zero approved athlete images. Review URLs and records do not load in the public application.
+## Public team athletes
 
-## Source URLs
+| Athlete | Eligibility source | Current participation source | Public performance |
+| --- | --- | --- | --- |
+| Deni Avdija | [NBA player profile](https://www.nba.com/player/1630166/deni-avdija) | Portland Trail Blazers, 2026-27, on the same NBA profile | ESPN NBA binding for 2025-26 (`4683021`) |
+| Ben Saraf | [FIBA U19 roster](https://reports.fiba.basketball/reports/2025/FIBA%20U19%20Basketball%20World%20Cup/rosters.pdf) | [Brooklyn Nets 2026-27 roster](https://www.nba.com/team/1610612751/brooklyn-nets) | ESPN NBA binding for 2025-26 (`5242502`) |
+| Danny Wolf | [FIBA player record](https://www.fiba.basketball/en/players/344261-daniel-wolf) | [Brooklyn Nets 2026-27 roster](https://www.nba.com/team/1610612751/brooklyn-nets) | ESPN NBA binding for 2025-26 (`5107173`) |
+| Emanuel Sharp | [FIBA player record](https://www.fiba.basketball/en/players/271529-emanuel-christopher-sharp) | [Sacramento Kings 2026-27 roster](https://www.nba.com/team/1610612758) | Not integrated |
+| Yarden Garzon | [FIBA player record](https://www.fiba.basketball/en/players/254610-yarden-garzon) | [Casademont Zaragoza women, 2026-27](https://www.casademontzaragoza.es/equipo-femenino) and [club signing](https://www.casademontzaragoza.es/noticias/yarden-garzon-talento-y-versatilidad-para-casademont-zaragoza) | Not integrated |
+| Gal Raviv | [FIBA player record](https://www.fiba.basketball/en/players/295728-gal-raviv) | [Miami Hurricanes 2026-27 roster](https://miamihurricanes.com/sports/wbball/roster/) | Not integrated |
+| Omer Mayer | [FIBA eligibility feature](https://www.fiba.basketball/en/news/player-spotlight-omer-mayer-emerging-as-israels-next-star) | [Purdue 2026-27 roster](https://purduesports.com/sports/mens-basketball/roster) | Not integrated |
+| Noam Yaacov | [FIBA player record](https://www.fiba.basketball/el/player/300962/Noam-Yaacov) | [Utah 2026-27 player roster](https://utahutes.com/sports/mens-basketball/roster/noam-yaacov/17764) and [26 June signing](https://utahutes.com/news/2026/6/26/utah-mens-basketball-inks-noam-yaacov-for-2026-27-campaign) | Not integrated |
+| Oscar Gloukh | [Ajax player profile](https://english.ajax.nl/teams/ajax-1/oscar-gloukh) | Ajax, 2026-27, on the same profile | Curated 2025-26 observation is currently unavailable; no totals are published |
+| Manor Solomon | [Israel men's national-team roster](https://www.football.org.il/en/national-team/?national_team_id=3) | [Tottenham Hotspur 2026-27 squad](https://www.tottenhamhotspur.com/teams/mens/squad) and [player profile](https://www.tottenhamhotspur.com/player/235674/manor-solomon) | Not integrated |
+| Daniel Peretz | [Israel men's national-team roster](https://www.football.org.il/en/national-team/?national_team_id=3) | [Southampton men](https://www.southamptonfc.com/en/teams/mens-team) and [permanent transfer, 5 June 2026](https://www.southamptonfc.com/en/news/article/saints-seal-permanent-peretz-signing) | Not integrated |
+| Stav Lemkin | [IFA player record](https://www.football.org.il/national-team-player/?player_id=132052) | [FC Twente first-team roster](https://fctwente.nl/teams/eerste-selectie/spelers) | Not integrated |
+| Tai Abed | [IFA player record](https://www.football.org.il/national-team-player/?player_id=148028) | [Levante UD player profile](https://www.levanteud.com/en/players/tay-abed) | Not integrated |
+| Neta Lavi | [IFA player record](https://www.football.org.il/national-team-player/?player_id=115951) | [FC Machida Zelvia 2026/27 profile](https://www.zelvia.co.jp/club/clubteam/355524/) and [2025 transfer notice](https://www.zelvia.co.jp/news/news-317597/) | Not integrated |
+| Dor Turgeman | [IFA player record](https://www.football.org.il/national-team-player/?player_id=126467) | [New England Revolution player profile](https://www.revolutionsoccer.net/players/dor-turgeman/) | Not integrated |
+| Idan Toklomati | [IFA player record](https://www.football.org.il/national-team-player/?player_id=136386) | [Charlotte FC roster](https://www.charlottefootballclub.com/roster/) and [player profile](https://www.charlottefootballclub.com/players/idan-toklomati/) | Not integrated |
+| Liel Abada | [IFA player record](https://www.football.org.il/national-team-player/?player_id=113648) | [Charlotte FC player profile](https://www.charlottefootballclub.com/players/liel-abada/) | Not integrated |
+| Ilay Feingold | [IFA player record](https://www.football.org.il/national-team-player/?player_id=133617) | [New England Revolution player profile](https://www.revolutionsoccer.net/players/ilay-feingold/) | Not integrated |
+| Tai Baribo | [IFA player record](https://www.football.org.il/national-team-player/?player_id=103224) | [D.C. United player profile](https://www.dcunited.com/players/tai-baribo/) and [17 December 2025 acquisition](https://www.dcunited.com/news/d-c-united-acquires-israeli-international-and-mls-all-star-tai-baribo-from-the-philadelphia-union) | Not integrated |
+| Omri Gandelman | [IFA player record](https://www.football.org.il/en/players/player/?player_id=101021&season_id=23) | [U.S. Lecce player profile](https://uslecce.it/giocatori/omri-gandelman/) and [9 January 2026 transfer notice](https://uslecce.it/gandelman-in-giallorosso/) | Not integrated |
+| Mahmoud Jaber | [IFA player record](https://www.football.org.il/national-team-player/?player_id=89351) | [AS Saint-Étienne 2026-27 profile](https://www.asse.fr/en/club/saison-2026-2027/effectif/jaber-mahmoud-j251) | Not integrated |
+| Idan Nachmias | [IFA player record](https://www.football.org.il/national-team-player/?player_id=114368) | [PFC Ludogorets A team](https://www.ludogorets.com/en/a-team/) | Not integrated |
+| Gavriel Kanikovsky | [IFA player record](https://www.football.org.il/national-team-player/?player_id=77673) | [Ferencvárosi TC squad](https://www.fradi.hu/en/football/men-s/squad) and [23 July 2025 signing](https://www.fradi.hu/en/football/men-s/news/israeli-champion-player-signed) | Not integrated |
+| Anan Khalaili | [IFA player record](https://www.football.org.il/national-team-player/?player_id=137896) | [Royale Union Saint-Gilloise player profile](https://rusg.brussels/en/team/anan-khalaili) and [17 June 2024 signing](https://rusg.brussels/en/news/anan-khalaili-signs-four-seasons-union) | Not integrated |
+| Nikita Stoinov | [IFA player record](https://www.football.org.il/national-team-player/?player_id=164227) | [FC Dinamo 1948 București player profile](https://dinamo1948.ro/team/nikita-stoinov/) | Not integrated |
+| Omri Glazer | [IFA player record](https://www.football.org.il/national-team-player/?player_id=78956) | [FK Crvena zvezda player profile](https://www.crvenazvezdafk.com/en/zvezda-tim/omri-glazer) | Not integrated |
+| Mohammad Abu Fani | [IFA player record](https://www.football.org.il/national-team-player/?player_id=75387) | [Ferencvárosi TC squad](https://www.fradi.hu/en/football/men-s/squad?p=743) and [March 2026 match report](https://www.fradi.hu/en/football/men-s/news/abu-fani-was-the-hero-of-the-match-in-nyiregyhaza) | Not integrated |
+| Talia Sommer | [Official Israel call-up](https://www.gothamfc.com/news/five-gotham-fc-players-earn-international-callups-for-june-fifa-window) | [Gotham player profile](https://www.gothamfc.com/roster/talia-sommer-14) and [2026 roster](https://www.gothamfc.com/news/gotham-fc-announces-leadership-group-roster-ahead-of-2026-season) | Not integrated |
+| Vital Kats | [Israel national-team match record](https://www.football.org.il/en/national-team-game/?game_id=9272&national_team_id=377) | [Mainz renewal for 2026-27](https://www.mainz05.de/news/vital-kats-bleibt-dem-fsv-treu) | Not integrated |
 
-- Deni Avdija: <https://www.nba.com/player/1630166/deni-avdija>
-- Ben Saraf NBA affiliation: <https://www.nba.com/player/1642879/ben-saraf>
-- Ben Saraf FIBA U19 roster: <https://reports.fiba.basketball/reports/2025/FIBA%20U19%20Basketball%20World%20Cup/rosters.pdf>
-- Oscar Gloukh: <https://english.ajax.nl/teams/ajax-1/oscar-gloukh>
-- ESPN statistics endpoint: `https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/{seasonYear}/types/2/athletes/{providerId}/statistics?lang=en&region=us`
-- NHL fixture-tested endpoint: `https://api-web.nhle.com/v1/player/{providerId}/landing`
+## Public circuit athletes
 
-The registry separates eligibility evidence, statistics provenance, and image provenance. A valid response from one source never substitutes for another concern. These are scheduled source checks, not live play-by-play feeds.
+The exact [ATP singles ISR universe](https://www.atptour.com/en/rankings/singles?RankRange=0-5000&Region=ISR) contained eight rows at the research watermark. The [Israel Tennis Association Davis Cup page](https://ita.co.il/%D7%A0%D7%91%D7%97%D7%A8%D7%AA-%D7%94%D7%93%D7%99%D7%95%D7%95%D7%99%D7%A1/) independently corroborated Amit Vales, Orel Kimhi, Ofek Shimanov, Daniel Cukierman, and Yshai Oliel. Those five are public as current ATP singles-circuit participants. Jordan Hasson, Vladimir Bazilevskiy, and Tim Vaisman remain private pending a second approved eligibility/name signal.
+
+No ATP rank, points, win-loss record, fake club, or fixed location is published. The ATP page is manual evidence of current circuit activity, not an integrated statistics feed.
+
+The official [WTA Singles Rankings numeric PDF](https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf) dated 3 August 2026 contains four ISR rows: Lina Glushko, Maayan Laron, Mika Buchnik, and Sofiia Nagornaia. Lina Glushko, Maayan Laron, and Mika Buchnik are public as current WTA singles-circuit participants after independent Billie Jean King Cup identity/Israel-player pages and Israel Tennis Association Hebrew-name corroboration: [Lina in an ITA BJK Cup Israel squad article](https://ita.co.il/%D7%98%D7%95%D7%A8%D7%A0%D7%99%D7%A8-%D7%91%D7%99%D7%9C%D7%99-%D7%92%D7%B3%D7%99%D7%9F-%D7%A7%D7%99%D7%A0%D7%92-%D7%99%D7%A9%D7%A8%D7%90%D7%9C-%D7%AA%D7%A4%D7%AA%D7%97-%D7%9E%D7%97%D7%A8-%D7%9E%D7%95/), [Maayan as 2025 Israel champion](https://ita.co.il/%F0%9F%8E%BE-%D7%90%D7%9C%D7%99%D7%A4%D7%95%D7%AA-%D7%99%D7%A9%D7%A8%D7%90%D7%9C-%D7%95%D7%99%D7%9C%D7%A1%D7%95%D7%9F-2025-%D7%94%D7%92%D7%99%D7%A2%D7%94-%D7%9C%D7%A1%D7%99%D7%95%D7%9E%D7%94-%D7%91/), and [Mika as 2023 Israel champion](https://ita.co.il/%D7%9E%D7%99%D7%A7%D7%94-%D7%91%D7%95%D7%97%D7%A0%D7%99%D7%A7-%D7%95%D7%99%D7%A9%D7%99-%D7%A2%D7%95%D7%9C%D7%99%D7%90%D7%9C-%D7%94%D7%9D-%D7%90%D7%9C%D7%95%D7%A4%D7%99-%D7%99%D7%A9%D7%A8%D7%90%D7%9C/). Sofiia Nagornaia remains private until a second approved eligibility and localized-name source is captured. No WTA rank, points, win-loss record, fake club, or fixed location is published.
+
+## Private review inputs
+
+- Shon Abaev has an official [FIBA nationality record](https://www.fiba.basketball/en/players/362507-shon-abaev) and [Florida State 2026-27 roster entry](https://seminoles.com/sports/mens-basketball/roster/shon-abaev/8548); the approved localized Hebrew name is still missing, so he remains private.
+- Sofiia Nagornaia has an official WTA numeric-ranking row with `Nat ISR`, but independent eligibility and localized-name corroboration have not yet been captured for public promotion.
+- The official IFA [senior men's Team Squad](https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3) and [senior women's Team Squad](https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377) have been enumerated into public matches and review-queue candidates. Non-public rows still require independent current foreign-club verification before publication.
+- The [2026 IIHF Israel men's roster](https://www.iihf.com/en/events/2026/wmiib/teams/roster/68052/israel) and [women's roster](https://www.iihf.com/en/events/2026/wwiiib/teams/roster/68222/israel) are eligibility signals. Tournament-time club fields are not treated as proof of a current 2026-27 club.
+- Zeev Buium is rejected: [USA Hockey](https://teamusa.usahockey.com/page/show/9227779-2025-u-s-men-s-national-team-roster) establishes USA representation, while the [NHL profile](https://www.nhl.com/player/zeev-buium-8484798) establishes affiliation but no qualifying Israeli evidence was found.
+
+Review data is not imported by the public application and must not appear in `public/data/snapshot.json` or build artifacts.
 
 ## Coverage universes
 
-ATP, IIHF, IFA, and FIBA universes have been partially researched but have not been reconciled into a complete census.
+The ledger declares seven bounded universes: ATP men, WTA women, IFA senior men and women, per-event FIBA rosters, and IIHF senior men and women. ATP men is healthy with `8 observed / 5 matched / 3 new candidates / 0 out-of-scope / 0 unresolved / 0 conflicts`; WTA women is healthy for the 3 August 2026 numeric PDF with `4 observed / 3 matched / 1 new candidate / 0 out-of-scope / 0 unresolved / 0 conflicts`. IFA men and women are enumerated but partial: men has `24 observed / 12 matched / 12 review candidates`, women has `24 observed / 2 matched / 22 review candidates`; those non-public rows still need current foreign-club verification. The seven added overseas football men outside the current IFA senior-squad match set are targeted source-backed promotions, not a new bounded coverage universe. Overall coverage remains incomplete. No statement in the UI or documentation should call the 37-athlete batch a complete census.
 
-- ATP covers Israeli-filtered ATP singles ranking entries.
-- IIHF covers the 2026 Israel senior men's roster.
-- IFA covers the 2026 Israel senior men's roster.
-- FIBA covers Israel competition rosters across the declared mixed-gender universe.
+## Performance retention and rights
 
-The four seeded ledger entries are all `partial`: 0 of 4 are healthy. Their attempt, source, freshness, successful-scan and classification-count fields where available, and limitations are recorded, but this state makes no completeness claim.
+The only currently bound statistics adapters are scheduled ESPN NBA observations and the curated football adapter. Provider failure may reuse an exact matching, verified, non-null performance observation for at most 48 hours, including the boundary; otherwise the athlete remains public with source-free unavailable performance. A public webpage or endpoint is not by itself permission for systematic retrieval or republication. See [sports-data-strategy.md](sports-data-strategy.md) for the provider and licensing plan.
 
-## Performance retention
-
-Provider failure can reuse a previously verified, non-null performance observation for at most 48 hours, including the exact boundary. Its sport, competition, and season must match the current verified context. Its source URL and retrieval timestamp remain unchanged; only its state changes to `stale`. Future-dated, mismatched, unavailable, or older observations fail closed. The compiler and freshness badge share this policy through `src/domain/observation.ts`.
+The public snapshot contains zero approved athlete images. Official portraits are not copied merely because they appear on an official page.

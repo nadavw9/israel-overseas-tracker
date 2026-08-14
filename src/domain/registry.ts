@@ -14,6 +14,7 @@ import {
   verificationStatusSchema,
   visibilitySchema,
 } from './taxonomy'
+import { isCanonicalNbaSeason } from './nba-season'
 
 export {
   eligibilityBasisSchema,
@@ -99,6 +100,19 @@ const sourceSchema = z.object({
   retrievedAt: z.iso.datetime(),
 }).strict()
 
+export const circuitActivitySchema = z.object({
+  id: recordIdSchema,
+  athleteId: athleteIdSchema,
+  circuit: z.enum(['ATP', 'WTA', 'ITF']),
+  discipline: z.enum(['singles', 'doubles']),
+  competition: nonEmptyStringSchema,
+  season: nonEmptyStringSchema,
+  activityType: z.enum(['ranking', 'sanctioned-result']),
+  effectiveAt: z.iso.datetime(),
+  status: verificationStatusSchema,
+  source: sourceSchema,
+}).strict()
+
 export const affiliationSchema = z
   .object({
     id: recordIdSchema,
@@ -125,22 +139,36 @@ export const affiliationSchema = z
     }
   })
 
-export const providerBindingSchema = z.object({
-  id: recordIdSchema,
-  athleteId: athleteIdSchema,
-  provider: providerSchema,
-  externalId: nonEmptyStringSchema,
-  sport: sportSchema,
-  competition: nonEmptyStringSchema,
-  status: verificationStatusSchema,
-  matchedOn: z
-    .array(identityMatchFieldSchema)
-    .min(2)
-    .refine((fields) => new Set(fields).size === fields.length, {
-      message: 'Provider identity matches must use distinct fields',
-    }),
-  verifiedAt: z.iso.datetime(),
-}).strict()
+export const providerBindingSchema = z
+  .object({
+    id: recordIdSchema,
+    athleteId: athleteIdSchema,
+    provider: providerSchema,
+    externalId: nonEmptyStringSchema,
+    sport: sportSchema,
+    competition: nonEmptyStringSchema,
+    season: nonEmptyStringSchema,
+    status: verificationStatusSchema,
+    matchedOn: z
+      .array(identityMatchFieldSchema)
+      .min(2)
+      .refine((fields) => new Set(fields).size === fields.length, {
+        message: 'Provider identity matches must use distinct fields',
+      }),
+    verifiedAt: z.iso.datetime(),
+  })
+  .strict()
+  .superRefine((binding, context) => {
+    if (binding.provider !== 'espn-nba') return
+
+    if (!isCanonicalNbaSeason(binding.season)) {
+      context.addIssue({
+        code: 'custom',
+        message: 'ESPN NBA seasons must use canonical consecutive YYYY-YY format',
+        path: ['season'],
+      })
+    }
+  })
 
 export const mediaAssetSchema = z
   .object({
@@ -179,7 +207,7 @@ export const mediaAssetSchema = z
 
 const addDuplicateIdIssues = (
   records: ReadonlyArray<{ id: string }>,
-  collection: 'athletes' | 'evidence' | 'affiliations' | 'providerBindings' | 'media',
+  collection: 'athletes' | 'evidence' | 'affiliations' | 'circuitActivities' | 'providerBindings' | 'media',
   context: z.RefinementCtx,
 ) => {
   const seen = new Set<string>()
@@ -198,7 +226,7 @@ const addDuplicateIdIssues = (
 
 export type RegistryAsOf = Date | string
 /** Required provenance watermark for the normalized registry migration. */
-export const registryMigrationInstant = '2026-07-23T08:00:00.000Z'
+export const registryMigrationInstant = '2026-08-14T04:16:00.000Z'
 
 export function registryInstantMs(value: Date | string) {
   const milliseconds = value instanceof Date ? value.getTime() : new Date(value).getTime()
@@ -225,12 +253,14 @@ export function normalizeRegistryAsOf(asOf: RegistryAsOf) {
 export function createRegistryBundleSchema(asOf: RegistryAsOf) {
   const { date: asOfDate, milliseconds: asOfMilliseconds } = normalizeRegistryAsOf(asOf)
   const atOrBeforeAsOf = (instant: string) => registryInstantMs(instant) <= asOfMilliseconds
+  const circuitActivityCutoffMilliseconds = asOfMilliseconds - (365 * 24 * 60 * 60 * 1_000)
 
   return z
   .object({
     athletes: z.array(athleteIdentitySchema),
     evidence: z.array(eligibilityEvidenceSchema),
     affiliations: z.array(affiliationSchema),
+    circuitActivities: z.array(circuitActivitySchema),
     providerBindings: z.array(providerBindingSchema),
     media: z.array(mediaAssetSchema),
   })
@@ -243,6 +273,7 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
     addDuplicateIdIssues(bundle.athletes, 'athletes', context)
     addDuplicateIdIssues(bundle.evidence, 'evidence', context)
     addDuplicateIdIssues(bundle.affiliations, 'affiliations', context)
+    addDuplicateIdIssues(bundle.circuitActivities, 'circuitActivities', context)
     addDuplicateIdIssues(bundle.providerBindings, 'providerBindings', context)
     addDuplicateIdIssues(bundle.media, 'media', context)
 
@@ -250,6 +281,7 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
     const referencedCollections = [
       ['evidence', bundle.evidence],
       ['affiliations', bundle.affiliations],
+      ['circuitActivities', bundle.circuitActivities],
       ['providerBindings', bundle.providerBindings],
       ['media', bundle.media],
     ] as const
@@ -271,18 +303,6 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
       'espn-nba': 'basketball',
       nhl: 'hockey',
     } as const
-    const bindingMatchesAthleteAndProvider = (binding: (typeof bundle.providerBindings)[number]) => {
-      const athlete = athletesById.get(binding.athleteId)
-      const requiredProviderSport =
-        binding.provider === 'curated' ? undefined : providerSport[binding.provider]
-
-      return (
-        athlete !== undefined &&
-        binding.sport === athlete.sport &&
-        (requiredProviderSport === undefined || binding.sport === requiredProviderSport)
-      )
-    }
-
     const providerIdentities = new Set<string>()
     bundle.providerBindings.forEach((binding, index) => {
       const identity = `${binding.provider}\u0000${binding.externalId}`
@@ -315,6 +335,45 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
       }
     })
 
+    bundle.circuitActivities.forEach((activity, index) => {
+      const athlete = athletesById.get(activity.athleteId)
+      if (athlete?.tier !== undefined && athlete.tier !== 'international-circuit') {
+        context.addIssue({
+          code: 'custom',
+          message: 'Circuit activities require an international-circuit athlete',
+          path: ['circuitActivities', index, 'athleteId'],
+        })
+      }
+      if (athlete?.sport !== undefined && athlete.sport !== 'tennis') {
+        context.addIssue({
+          code: 'custom',
+          message: 'Circuit activities require a tennis athlete',
+          path: ['circuitActivities', index, 'athleteId'],
+        })
+      }
+      if (athlete?.discipline !== undefined && athlete.discipline !== activity.discipline) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Circuit activity discipline must match athlete discipline',
+          path: ['circuitActivities', index, 'discipline'],
+        })
+      }
+      if (!atOrBeforeAsOf(activity.effectiveAt)) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Circuit activity effective time cannot be after the registry as-of instant',
+          path: ['circuitActivities', index, 'effectiveAt'],
+        })
+      }
+      if (!atOrBeforeAsOf(activity.source.retrievedAt)) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Circuit activity source cannot be retrieved after the registry as-of instant',
+          path: ['circuitActivities', index, 'source', 'retrievedAt'],
+        })
+      }
+    })
+
     bundle.athletes.forEach((athlete, athleteIndex) => {
       if (athlete.visibility !== 'public') return
 
@@ -341,9 +400,53 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
           affiliation.startDate <= asOfDate &&
           (affiliation.endDate === undefined || affiliation.endDate >= asOfDate),
       )
+      const qualifyingCircuitActivities = bundle.circuitActivities.filter(
+        (activity) =>
+          activity.athleteId === athlete.id &&
+          activity.status === 'verified' &&
+          atOrBeforeAsOf(activity.effectiveAt) &&
+          atOrBeforeAsOf(activity.source.retrievedAt) &&
+          registryInstantMs(activity.effectiveAt) >= circuitActivityCutoffMilliseconds,
+      )
 
-      let qualifyingCompetition: string | undefined
-      if (athlete.lifecycleStatus === 'active' || athlete.lifecycleStatus === 'injured') {
+      if (qualifyingCircuitActivities.length > 1) {
+        const newestEffectiveAt = Math.max(
+          ...qualifyingCircuitActivities.map((activity) => registryInstantMs(activity.effectiveAt)),
+        )
+        if (qualifyingCircuitActivities.filter(
+          (activity) => registryInstantMs(activity.effectiveAt) === newestEffectiveAt,
+        ).length > 1) {
+          context.addIssue({
+            code: 'custom',
+            message: 'Ambiguous newest qualifying circuit activity',
+            path: ['athletes', athleteIndex, 'tier'],
+          })
+        }
+      }
+
+      if (athlete.tier === 'international-circuit') {
+        if (athlete.lifecycleStatus !== 'active' && athlete.lifecycleStatus !== 'injured') {
+          context.addIssue({
+            code: 'custom',
+            message: `A ${athlete.lifecycleStatus} athlete cannot be public`,
+            path: ['athletes', athleteIndex, 'lifecycleStatus'],
+          })
+        }
+        if (currentPrimaryOverseasAffiliations.length !== 0) {
+          context.addIssue({
+            code: 'custom',
+            message: 'A public international-circuit athlete cannot have a current primary overseas affiliation',
+            path: ['athletes', athleteIndex, 'tier'],
+          })
+        }
+        if (qualifyingCircuitActivities.length === 0) {
+          context.addIssue({
+            code: 'custom',
+            message: 'A public international-circuit athlete requires a verified current circuit activity',
+            path: ['athletes', athleteIndex, 'tier'],
+          })
+        }
+      } else if (athlete.lifecycleStatus === 'active' || athlete.lifecycleStatus === 'injured') {
         if (currentPrimaryOverseasAffiliations.length !== 1) {
           context.addIssue({
             code: 'custom',
@@ -358,11 +461,9 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
             path: ['athletes', athleteIndex, 'lifecycleStatus'],
           })
         }
-        const currentAffiliation = currentPrimaryOverseasAffiliations[0]
-        qualifyingCompetition = currentAffiliation?.rosterStatus === 'active'
-          ? currentAffiliation.competition
-          : undefined
       } else if (athlete.lifecycleStatus === 'free-agent') {
+        // Preserve the existing public free-agent exception: its participation is the
+        // single qualifying release from the previous 90 days, not a current roster.
         if (currentPrimaryOverseasAffiliations.length !== 0) {
           context.addIssue({
             code: 'custom',
@@ -385,7 +486,6 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
             path: ['athletes', athleteIndex, 'lifecycleStatus'],
           })
         }
-        qualifyingCompetition = recentReleasedAffiliations[0]?.competition
       } else {
         context.addIssue({
           code: 'custom',
@@ -394,19 +494,11 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
         })
       }
 
-      const hasVerifiedProviderBinding = bundle.providerBindings.some(
-        (binding) =>
-          binding.athleteId === athlete.id &&
-          binding.status === 'verified' &&
-          atOrBeforeAsOf(binding.verifiedAt) &&
-          binding.competition === qualifyingCompetition &&
-          bindingMatchesAthleteAndProvider(binding),
-      )
-      if (!hasVerifiedProviderBinding) {
+      if (athlete.tier !== 'international-circuit' && qualifyingCircuitActivities.length !== 0) {
         context.addIssue({
           code: 'custom',
-          message: 'A public athlete requires a verified provider binding',
-          path: ['athletes', athleteIndex, 'visibility'],
+          message: 'A public team athlete cannot also have a qualifying circuit activity',
+          path: ['athletes', athleteIndex, 'tier'],
         })
       }
     })
@@ -422,9 +514,14 @@ const candidateSignalSchema = z.object({
   note: nonEmptyStringSchema,
 }).strict()
 
+const candidateNameSchema = z.object({
+  en: nonEmptyStringSchema,
+  he: nonEmptyStringSchema.optional(),
+}).strict()
+
 export const candidateSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
-  name: localizedNameSchema,
+  name: candidateNameSchema,
   sport: sportSchema,
   tier: athleteTierSchema,
   genderCategory: genderCategorySchema,

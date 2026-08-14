@@ -4,10 +4,30 @@ import { describe, expect, it } from 'vitest'
 import snapshotJson from '../../public/data/snapshot.json'
 import { TrackerApp } from '../../src/app/App'
 import type { Athlete } from '../../src/domain/athlete'
-import { snapshotSchema } from '../../src/domain/athlete'
+import { athleteSchema, snapshotSchema } from '../../src/domain/athlete'
 import { rankAthletes, rankAthletesBySport } from '../../src/services/rankings'
 
 const snapshot = snapshotSchema.parse(snapshotJson)
+
+function circuitAthlete(): Athlete {
+  return athleteSchema.parse({
+    ...snapshot.athletes[2],
+    id: 'circuit-athlete',
+    name: { en: 'Circuit Athlete', he: 'Circuit Athlete' },
+    sport: 'tennis',
+    discipline: 'singles',
+    tier: 'international-circuit',
+    participation: {
+      kind: 'circuit-activity',
+      activity: {
+        circuit: 'ITF', discipline: 'singles', competition: 'Granby National Bank Championships', season: '2026',
+        activityType: 'ranking', effectiveAt: '2026-08-01T00:00:00.000Z',
+        source: { publisher: 'ITF', sourceUrl: 'https://example.com/itf/circuit-athlete', retrievedAt: '2026-08-03T22:00:00.000Z' },
+      },
+    },
+    performance: { status: 'unavailable', state: 'unavailable', stats: null, reason: 'not-integrated' },
+  })
+}
 
 describe('athlete details', () => {
   it('distinguishes citizenship evidence from representing Israel and links each source', async () => {
@@ -18,14 +38,35 @@ describe('athlete details', () => {
     expect(screen.getByText('Eligibility basis')).toBeInTheDocument()
     expect(screen.getByText('Nationality / citizenship evidence')).toBeInTheDocument()
     expect(screen.getByText(/does not by itself mean this athlete represents Israel in competition/i)).toBeInTheDocument()
+    expect(screen.getAllByText('Portland Trail Blazers')).not.toHaveLength(0)
+    expect(screen.getByText(/Portland, United States/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /eligibility source/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /affiliation source/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /current team source/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /performance source/i })).toBeInTheDocument()
 
     await user.keyboard('{Escape}')
     await user.click(screen.getByRole('button', { name: /open ben saraf/i }))
     expect(screen.getByText('Represents Israel evidence')).toBeInTheDocument()
     expect(screen.getByText(/verified sporting representation, not a claim about citizenship/i)).toBeInTheDocument()
+  })
+
+  it('renders circuit activity without inventing club, country, or performance source', async () => {
+    const user = userEvent.setup()
+    const circuit = circuitAthlete()
+    render(<TrackerApp snapshot={{ ...snapshot, athletes: [circuit] }} />)
+
+    expect(screen.getByText('ITF international circuit')).toBeInTheDocument()
+    expect(screen.getByText(/Granby National Bank Championships · 2026/)).toBeInTheDocument()
+    expect(screen.queryByText(/United Kingdom|Ajax|Portland Trail Blazers/)).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /view data source/i })).toHaveAttribute('href', 'https://example.com/itf/circuit-athlete')
+
+    await user.click(screen.getByRole('button', { name: 'עברית' }))
+    expect(screen.getByText('הסבב הבין־לאומי ITF')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'English' }))
+
+    await user.click(screen.getByRole('button', { name: /open circuit athlete/i }))
+    expect(screen.getByRole('link', { name: /circuit activity source/i })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /performance source/i })).not.toBeInTheDocument()
   })
 
   it('opens and closes details with keyboard focus restored', async () => {
@@ -80,6 +121,7 @@ describe('rankings', () => {
     )
     expect(rankAthletes(snapshot.athletes).map((athlete) => athlete.id)).toEqual([
       'deni-avdija',
+      'danny-wolf',
       'ben-saraf',
     ])
   })
@@ -90,7 +132,7 @@ describe('rankings', () => {
       ...basketball,
       id: 'football-leader',
       sport: 'football',
-      affiliation: { ...basketball.affiliation, competition: 'Eredivisie' },
+      participation: { kind: 'team-affiliation', affiliation: { ...basketball.participation.affiliation, competition: 'Eredivisie' } },
       performance: {
         ...basketball.performance,
         competition: 'Eredivisie',
@@ -107,7 +149,7 @@ describe('rankings', () => {
       ...basketball,
       id: 'football-leader',
       sport: 'football',
-      affiliation: { ...basketball.affiliation, competition: 'Eredivisie' },
+      participation: { kind: 'team-affiliation', affiliation: { ...basketball.participation.affiliation, competition: 'Eredivisie' } },
       performance: {
         ...basketball.performance,
         competition: 'Eredivisie',
@@ -237,7 +279,7 @@ describe('rankings', () => {
       id: 'football-leader',
       name: { en: 'Football Leader', he: 'Football Leader' },
       sport: 'football',
-      affiliation: { ...snapshot.athletes[0].affiliation, competition: 'Eredivisie' },
+      participation: { kind: 'team-affiliation', affiliation: { ...snapshot.athletes[0].participation.affiliation, competition: 'Eredivisie' } },
       performance: {
         ...snapshot.athletes[0].performance,
         competition: 'Eredivisie',
@@ -254,6 +296,7 @@ describe('rankings', () => {
     expect(basketballGroup?.querySelectorAll('ol')).toHaveLength(1)
     expect(footballGroup?.querySelectorAll('ol')).toHaveLength(1)
     expect(basketballGroup).toHaveTextContent('01')
+    expect(basketballGroup).toHaveTextContent('Portland Trail Blazers · NBA')
     expect(footballGroup).toHaveTextContent('01')
   })
 
@@ -302,5 +345,16 @@ describe('rankings', () => {
     expect(
       screen.getByRole('dialog', { name: /deni avdija/i }),
     ).toBeInTheDocument()
+  })
+
+  it('omits a locationless circuit activity from the map while retaining team markers and list actions', async () => {
+    const user = userEvent.setup()
+    render(<TrackerApp snapshot={{ ...snapshot, athletes: [...snapshot.athletes, circuitAthlete()] }} />)
+
+    await user.click(screen.getByRole('button', { name: 'Map' }))
+    expect(screen.getByText('3 mapped')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /open circuit athlete from map/i })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /open deni avdija from map/i }))
+    expect(screen.getByRole('dialog', { name: /deni avdija/i })).toBeInTheDocument()
   })
 })

@@ -64,7 +64,7 @@ export const observationStateSchema = z.enum([
   'unavailable',
 ])
 
-export const eligibilityBasisSchema = z.enum(['citizenship', 'represents-israel'])
+export const eligibilityBasisSchema = z.enum(['citizenship', 'nationality', 'represents-israel'])
 
 export const organizationTypeSchema = z.enum([
   'club',
@@ -87,6 +87,8 @@ export const rosterStatusSchema = z.enum([
 ])
 
 export const providerSchema = z.enum(['espn-nba', 'nhl', 'curated'])
+
+export type ProviderId = z.infer<typeof providerSchema>
 
 export const mediaLicenseSchema = z.enum([
   'provider-terms',

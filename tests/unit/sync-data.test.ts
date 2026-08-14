@@ -2,26 +2,65 @@ import { mkdtemp, mkdir, readFile, readdir, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import type { AthleteSnapshot } from '../../src/domain/athlete'
+import type { AthleteSnapshot, PublicPerformance } from '../../src/domain/athlete'
 import { compileRegistryBundle, publicRegistry } from '../../src/data/registry'
+import type { RegistryAthlete } from '../../src/data/registry'
+import { registryMigrationInstant, type RegistryBundleInput } from '../../src/domain/registry'
 import { rankAthletesBySport } from '../../src/services/rankings'
 import { buildSnapshot } from '../../src/services/snapshot'
 import { registryBundleFixture } from '../fixtures/registry'
 import deniFixture from '../../data/fixtures/nba-deni.json'
+import zeevFixture from '../../data/fixtures/nhl-zeev.json'
 import {
   fetchProviderRecord,
   resolveSyncNow,
+  runPerformanceRefresh,
   writeSnapshotAtomically,
 } from '../../scripts/sync-data'
+import type { ProviderAdapterMap } from '../../scripts/providers/types'
 
-const generatedAt = '2026-07-23T08:00:00.000Z'
+const generatedAt = '2026-08-08T08:00:00.000Z'
 const coverage = { required: 4, healthy: 0, complete: false } as const
 const entry = publicRegistry[0]
+if (entry?.participation.kind !== 'team-affiliation' || entry.binding === undefined) {
+  throw new Error('Expected a bound team athlete fixture')
+}
+const secondEntry = publicRegistry[1]
+if (secondEntry?.participation.kind !== 'team-affiliation' || secondEntry.binding === undefined) {
+  throw new Error('Expected a second bound team athlete fixture')
+}
 const providerContext = {
   sport: entry.sport,
-  competition: entry.affiliation.competition,
-  season: entry.affiliation.season,
+  competition: entry.binding.competition,
+  season: entry.binding.season,
 } as const
+
+function circuitEntry(): RegistryAthlete {
+  const bundle = structuredClone(registryBundleFixture) as RegistryBundleInput
+  const athlete = bundle.athletes[0]
+  if (athlete === undefined) throw new Error('Missing circuit athlete fixture')
+  athlete.tier = 'international-circuit'
+  bundle.affiliations = []
+  bundle.circuitActivities = [{
+    id: 'activity-athlete-one-itf-2026',
+    athleteId: athlete.id,
+    circuit: 'ITF',
+    discipline: 'singles',
+    competition: 'ITF World Tennis Tour',
+    season: '2026',
+    activityType: 'sanctioned-result',
+    effectiveAt: generatedAt,
+    status: 'verified',
+    source: {
+      publisher: 'International Tennis Federation',
+      sourceUrl: 'https://example.com/results/athlete-one',
+      retrievedAt: generatedAt,
+    },
+  }]
+  const compiled = compileRegistryBundle(bundle, generatedAt)[0]
+  if (compiled === undefined) throw new Error('Missing compiled circuit athlete')
+  return compiled
+}
 
 function availablePerformance() {
   return {
@@ -39,7 +78,7 @@ function availablePerformance() {
     source: {
       provider: 'espn-nba' as const,
       sourceUrl: 'https://example.com/deni',
-      retrievedAt: '2026-07-22T12:00:00.000Z',
+      retrievedAt: '2026-08-07T12:00:00.000Z',
     },
   }
 }
@@ -64,14 +103,19 @@ function previousSnapshot(): AthleteSnapshot {
           sourceUrl: entry.eligibility.sourceUrl,
           retrievedAt: entry.eligibility.retrievedAt,
         },
-        affiliation: {
-          organization: { ...entry.affiliation.organization, name: 'Old Team' },
-          competition: entry.affiliation.competition,
-          season: entry.affiliation.season,
-          rosterStatus: entry.affiliation.rosterStatus,
-          countsAsOverseas: true,
-          source: entry.affiliation.source,
-          ...(entry.affiliation.location ? { location: entry.affiliation.location } : {}),
+        participation: {
+          kind: 'team-affiliation',
+          affiliation: {
+            organization: { ...entry.participation.affiliation.organization, name: 'Old Team' },
+            competition: entry.participation.affiliation.competition,
+            season: entry.participation.affiliation.season,
+            rosterStatus: entry.participation.affiliation.rosterStatus,
+            countsAsOverseas: true,
+            source: entry.participation.affiliation.source,
+            ...(entry.participation.affiliation.location
+              ? { location: entry.participation.affiliation.location }
+              : {}),
+          },
         },
         performance: availablePerformance(),
         image: {
@@ -82,7 +126,7 @@ function previousSnapshot(): AthleteSnapshot {
           rightsHolder: 'Old holder',
           license: 'cc-by',
           usage: 'editorial-display',
-          retrievedAt: '2026-07-22T12:00:00.000Z',
+          retrievedAt: '2026-08-07T12:00:00.000Z',
         },
       },
     ],
@@ -111,16 +155,19 @@ describe('buildSnapshot', () => {
     expect(next.athletes[0]).toMatchObject({
       name: entry.name,
       aliases: entry.aliases,
-      affiliation: {
-        organization: entry.affiliation.organization,
-        competition: entry.affiliation.competition,
-        season: entry.affiliation.season,
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: entry.participation.affiliation.organization,
+          competition: entry.participation.affiliation.competition,
+          season: entry.participation.affiliation.season,
+        },
       },
       performance: {
         status: 'available',
         state: 'corrected',
-        competition: entry.affiliation.competition,
-        season: entry.affiliation.season,
+        competition: entry.binding.competition,
+        season: entry.binding.season,
         stats: availablePerformance().stats,
         source: { provider: entry.binding.provider },
       },
@@ -149,6 +196,150 @@ describe('buildSnapshot', () => {
     ).rejects.toThrow(/organization mismatch/i)
   })
 
+  it('keeps an identity-only athlete without a binding and never calls its provider', async () => {
+    const identityOnly = structuredClone(entry) as RegistryAthlete
+    delete identityOnly.binding
+    let calls = 0
+
+    const next = await buildSnapshot({
+      entries: [identityOnly],
+      previous: { athletes: [] },
+      coverage,
+      fetchRecord: async () => {
+        calls += 1
+        throw new Error('must not be called')
+      },
+      now: new Date(generatedAt),
+    })
+
+    expect(calls).toBe(0)
+    expect(next.athletes[0]?.performance).toEqual({
+      status: 'unavailable',
+      state: 'unavailable',
+      stats: null,
+      reason: 'not-integrated',
+    })
+  })
+
+  it('publishes a source-free not-integrated result when a binding returns null stats', async () => {
+    const next = await buildSnapshot({
+      entries: [entry],
+      previous: { athletes: [] },
+      coverage,
+      fetchRecord: async () => ({
+        athleteId: entry.id,
+        ...providerContext,
+        stats: null,
+        state: 'final',
+        sourceUrl: 'https://example.com/no-stats',
+        retrievedAt: generatedAt,
+      }),
+      now: new Date(generatedAt),
+    })
+
+    expect(next.athletes[0]?.performance).toEqual({
+      status: 'unavailable',
+      state: 'unavailable',
+      stats: null,
+      reason: 'not-integrated',
+    })
+  })
+
+  it('isolates a failed athlete without history while publishing another athlete', async () => {
+    const next = await buildSnapshot({
+      entries: [entry, secondEntry],
+      previous: { athletes: [] },
+      coverage,
+      fetchRecord: async (current) => {
+        if (current.id === entry.id) throw new Error('provider unavailable')
+        if (current.binding === undefined) throw new Error('Missing test binding')
+        return {
+          athleteId: current.id,
+          sport: current.binding.sport,
+          competition: current.binding.competition,
+          season: current.binding.season,
+          stats: availablePerformance().stats,
+          state: 'final',
+          sourceUrl: 'https://example.com/available',
+          retrievedAt: generatedAt,
+        }
+      },
+      now: new Date(generatedAt),
+    })
+
+    expect(next.athletes).toHaveLength(2)
+    expect(next.athletes[0]?.performance).toMatchObject({
+      status: 'unavailable',
+      reason: 'provider-unavailable',
+    })
+    expect(next.athletes[1]?.performance).toMatchObject({ status: 'available' })
+  })
+
+  it('accepts binding-season performance alongside a newer team affiliation season', async () => {
+    const nextSeason = structuredClone(entry)
+    nextSeason.participation.affiliation.season = '2026-27'
+
+    const next = await buildSnapshot({
+      entries: [nextSeason],
+      previous: { athletes: [] },
+      coverage,
+      fetchRecord: async () => ({
+        athleteId: nextSeason.id,
+        ...providerContext,
+        stats: availablePerformance().stats,
+        state: 'final',
+        sourceUrl: 'https://example.com/prior-season',
+        retrievedAt: generatedAt,
+      }),
+      now: new Date(generatedAt),
+    })
+
+    expect(next.athletes[0]).toMatchObject({
+      participation: { affiliation: { season: '2026-27' } },
+      performance: { status: 'available', season: '2025-26' },
+    })
+  })
+
+  it('publishes exact circuit activity without fabricating a team or map location', async () => {
+    const circuit = circuitEntry()
+    if (circuit.binding === undefined) throw new Error('Expected circuit binding')
+    const next = await buildSnapshot({
+      entries: [circuit],
+      previous: { athletes: [] },
+      coverage,
+      fetchRecord: async () => ({
+        athleteId: circuit.id,
+        sport: circuit.binding!.sport,
+        competition: circuit.binding!.competition,
+        season: circuit.binding!.season,
+        stats: null,
+        state: 'final',
+        observedOrganization: 'Imaginary Tennis Club',
+        sourceUrl: 'https://example.com/circuit-stats',
+        retrievedAt: generatedAt,
+      }),
+      now: new Date(generatedAt),
+    })
+
+    expect(next.athletes[0]?.participation).toEqual({
+      kind: 'circuit-activity',
+      activity: circuit.participation.kind === 'circuit-activity'
+        ? {
+            circuit: circuit.participation.activity.circuit,
+            discipline: circuit.participation.activity.discipline,
+            competition: circuit.participation.activity.competition,
+            season: circuit.participation.activity.season,
+            activityType: circuit.participation.activity.activityType,
+            effectiveAt: circuit.participation.activity.effectiveAt,
+            source: circuit.participation.activity.source,
+          }
+        : undefined,
+    })
+    expect(next.athletes[0]).not.toHaveProperty('affiliation')
+    expect(next.athletes[0]).not.toHaveProperty('organization')
+    expect(next.athletes[0]).not.toHaveProperty('location')
+  })
+
   it('rebuilds registry truth and reuses only prior verified performance on failure', async () => {
     const prior = previousSnapshot()
     const next = await buildSnapshot({
@@ -162,31 +353,90 @@ describe('buildSnapshot', () => {
     })
 
     expect(next.athletes[0].name).toEqual(entry.name)
-    expect(next.athletes[0].affiliation.organization).toEqual(entry.affiliation.organization)
+    expect(next.athletes[0].participation).toEqual({
+      kind: 'team-affiliation',
+      affiliation: {
+        organization: entry.participation.affiliation.organization,
+        competition: entry.participation.affiliation.competition,
+        season: entry.participation.affiliation.season,
+        rosterStatus: entry.participation.affiliation.rosterStatus,
+        countsAsOverseas: true,
+        source: entry.participation.affiliation.source,
+        ...(entry.participation.affiliation.location
+          ? { location: entry.participation.affiliation.location }
+          : {}),
+      },
+    })
     expect(next.athletes[0].performance.stats).toEqual(prior.athletes[0].performance.stats)
     expect(next.athletes[0].performance.state).toBe('stale')
     expect(next.athletes[0].image).toBeUndefined()
   })
 
   it.each([
-    ['competition mismatch', (prior: AthleteSnapshot) => { prior.athletes[0].performance.competition = 'EuroLeague' }],
-    ['season mismatch', (prior: AthleteSnapshot) => { prior.athletes[0].performance.season = '2024-25' }],
-    ['sport mismatch', (prior: AthleteSnapshot) => { prior.athletes[0].performance.stats = { kind: 'football', appearances: 1, goals: 0, assists: 0 } }],
-    ['future observation', (prior: AthleteSnapshot) => { prior.athletes[0].performance.source.retrievedAt = '2026-07-23T08:00:00.001Z' }],
-    ['expired observation', (prior: AthleteSnapshot) => { prior.athletes[0].performance.source.retrievedAt = '2026-07-21T07:59:59.999Z' }],
-  ])('fails closed on prior %s', async (_label, mutate) => {
+    ['provider mismatch', (performance: PublicPerformance) => {
+      if (performance.status === 'available') performance.source.provider = 'nhl'
+    }],
+    ['competition mismatch', (performance: PublicPerformance) => {
+      if (performance.status === 'available') performance.competition = 'EuroLeague'
+    }],
+    ['season mismatch', (performance: PublicPerformance) => {
+      if (performance.status === 'available') performance.season = '2024-25'
+    }],
+    ['sport mismatch', (performance: PublicPerformance) => {
+      if (performance.status === 'available') {
+        performance.stats = { kind: 'football', appearances: 1, goals: 0, assists: 0 }
+      }
+    }],
+    ['future observation', (performance: PublicPerformance) => {
+      if (performance.status === 'available') {
+        performance.source.retrievedAt = '2026-08-08T08:00:00.001Z'
+      }
+    }],
+    ['expired observation', (performance: PublicPerformance) => {
+      if (performance.status === 'available') {
+        performance.source.retrievedAt = '2026-08-06T07:59:59.999Z'
+      }
+    }],
+  ])('does not retain prior performance with a %s', async (_label, mutate) => {
     const prior = previousSnapshot()
-    mutate(prior)
-    await expect(buildSnapshot({
+    mutate(prior.athletes[0]!.performance)
+    const next = await buildSnapshot({
       entries: [entry], previous: prior, coverage,
       fetchRecord: async () => { throw new Error('provider unavailable') },
       now: new Date(generatedAt),
-    })).rejects.toThrow(/No verified data available/i)
+    })
+
+    expect(next.athletes[0]?.performance).toEqual({
+      status: 'unavailable',
+      state: 'unavailable',
+      stats: null,
+      reason: 'provider-unavailable',
+    })
+  })
+
+  it('does not retain performance belonging to another athlete identity', async () => {
+    const prior = previousSnapshot()
+    prior.athletes[0]!.id = 'another-athlete'
+
+    const next = await buildSnapshot({
+      entries: [entry],
+      previous: prior,
+      coverage,
+      fetchRecord: async () => { throw new Error('provider unavailable') },
+      now: new Date(generatedAt),
+    })
+
+    expect(next.athletes[0]?.performance).toMatchObject({
+      status: 'unavailable',
+      reason: 'provider-unavailable',
+    })
   })
 
   it('retains prior source context unchanged at the exact 48-hour boundary', async () => {
     const prior = previousSnapshot()
-    prior.athletes[0].performance.source.retrievedAt = '2026-07-21T08:00:00.000Z'
+    const performance = prior.athletes[0]?.performance
+    if (performance?.status !== 'available') throw new Error('Expected available history')
+    performance.source.retrievedAt = '2026-08-06T08:00:00.000Z'
     const next = await buildSnapshot({
       entries: [entry], previous: prior, coverage,
       fetchRecord: async () => { throw new Error('provider unavailable') },
@@ -200,23 +450,23 @@ describe('buildSnapshot', () => {
     prior.athletes[0].performance = {
       status: 'unavailable',
       state: 'unavailable',
-      competition: 'NBA',
-      season: '2025-26',
       stats: null,
-      source: availablePerformance().source,
+      reason: 'not-integrated',
     }
 
-    await expect(
-      buildSnapshot({
-        entries: [entry],
-        previous: prior,
-        coverage,
-        fetchRecord: async () => {
-          throw new Error('provider unavailable')
-        },
-        now: new Date(generatedAt),
-      }),
-    ).rejects.toThrow(/No verified data available/)
+    const next = await buildSnapshot({
+      entries: [entry],
+      previous: prior,
+      coverage,
+      fetchRecord: async () => {
+        throw new Error('provider unavailable')
+      },
+      now: new Date(generatedAt),
+    })
+    expect(next.athletes[0]?.performance).toMatchObject({
+      status: 'unavailable',
+      reason: 'provider-unavailable',
+    })
   })
 
   it('rejects a provider result for a different registry athlete', async () => {
@@ -272,20 +522,40 @@ describe('buildSnapshot', () => {
     })).rejects.toThrow(/context mismatch/i)
   })
 
+  it('rejects available performance outside the current participation competition', async () => {
+    const changedCompetition = structuredClone(entry)
+    changedCompetition.participation.affiliation.competition = 'EuroLeague'
+
+    await expect(buildSnapshot({
+      entries: [changedCompetition],
+      previous: { athletes: [] },
+      coverage,
+      fetchRecord: async () => ({
+        athleteId: changedCompetition.id,
+        ...providerContext,
+        stats: availablePerformance().stats,
+        state: 'final',
+        sourceUrl: 'https://example.com/old-competition',
+        retrievedAt: generatedAt,
+      }),
+      now: new Date(generatedAt),
+    })).rejects.toThrow(/context mismatch/i)
+  })
+
   it('rejects a provider observation after the snapshot clock', async () => {
     await expect(buildSnapshot({
       entries: [entry], previous: previousSnapshot(), coverage,
       fetchRecord: async () => ({
         athleteId: entry.id, ...providerContext, stats: null, state: 'final',
-        sourceUrl: 'https://example.com/future', retrievedAt: '2026-07-23T08:00:00.001Z',
+        sourceUrl: 'https://example.com/future', retrievedAt: '2026-08-08T08:00:00.001Z',
       }),
       now: new Date(generatedAt),
     })).rejects.toThrow(/snapshot|generated|future/i)
   })
 
   it.each([
-    ['exact 48-hour boundary', '2026-07-21T08:00:00.000Z'],
-    ['one millisecond inside retention', '2026-07-21T08:00:00.001Z'],
+    ['exact 48-hour boundary', '2026-08-06T08:00:00.000Z'],
+    ['one millisecond inside retention', '2026-08-06T08:00:00.001Z'],
   ])('accepts fulfilled available performance at the %s', async (_case, retrievedAt) => {
     const next = await buildSnapshot({
       entries: [entry], previous: { athletes: [] }, coverage,
@@ -300,8 +570,8 @@ describe('buildSnapshot', () => {
   })
 
   it.each([
-    ['one millisecond outside retention', '2026-07-21T07:59:59.999Z'],
-    ['future available observation', '2026-07-23T08:00:00.001Z'],
+    ['one millisecond outside retention', '2026-08-06T07:59:59.999Z'],
+    ['future available observation', '2026-08-08T08:00:00.001Z'],
   ])('rejects fulfilled %s before it can enter the snapshot', async (_case, retrievedAt) => {
     await expect(buildSnapshot({
       entries: [entry], previous: { athletes: [] }, coverage,
@@ -319,7 +589,7 @@ describe('buildSnapshot', () => {
       fetchRecord: async () => ({
         athleteId: entry.id, ...providerContext, stats: null, state: 'final',
         sourceUrl: 'https://example.com/future-unavailable',
-        retrievedAt: '2026-07-23T08:00:00.001Z',
+        retrievedAt: '2026-08-08T08:00:00.001Z',
       }),
       now: new Date(generatedAt),
     })).rejects.toThrow(/future|snapshot|generated/i)
@@ -336,7 +606,12 @@ describe('buildSnapshot', () => {
       now: new Date(generatedAt),
     })
 
-    expect(next.athletes[0].performance).toMatchObject({ status: 'unavailable', stats: null })
+    expect(next.athletes[0].performance).toEqual({
+      status: 'unavailable',
+      state: 'unavailable',
+      stats: null,
+      reason: 'not-integrated',
+    })
   })
 
   it('publishes the valid tennis fixture identity-only and excludes it from rankings', async () => {
@@ -362,13 +637,45 @@ describe('buildSnapshot', () => {
     expect(next.athletes[0]).toMatchObject({
       id: 'athlete-one',
       sport: 'tennis',
-      performance: { status: 'unavailable', stats: null },
+      performance: { status: 'unavailable', stats: null, reason: 'not-integrated' },
     })
     expect(rankAthletesBySport(next.athletes)).toEqual([])
   })
 })
 
 describe('fetchProviderRecord', () => {
+  it('dispatches through the injected adapter map', async () => {
+    const adapters: ProviderAdapterMap = {
+      'espn-nba': async ({ entry: current }) => ({
+        athleteId: current.id,
+        ...providerContext,
+        stats: null,
+        state: 'final',
+        sourceUrl: 'https://example.com/provider',
+        retrievedAt: generatedAt,
+      }),
+    }
+
+    const result = await fetchProviderRecord(
+      entry,
+      async () => new Response(null, { status: 200 }),
+      new Date(generatedAt),
+      { adapters },
+    )
+
+    expect(result.athleteId).toBe(entry.id)
+    expect(result.sourceUrl).toBe('https://example.com/provider')
+  })
+
+  it('rejects a binding when its provider is missing from the injected adapter map', async () => {
+    await expect(fetchProviderRecord(
+      entry,
+      async () => new Response(null, { status: 200 }),
+      new Date(generatedAt),
+      { adapters: {} },
+    )).rejects.toThrow(/adapter.*espn-nba|provider.*espn-nba/i)
+  })
+
   it('uses a season-specific ESPN endpoint whose payload verifies athlete and season', async () => {
     const requestedUrls: string[] = []
     const fakeFetch: typeof fetch = async (input) => {
@@ -396,9 +703,24 @@ describe('fetchProviderRecord', () => {
     )
   })
 
-  it('rejects a non-canonical NBA affiliation season before fetching', async () => {
+  it('derives the ESPN season endpoint from the binding rather than current participation', async () => {
+    const newerAffiliation = structuredClone(entry)
+    newerAffiliation.participation.affiliation.season = '2026-27'
+    const requestedUrls: string[] = []
+    const fakeFetch: typeof fetch = async (input) => {
+      requestedUrls.push(String(input))
+      return new Response(JSON.stringify(deniFixture), { status: 200 })
+    }
+
+    const result = await fetchProviderRecord(newerAffiliation, fakeFetch, new Date(generatedAt))
+
+    expect(requestedUrls[0]).toContain('/seasons/2026/')
+    expect(result.season).toBe('2025-26')
+  })
+
+  it('rejects a non-canonical NBA binding season before fetching', async () => {
     const invalid = structuredClone(entry)
-    invalid.affiliation.season = 'NBA-2025-26'
+    invalid.binding.season = 'NBA-2025-26'
     let fetched = false
 
     await expect(fetchProviderRecord(invalid, async () => {
@@ -406,6 +728,144 @@ describe('fetchProviderRecord', () => {
       return new Response(JSON.stringify(deniFixture), { status: 200 })
     }, new Date(generatedAt))).rejects.toThrow(/NBA season/i)
     expect(fetched).toBe(false)
+  })
+
+  it('fails explicitly when provider fetching is called without a binding', async () => {
+    const identityOnly = structuredClone(entry) as RegistryAthlete
+    delete identityOnly.binding
+
+    await expect(fetchProviderRecord(identityOnly, async () => {
+      throw new Error('must not fetch')
+    }, new Date(generatedAt))).rejects.toThrow(/binding.*required|missing.*binding/i)
+  })
+
+  it('selects NHL rows from the binding season rather than current participation', async () => {
+    const hockeyEntry = structuredClone(entry) as RegistryAthlete
+    hockeyEntry.id = 'zeev-buium'
+    hockeyEntry.name = { en: 'Zeev Buium', he: 'זאב בויום' }
+    hockeyEntry.sport = 'hockey'
+    if (hockeyEntry.participation.kind !== 'team-affiliation') {
+      throw new Error('Expected team participation')
+    }
+    hockeyEntry.participation.affiliation.organization.name = 'Vancouver Canucks'
+    hockeyEntry.participation.affiliation.competition = 'NHL'
+    hockeyEntry.participation.affiliation.season = '2026-27'
+    if (hockeyEntry.binding === undefined) throw new Error('Expected provider binding')
+    hockeyEntry.binding.provider = 'nhl'
+    hockeyEntry.binding.externalId = '8484798'
+    hockeyEntry.binding.sport = 'hockey'
+    hockeyEntry.binding.competition = 'NHL'
+    hockeyEntry.binding.season = '2025-26'
+
+    const result = await fetchProviderRecord(
+      hockeyEntry,
+      async () => new Response(JSON.stringify(zeevFixture), { status: 200 }),
+      new Date(generatedAt),
+    )
+
+    expect(result).toMatchObject({ competition: 'NHL', season: '2025-26' })
+  })
+})
+
+describe('performance refresh', () => {
+  it('refreshes bound entries, skips unbound entries, and writes a manifest', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'performance-refresh-'))
+    const snapshotPath = join(directory, 'snapshot.json')
+    const manifestPath = join(directory, 'refresh-manifest.json')
+    const adapters: ProviderAdapterMap = {
+      curated: async ({ entry: current, now }) => ({
+        athleteId: current.id,
+        sport: current.sport,
+        competition: current.binding!.competition,
+        season: current.binding!.season,
+        stats: null,
+        state: 'final',
+        sourceUrl: 'https://example.com/curated',
+        retrievedAt: now.toISOString(),
+      }),
+      'espn-nba': async ({ entry: current, now }) => ({
+        athleteId: current.id,
+        sport: current.sport,
+        competition: current.binding!.competition,
+        season: current.binding!.season,
+        stats: null,
+        state: 'final',
+        sourceUrl: 'https://example.com/espn',
+        retrievedAt: now.toISOString(),
+      }),
+      nhl: async ({ entry: current, now }) => ({
+        athleteId: current.id,
+        sport: current.sport,
+        competition: current.binding!.competition,
+        season: current.binding!.season,
+        stats: null,
+        state: 'final',
+        sourceUrl: 'https://example.com/nhl',
+        retrievedAt: now.toISOString(),
+      }),
+    }
+
+    try {
+      const result = await runPerformanceRefresh({
+        now: new Date('2026-08-14T06:00:00.000Z'),
+        snapshotPath,
+        manifestPath,
+        coveragePath: join(process.cwd(), 'data/coverage/ledger.json'),
+        adapters,
+        fetcher: async () => new Response(null, { status: 200 }),
+      })
+
+      expect(result.snapshot.athletes).toHaveLength(publicRegistry.length)
+      expect(result.snapshot.athletes.every((athlete) => athlete.performance)).toBe(true)
+      expect(result.manifest.unboundSkipped).toBeGreaterThan(0)
+      expect(result.manifest.providers.length).toBeGreaterThan(0)
+      expect(JSON.parse(await readFile(manifestPath, 'utf8'))).toMatchObject({
+        unboundSkipped: result.manifest.unboundSkipped,
+      })
+    } finally {
+      await rm(directory, { recursive: true, force: true })
+    }
+  })
+
+  it('preserves provider-unavailable when a bound adapter rejects', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'performance-refresh-failure-'))
+    try {
+      const result = await runPerformanceRefresh({
+        now: new Date('2026-08-14T06:00:00.000Z'),
+        snapshotPath: join(directory, 'snapshot.json'),
+        manifestPath: join(directory, 'refresh-manifest.json'),
+        coveragePath: join(process.cwd(), 'data/coverage/ledger.json'),
+        adapters: {
+          curated: async ({ entry: current, now }) => ({
+            athleteId: current.id,
+            sport: current.sport,
+            competition: current.binding!.competition,
+            season: current.binding!.season,
+            stats: null,
+            state: 'final',
+            sourceUrl: 'https://example.com/curated',
+            retrievedAt: now.toISOString(),
+          }),
+          'espn-nba': async () => { throw new Error('provider unavailable') },
+          nhl: async ({ entry: current, now }) => ({
+            athleteId: current.id,
+            sport: current.sport,
+            competition: current.binding!.competition,
+            season: current.binding!.season,
+            stats: null,
+            state: 'final',
+            sourceUrl: 'https://example.com/nhl',
+            retrievedAt: now.toISOString(),
+          }),
+        },
+      })
+
+      const failed = result.snapshot.athletes.filter((athlete) => athlete.performance.status === 'unavailable' && athlete.performance.reason === 'provider-unavailable')
+      expect(failed.length).toBeGreaterThan(0)
+      expect(result.manifest.providers.find((provider) => provider.provider === 'espn-nba')?.failed).toBeGreaterThan(0)
+    } finally {
+      await rm(directory, { recursive: true, force: true })
+    }
   })
 })
 
@@ -478,9 +938,9 @@ describe('writeSnapshotAtomically', () => {
 
 describe('sync clock resolution', () => {
   it('bootstraps only an implicit clock to the migration watermark', () => {
-    const early = new Date('2026-07-22T00:00:00.000Z')
-    expect(resolveSyncNow(undefined, early).toISOString()).toBe(generatedAt)
-    expect(resolveSyncNow(early, new Date('2026-07-24T00:00:00.000Z'))).toBe(early)
+    const early = new Date('2026-08-07T00:00:00.000Z')
+    expect(resolveSyncNow(undefined, early).toISOString()).toBe(registryMigrationInstant)
+    expect(resolveSyncNow(early, new Date('2026-08-09T00:00:00.000Z'))).toBe(early)
   })
 })
 
@@ -516,10 +976,85 @@ describe('legacy snapshot migration', () => {
     }).athletes.map((athlete) => athlete.id)).toEqual(['retained'])
   })
 
+  it('migrates the checked-in normalized predecessor snapshot', async () => {
+    const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
+    const predecessor: unknown = JSON.parse(await readFile(
+      join(process.cwd(), 'public/data/snapshot.json'),
+      'utf8',
+    ))
+
+    const previous = parsePreviousSnapshot(predecessor)
+
+    expect(previous.athletes).toHaveLength(publicRegistry.length)
+    expect(previous.athletes.map((athlete) => athlete.id)).toEqual(
+      predecessor.athletes.map((athlete: { id: string }) => athlete.id),
+    )
+    expect(previous.athletes.filter(
+      (athlete) => athlete.performance.status === 'available',
+    )).toHaveLength(3)
+  })
+
+  it('accepts the checked-in current unavailable record without a performance source', async () => {
+    const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
+    const predecessor = JSON.parse(await readFile(
+      join(process.cwd(), 'public/data/snapshot.json'),
+      'utf8',
+    )) as { athletes: Array<{ id: string; performance: { status: string; source?: unknown } }> }
+    const unavailable = predecessor.athletes.find((athlete) => athlete.id === 'emanuel-sharp')
+    if (unavailable === undefined) {
+      throw new Error('Checked-in predecessor fixtures are incomplete')
+    }
+    const previous = parsePreviousSnapshot(predecessor)
+
+    expect(unavailable.performance.status).toBe('unavailable')
+    expect(unavailable.performance).not.toHaveProperty('source')
+    expect(previous.athletes.map((athlete) => athlete.id)).toContain('emanuel-sharp')
+  })
+
+  it('rejects private or unknown fields in a normalized predecessor snapshot', async () => {
+    const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
+    const predecessor = JSON.parse(await readFile(
+      join(process.cwd(), 'public/data/snapshot.json'),
+      'utf8',
+    )) as { athletes: Array<Record<string, unknown>> }
+    const athlete = predecessor.athletes[0]
+    if (athlete === undefined) throw new Error('Checked-in predecessor fixture is empty')
+    athlete.birthDate = '2001-01-02'
+
+    expect(() => parsePreviousSnapshot(predecessor)).toThrow(/birthDate|unrecognized/i)
+  })
+
+  it('accepts the current source-free unavailable shape without making it stale', async () => {
+    const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
+    const current = previousSnapshot()
+    current.athletes[0]!.performance = {
+      status: 'unavailable',
+      state: 'unavailable',
+      stats: null,
+      reason: 'not-integrated',
+    }
+
+    const previous = parsePreviousSnapshot(current)
+    const next = await buildSnapshot({
+      entries: [entry],
+      previous,
+      coverage,
+      fetchRecord: async () => { throw new Error('provider unavailable') },
+      now: new Date(generatedAt),
+    })
+
+    expect(next.athletes[0]?.performance).toEqual({
+      status: 'unavailable',
+      state: 'unavailable',
+      stats: null,
+      reason: 'provider-unavailable',
+    })
+  })
+
   it('never publishes future-dated legacy performance through stale fallback', async () => {
     const { parsePreviousSnapshot } = await import('../../scripts/sync-data')
     const legacy = {
-      generatedAt: '2026-07-23T08:00:00.000Z',
+      generatedAt: '2026-08-08T08:00:00.000Z',
       athletes: [{
         id: entry.id,
         name: entry.name,
@@ -529,7 +1064,7 @@ describe('legacy snapshot migration', () => {
         stats: availablePerformance().stats,
         source: {
           provider: 'espn-nba', sourceUrl: 'https://example.com/stats',
-          retrievedAt: '2026-07-23T09:00:00.000Z',
+          retrievedAt: '2026-08-08T09:00:00.000Z',
         },
         freshness: 'fresh',
       }],
@@ -538,12 +1073,16 @@ describe('legacy snapshot migration', () => {
     const previous = parsePreviousSnapshot(legacy)
     expect(previous.athletes).toEqual([])
 
-    await expect(buildSnapshot({
+    const next = await buildSnapshot({
       entries: [entry],
       previous,
       coverage,
       fetchRecord: async () => { throw new Error('provider unavailable') },
-      now: new Date('2026-07-23T10:00:00.000Z'),
-    })).rejects.toThrow(/No verified data available/i)
+      now: new Date('2026-08-08T10:00:00.000Z'),
+    })
+    expect(next.athletes[0]?.performance).toMatchObject({
+      status: 'unavailable',
+      reason: 'provider-unavailable',
+    })
   })
 })

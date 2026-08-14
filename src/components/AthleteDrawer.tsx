@@ -4,6 +4,7 @@ import type { Athlete } from '../domain/athlete'
 import { AthletePhoto } from './AthletePhoto'
 import { FreshnessBadge } from './FreshnessBadge'
 import { useI18n } from '../i18n/context'
+import { participationDisplay } from '../services/participation'
 
 type AthleteDrawerProps = {
   athlete: Athlete
@@ -44,6 +45,7 @@ export function AthleteDrawer({ athlete, onClose, returnFocus }: AthleteDrawerPr
   const drawer = useRef<HTMLElement>(null)
   const { locale, messages } = useI18n()
   const displayName = athlete.name[locale]
+  const participation = participationDisplay(athlete.participation, messages.circuitParticipation)
 
   useEffect(() => {
     const returnTarget = returnFocus.current
@@ -120,8 +122,8 @@ export function AthleteDrawer({ athlete, onClose, returnFocus }: AthleteDrawerPr
           <p className="section-heading__eyebrow">{messages.profileKicker}</p>
           <h2 id="athlete-dialog-title">{displayName}</h2>
           <p className="drawer__hebrew" lang={locale === 'en' ? 'he' : 'en'} dir={locale === 'en' ? 'rtl' : 'ltr'}>{athlete.name[locale === 'en' ? 'he' : 'en']}</p>
-          <p className="drawer__club">{athlete.affiliation.organization.name}<span>{athlete.affiliation.competition} · {athlete.affiliation.season}</span></p>
-          {athlete.affiliation.location && <p className="drawer__location"><MapPin size={16} aria-hidden="true" /> {athlete.affiliation.location.city}, {athlete.affiliation.location.country}</p>}
+          <p className="drawer__club">{participation.title}<span>{participation.competition} · {participation.season}</span></p>
+          {participation.location && <p className="drawer__location"><MapPin size={16} aria-hidden="true" /> {participation.location.city}, {participation.location.country}</p>}
           <div className="athlete-tags" aria-label={messages.athleteClassifications}>
             <span>{messages.tiers[athlete.tier]}</span>
             <span>{messages.lifecycleStatuses[athlete.lifecycleStatus]}</span>
@@ -139,8 +141,8 @@ export function AthleteDrawer({ athlete, onClose, returnFocus }: AthleteDrawerPr
           <FreshnessBadge performance={athlete.performance} />
           <div className="drawer__sources">
             <a href={athlete.eligibility.sourceUrl} target="_blank" rel="noreferrer"><ShieldCheck size={16} aria-hidden="true" /> {messages.eligibilitySource} <ArrowUpRight size={14} aria-hidden="true" /></a>
-            <a href={athlete.affiliation.source.sourceUrl} target="_blank" rel="noreferrer">{messages.affiliationSource} <ArrowUpRight size={14} aria-hidden="true" /></a>
-            <a href={athlete.performance.source.sourceUrl} target="_blank" rel="noreferrer">{messages.seasonSource} <ArrowUpRight size={14} aria-hidden="true" /></a>
+            <a href={participation.source.sourceUrl} target="_blank" rel="noreferrer">{participation.kind === 'team-affiliation' ? messages.currentTeamSource : messages.circuitActivitySource} <ArrowUpRight size={14} aria-hidden="true" /></a>
+            {athlete.performance.status === 'available' && <a href={athlete.performance.source.sourceUrl} target="_blank" rel="noreferrer">{messages.seasonSource} <ArrowUpRight size={14} aria-hidden="true" /></a>}
           </div>
         </div>
       </aside>

@@ -3,6 +3,7 @@ import type { Athlete, AthleteStats } from '../domain/athlete'
 import { AthletePhoto } from './AthletePhoto'
 import { FreshnessBadge } from './FreshnessBadge'
 import { useI18n } from '../i18n/context'
+import { participationDisplay } from '../services/participation'
 
 type AthleteCardProps = {
   athlete: Athlete
@@ -39,6 +40,10 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
   const stats = statItems(athlete.performance.stats)
   const { locale, messages } = useI18n()
   const displayName = athlete.name[locale]
+  const participation = participationDisplay(athlete.participation, messages.circuitParticipation)
+  const source = athlete.performance.status === 'available'
+    ? athlete.performance.source
+    : participation.source
 
   return (
     <article className={`athlete-card athlete-card--${athlete.sport}`}>
@@ -70,8 +75,8 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
             <ArrowUpRight size={20} aria-hidden="true" />
           </div>
           <p className="athlete-card__club">
-            <strong>{athlete.affiliation.organization.name}</strong>
-            <span>{athlete.affiliation.competition} · {athlete.affiliation.season}</span>
+            <strong>{participation.title}</strong>
+            <span>{participation.competition} · {participation.season}</span>
           </p>
           <div className="athlete-tags" aria-label={messages.athleteClassifications}>
             <span>{messages.tiers[athlete.tier]}</span>
@@ -94,7 +99,7 @@ export function AthleteCard({ athlete, rank, onOpen }: AthleteCardProps) {
       </button>
       <a
         className="athlete-card__source"
-        href={athlete.performance.source.sourceUrl}
+        href={source.sourceUrl}
         target="_blank"
         rel="noreferrer"
       >

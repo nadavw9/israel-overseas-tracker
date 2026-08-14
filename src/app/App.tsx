@@ -1,31 +1,47 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Athlete, AthleteSnapshot } from '../domain/athlete'
+import type { RefreshManifest } from '../domain/refresh'
 import { AppHeader } from '../components/AppHeader'
 import { AthleteCard } from '../components/AthleteCard'
 import { AthleteDrawer } from '../components/AthleteDrawer'
 import { AthleteMap } from '../components/AthleteMap'
+import { CoverageLedgerPanel } from '../components/CoverageLedgerPanel'
 import { CoverageStatus } from '../components/CoverageStatus'
 import { FilterBar, type DirectoryFilters } from '../components/FilterBar'
 import { Leaderboard } from '../components/Leaderboard'
+import { RegistryBoard } from '../components/RegistryBoard'
 import { ViewNav, type TrackerView } from '../components/ViewNav'
 import { I18nContext } from '../i18n/context'
 import { messages, type Locale } from '../i18n/messages'
+import { participationDisplay } from '../services/participation'
 import './styles.css'
 
 type TrackerAppProps = {
   snapshot: AthleteSnapshot
+  refreshManifest?: RefreshManifest | null
 }
 
 function matchesQuery(athlete: Athlete, query: string): boolean {
+  const englishParticipation = participationDisplay(
+    athlete.participation,
+    messages.en.circuitParticipation,
+  )
+  const hebrewParticipation = participationDisplay(
+    athlete.participation,
+    messages.he.circuitParticipation,
+  )
   const haystack = [
     athlete.name.en,
     athlete.name.he,
     ...athlete.aliases,
-    athlete.affiliation.organization.name,
-    athlete.affiliation.organization.country,
-    athlete.affiliation.competition,
-    athlete.affiliation.location?.city,
-    athlete.affiliation.location?.country,
+    englishParticipation.title,
+    englishParticipation.competition,
+    englishParticipation.season,
+    hebrewParticipation.title,
+    hebrewParticipation.competition,
+    hebrewParticipation.season,
+    englishParticipation.location?.city,
+    englishParticipation.location?.country,
   ]
     .filter(Boolean)
     .join(' ')
@@ -34,7 +50,7 @@ function matchesQuery(athlete: Athlete, query: string): boolean {
   return haystack.includes(query.trim().toLocaleLowerCase())
 }
 
-export function TrackerApp({ snapshot }: TrackerAppProps) {
+export function TrackerApp({ snapshot, refreshManifest = null }: TrackerAppProps) {
   const [query, setQuery] = useState('')
   const [filters, setFilters] = useState<DirectoryFilters>({
     sport: 'all',
@@ -99,7 +115,10 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
   return (
     <I18nContext.Provider value={{ locale, messages: copy }}>
     <div className="tracker-shell">
-      <AppHeader onToggleLocale={() => setLocale(locale === 'en' ? 'he' : 'en')} />
+      <AppHeader
+        onToggleLocale={() => setLocale(locale === 'en' ? 'he' : 'en')}
+        refreshManifest={refreshManifest}
+      />
       <main>
         <section className="hero" aria-labelledby="tracker-title">
           <div className="hero__glow" aria-hidden="true" />
@@ -121,6 +140,8 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
         </section>
 
         <section className="content" aria-label={copy.explorer}>
+          <RegistryBoard athletes={snapshot.athletes} sports={sports} />
+          <CoverageLedgerPanel coverage={snapshot.coverage} />
           <ViewNav view={view} onChange={setView} />
 
           {view === 'athletes' && (

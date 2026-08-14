@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { athleteStatsSchema, httpsUrlSchema } from '../../src/domain/athlete'
-import { sportSchema } from '../../src/domain/taxonomy'
+import { providerSchema, sportSchema, type ProviderId } from '../../src/domain/taxonomy'
+import type { RegistryAthlete } from '../../src/data/registry'
 
 export const providerResultSchema = z
   .object({
@@ -26,3 +27,17 @@ export const providerResultSchema = z
   })
 
 export type ProviderResult = z.output<typeof providerResultSchema>
+
+export type ProviderFetchContext = {
+  entry: RegistryAthlete
+  fetcher: typeof fetch
+  now: Date
+}
+
+export type ProviderAdapter = (
+  context: ProviderFetchContext,
+) => Promise<ProviderResult>
+
+export type ProviderAdapterMap = Partial<Record<ProviderId, ProviderAdapter>>
+
+export { providerSchema }

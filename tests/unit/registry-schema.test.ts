@@ -6,14 +6,42 @@ import {
   athleteIdentitySchema,
   candidateQueueSchema,
   candidateSchema,
+  circuitActivitySchema,
   createRegistryBundleSchema,
+  providerBindingSchema,
 } from '../../src/domain/registry'
-import { athleteTierSchema } from '../../src/domain/taxonomy'
+import { athleteTierSchema, eligibilityBasisSchema } from '../../src/domain/taxonomy'
 
 const asOfTimestamp = '2026-07-23T08:00:00.000Z'
 const registryBundleSchema = createRegistryBundleSchema(asOfTimestamp)
 
 const cloneRegistryFixture = (): RegistryBundleInput => structuredClone(registryBundleFixture)
+
+const circuitActivity = {
+  id: 'activity-athlete-one-wimbledon-2026',
+  athleteId: 'athlete-one',
+  circuit: 'WTA',
+  discipline: 'singles',
+  competition: 'Wimbledon',
+  season: '2026',
+  activityType: 'sanctioned-result',
+  effectiveAt: '2026-07-10T08:00:00.000Z',
+  status: 'verified',
+  source: {
+    publisher: 'WTA',
+    sourceUrl: 'https://example.com/wta/wimbledon/athlete-one',
+    retrievedAt: asOfTimestamp,
+  },
+} as const
+
+const circuitRegistryFixture = () => {
+  const bundle = cloneRegistryFixture()
+  bundle.athletes[0].tier = 'international-circuit'
+  bundle.affiliations = []
+  bundle.circuitActivities = [structuredClone(circuitActivity)]
+  bundle.providerBindings = []
+  return bundle
+}
 
 const candidateFixture = {
   id: 'candidate-one',
@@ -39,6 +67,15 @@ describe('normalized registry schemas', () => {
     ['athlete row', (bundle: Record<string, unknown>) => { ((bundle.athletes as Record<string, unknown>[])[0]!).unexpected = true }],
     ['evidence row', (bundle: Record<string, unknown>) => { ((bundle.evidence as Record<string, unknown>[])[0]!).unexpected = true }],
     ['affiliation row', (bundle: Record<string, unknown>) => { ((bundle.affiliations as Record<string, unknown>[])[0]!).unexpected = true }],
+    ['circuit activity row', (bundle: Record<string, unknown>) => {
+      ;(bundle.circuitActivities as Record<string, unknown>[]).push({ ...circuitActivity, unexpected: true })
+    }],
+    ['circuit activity source', (bundle: Record<string, unknown>) => {
+      ;(bundle.circuitActivities as Record<string, unknown>[]).push({
+        ...circuitActivity,
+        source: { ...circuitActivity.source, unexpected: true },
+      })
+    }],
     ['provider binding row', (bundle: Record<string, unknown>) => { ((bundle.providerBindings as Record<string, unknown>[])[0]!).unexpected = true }],
     ['media row', (bundle: Record<string, unknown>) => { ((bundle.media as Record<string, unknown>[])[0]!).unexpected = true }],
     ['athlete name', (bundle: Record<string, unknown>) => {
@@ -97,6 +134,168 @@ describe('normalized registry schemas', () => {
       'citizenship',
       'represents-israel',
     ])
+  })
+
+  it('accepts nationality as a distinct evidence basis', () => {
+    expect(eligibilityBasisSchema.parse('nationality')).toBe('nationality')
+  })
+
+  it('requires provider binding season and rejects unknown binding keys', () => {
+    const { season: _, ...withoutSeason } = registryBundleFixture.providerBindings[0]
+
+    expect(providerBindingSchema.safeParse(withoutSeason).success).toBe(false)
+    expect(providerBindingSchema.safeParse({
+      ...registryBundleFixture.providerBindings[0],
+      unexpected: true,
+    }).success).toBe(false)
+  })
+
+  it.each([
+    'NBA-2025-26',
+    '2025',
+    '2025-2026',
+    '2025-27',
+    '2025-25',
+    '1945-46',
+    '9999-00',
+    '0000-01',
+  ])('rejects malformed ESPN NBA binding season %s', (season) => {
+    expect(providerBindingSchema.safeParse({
+      ...registryBundleFixture.providerBindings[0],
+      provider: 'espn-nba',
+      sport: 'basketball',
+      competition: 'NBA',
+      season,
+    }).success).toBe(false)
+  })
+
+  it.each(['1946-47', '2025-26', '2099-00'])('accepts canonical ESPN NBA binding season %s', (season) => {
+    expect(providerBindingSchema.safeParse({
+      ...registryBundleFixture.providerBindings[0],
+      provider: 'espn-nba',
+      sport: 'basketball',
+      competition: 'NBA',
+      season,
+    }).success).toBe(true)
+  })
+
+  it('accepts the strict circuit activity shape', () => {
+    expect(circuitActivitySchema.parse(circuitActivity)).toEqual(circuitActivity)
+    expect(circuitActivitySchema.safeParse({ ...circuitActivity, competition: '   ' }).success).toBe(false)
+    expect(circuitActivitySchema.safeParse({ ...circuitActivity, season: '' }).success).toBe(false)
+  })
+
+  it('allows an international-circuit athlete with a verified current activity and no team affiliation or binding', () => {
+    expect(registryBundleSchema.safeParse(circuitRegistryFixture()).success).toBe(true)
+  })
+
+  it('allows a team athlete without a provider binding', () => {
+    const bundle = cloneRegistryFixture()
+    bundle.providerBindings = []
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(true)
+  })
+
+  it('rejects a public athlete with neither qualifying participation kind', () => {
+    const bundle = circuitRegistryFixture()
+    bundle.circuitActivities = []
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it('rejects a public athlete with both team and qualifying circuit participation', () => {
+    const bundle = cloneRegistryFixture()
+    bundle.circuitActivities.push(structuredClone(circuitActivity))
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it.each([
+    ['future effective time', (activity: Record<string, unknown>) => { activity.effectiveAt = '2026-07-23T08:00:00.001Z' }],
+    ['future source time', (activity: Record<string, unknown>) => {
+      ;(activity.source as Record<string, unknown>).retrievedAt = '2026-07-23T08:00:00.001Z'
+    }],
+    ['stale effective time', (activity: Record<string, unknown>) => { activity.effectiveAt = '2025-07-22T07:59:59.999Z' }],
+    ['pending status', (activity: Record<string, unknown>) => { activity.status = 'pending' }],
+    ['conflicting status', (activity: Record<string, unknown>) => { activity.status = 'conflicting' }],
+  ])('rejects an international-circuit athlete whose only activity has a %s', (_label, mutate) => {
+    const bundle = circuitRegistryFixture()
+    mutate(bundle.circuitActivities[0] as unknown as Record<string, unknown>)
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it('rejects duplicate circuit activity ids', () => {
+    const bundle = circuitRegistryFixture()
+    bundle.circuitActivities.push(structuredClone(bundle.circuitActivities[0]))
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it('rejects a circuit activity referencing an unknown athlete', () => {
+    const bundle = circuitRegistryFixture()
+    bundle.circuitActivities[0].athleteId = 'missing-athlete'
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it('accepts multiple qualifying activities with distinct effective times', () => {
+    const bundle = circuitRegistryFixture()
+    bundle.circuitActivities.push({
+      ...structuredClone(bundle.circuitActivities[0]),
+      id: 'activity-athlete-one-wimbledon-qualifying-2026',
+      effectiveAt: '2026-07-09T08:00:00.000Z',
+    })
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(true)
+  })
+
+  it('rejects ambiguous newest circuit activities at the same effective time', () => {
+    const bundle = circuitRegistryFixture()
+    bundle.circuitActivities.push({
+      ...structuredClone(bundle.circuitActivities[0]),
+      id: 'activity-athlete-one-wimbledon-doubles-2026',
+      discipline: 'doubles',
+    })
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it('rejects a verified circuit activity owned by a review non-circuit athlete', () => {
+    const bundle = cloneRegistryFixture()
+    bundle.circuitActivities.push({
+      ...structuredClone(circuitActivity),
+      id: 'activity-athlete-two-wimbledon-2026',
+      athleteId: 'athlete-two',
+    })
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it.each([
+    ['pending', (activity: Record<string, unknown>) => { activity.status = 'pending' }],
+    ['stale', (activity: Record<string, unknown>) => { activity.effectiveAt = '2025-07-22T07:59:59.999Z' }],
+  ])('rejects a %s circuit activity owned by a public non-circuit athlete', (_label, mutate) => {
+    const bundle = cloneRegistryFixture()
+    const activity = structuredClone(circuitActivity) as unknown as Record<string, unknown>
+    mutate(activity)
+    bundle.circuitActivities.push(activity as typeof circuitActivity)
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it('rejects an international-circuit activity owned by a non-tennis athlete', () => {
+    const bundle = circuitRegistryFixture()
+    bundle.athletes[0].sport = 'basketball'
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
+  })
+
+  it('rejects a circuit activity that differs from the athlete declared discipline', () => {
+    const bundle = circuitRegistryFixture()
+    bundle.circuitActivities[0].discipline = 'doubles'
+
+    expect(registryBundleSchema.safeParse(bundle).success).toBe(false)
   })
 
   it('accepts an optional para classification for a tennis athlete', () => {

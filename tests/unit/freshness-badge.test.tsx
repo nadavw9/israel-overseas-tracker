@@ -37,13 +37,17 @@ describe('FreshnessBadge', () => {
     vi.useRealTimers()
   })
 
-  it('keeps an aged unavailable observation identity-only', () => {
+  it.each([
+    ['not-integrated', /identity\/activity verified.*not integrated/i],
+    ['provider-unavailable', /identity\/activity verified · performance temporarily unavailable/i],
+  ] as const)('explains unavailable %s without reading a performance source', (reason, expected) => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-08-01T08:00:00.000Z'))
     render(<FreshnessBadge performance={{
-      ...performance(), status: 'unavailable', state: 'unavailable', stats: null,
+      status: 'unavailable', state: 'unavailable', stats: null, reason,
     }} />)
     expect(document.querySelector('.freshness--identity-only')).toBeInTheDocument()
+    expect(screen.getByText(expected)).toBeInTheDocument()
     vi.useRealTimers()
   })
 

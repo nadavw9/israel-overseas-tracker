@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "sync:data": "tsx scripts/sync-data.ts",
+    "refresh:performance": "tsx scripts/refresh-performance.ts",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:watch": "vitest",

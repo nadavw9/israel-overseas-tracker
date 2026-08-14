@@ -2,6 +2,7 @@ import { CircleMarker, MapContainer, Popup, TileLayer } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Athlete } from '../domain/athlete'
 import { useI18n } from '../i18n/context'
+import { hasTeamLocation } from '../services/participation'
 
 type AthleteMapProps = {
   athletes: Athlete[]
@@ -9,7 +10,7 @@ type AthleteMapProps = {
 }
 
 export function AthleteMap({ athletes, onOpen }: AthleteMapProps) {
-  const located = athletes.filter((athlete) => athlete.affiliation.location)
+  const located = athletes.filter(hasTeamLocation)
   const { locale, messages } = useI18n()
 
   return (
@@ -30,7 +31,7 @@ export function AthleteMap({ athletes, onOpen }: AthleteMapProps) {
             aria-label={messages.openMapAthlete(athlete.name[locale])}
           >
             <strong>{athlete.name[locale]}</strong>
-            <span>{athlete.affiliation.location!.city}</span>
+            <span>{athlete.participation.affiliation.location.city}</span>
           </button>
         ))}
       </div>
@@ -43,15 +44,15 @@ export function AthleteMap({ athletes, onOpen }: AthleteMapProps) {
           {located.map((athlete) => (
             <CircleMarker
               key={athlete.id}
-              center={[athlete.affiliation.location!.lat, athlete.affiliation.location!.lng]}
+              center={[athlete.participation.affiliation.location.lat, athlete.participation.affiliation.location.lng]}
               radius={9}
               pathOptions={{ color: '#071526', weight: 3, fillColor: '#47c7a5', fillOpacity: 1 }}
             >
               <Popup>
                 <div dir={locale === 'he' ? 'rtl' : 'ltr'}>
                   <strong>{athlete.name[locale]}</strong><br />
-                  {athlete.affiliation.organization.name}<br />
-                  {athlete.affiliation.location!.city}, {athlete.affiliation.location!.country}
+                  {athlete.participation.affiliation.organization.name}<br />
+                  {athlete.participation.affiliation.location.city}, {athlete.participation.affiliation.location.country}
                 </div>
               </Popup>
             </CircleMarker>

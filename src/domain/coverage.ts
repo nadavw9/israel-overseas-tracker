@@ -34,11 +34,19 @@ const coverageCountsSchema = z
     observed: z.number().int().nonnegative(),
     matched: z.number().int().nonnegative(),
     newCandidates: z.number().int().nonnegative(),
+    outOfScope: z.number().int().nonnegative().default(0),
+    unresolved: z.number().int().nonnegative().default(0),
     conflicts: z.number().int().nonnegative(),
   })
   .strict()
   .superRefine((counts, context) => {
-    const classifications = ['matched', 'newCandidates', 'conflicts'] as const
+    const classifications = [
+      'matched',
+      'newCandidates',
+      'outOfScope',
+      'unresolved',
+      'conflicts',
+    ] as const
 
     classifications.forEach((field) => {
       if (counts[field] > counts.observed) {
@@ -50,10 +58,12 @@ const coverageCountsSchema = z
       }
     })
 
-    if (counts.matched + counts.newCandidates + counts.conflicts !== counts.observed) {
+    const classified = counts.matched + counts.newCandidates + counts.outOfScope +
+      counts.unresolved + counts.conflicts
+    if (classified !== counts.observed) {
       context.addIssue({
         code: 'custom',
-        message: 'matched, newCandidates, and conflicts must classify every observed record',
+        message: 'matched, newCandidates, outOfScope, unresolved, and conflicts must classify every observed record',
         path: ['observed'],
       })
     }
@@ -107,6 +117,14 @@ export const coverageEntrySchema = z
         code: 'custom',
         message: 'Healthy coverage entries require classification counts',
         path: ['counts'],
+      })
+    }
+
+    if (entry.health === 'healthy' && entry.counts && entry.counts.unresolved > 0) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Healthy coverage entries cannot contain unresolved observed records',
+        path: ['counts', 'unresolved'],
       })
     }
   })
@@ -169,6 +187,7 @@ export const coverageSummarySchema = z
     required: z.number().int().nonnegative(),
     healthy: z.number().int().nonnegative(),
     complete: z.boolean(),
+    entries: z.array(coverageEntrySchema).optional(),
   })
   .strict()
   .superRefine((summary, context) => {
@@ -188,9 +207,65 @@ export const coverageSummarySchema = z
         path: ['complete'],
       })
     }
+
+    if (summary.entries !== undefined) {
+      if (summary.entries.length !== summary.required) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Coverage entry count must match required count',
+          path: ['entries'],
+        })
+      }
+
+      const healthyEntries = summary.entries.filter((entry) => entry.health === 'healthy').length
+      if (healthyEntries !== summary.healthy) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Coverage healthy count must match healthy entries',
+          path: ['healthy'],
+        })
+      }
+    }
   })
 
 export type CoverageSummary = z.output<typeof coverageSummarySchema>
+export type PublicCoverageEntry = z.output<typeof coverageEntrySchema>
+
+function isEntryHealthyAt(entry: CoverageLedger['entries'][number], summaryMilliseconds: number) {
+  if (entry.health !== 'healthy' || entry.lastSuccessAt === undefined) return false
+  const successMilliseconds = new Date(entry.lastSuccessAt).getTime()
+  const ageMilliseconds = summaryMilliseconds - successMilliseconds
+  return ageMilliseconds >= 0 &&
+    ageMilliseconds <= entry.freshnessWindowDays * 24 * 60 * 60 * 1000
+}
+
+function staleLimitation(entry: CoverageLedger['entries'][number]) {
+  return [
+    ...entry.limitations,
+    'The latest successful scan is outside this universe freshness window.',
+  ]
+}
+
+export function publicCoverageEntries(ledger: CoverageLedger, asOf?: Date): PublicCoverageEntry[] {
+  const summaryInstant = asOf ?? new Date(ledger.generatedAt)
+  const summaryMilliseconds = summaryInstant.getTime()
+  const ledgerMilliseconds = new Date(ledger.generatedAt).getTime()
+  if (!Number.isFinite(summaryMilliseconds) || ledgerMilliseconds > summaryMilliseconds) {
+    throw new Error('Coverage ledger cannot be generated after the summary clock')
+  }
+
+  return ledger.entries.map((entry) => {
+    if (entry.health !== 'healthy' || isEntryHealthyAt(entry, summaryMilliseconds)) {
+      return coverageEntrySchema.parse(entry)
+    }
+
+    return coverageEntrySchema.parse({
+      ...entry,
+      health: 'stale',
+      limitations: staleLimitation(entry),
+    })
+  })
+}
 
 export function summarizeCoverage(ledger: CoverageLedger, asOf?: Date) {
   const summaryInstant = asOf ?? new Date(ledger.generatedAt)
@@ -200,13 +275,20 @@ export function summarizeCoverage(ledger: CoverageLedger, asOf?: Date) {
     throw new Error('Coverage ledger cannot be generated after the summary clock')
   }
   const required = ledger.entries.length
-  const healthy = ledger.entries.filter((entry) => {
-    if (entry.health !== 'healthy' || entry.lastSuccessAt === undefined) return false
-    const ageMilliseconds = summaryMilliseconds - new Date(entry.lastSuccessAt).getTime()
-    return ageMilliseconds >= 0 &&
-      ageMilliseconds <= entry.freshnessWindowDays * 24 * 60 * 60 * 1000
-  }).length
+  const healthy = ledger.entries.filter((entry) => isEntryHealthyAt(entry, summaryMilliseconds)).length
   return coverageSummarySchema.parse({ required, healthy, complete: required > 0 && required === healthy })
 }
 
 export const summarizeCoverageLedger = summarizeCoverage
+
+export function publicCoverageFromLedger(ledger: CoverageLedger, asOf?: Date): CoverageSummary {
+  const entries = publicCoverageEntries(ledger, asOf)
+  const required = entries.length
+  const healthy = entries.filter((entry) => entry.health === 'healthy').length
+  return coverageSummarySchema.parse({
+    required,
+    healthy,
+    complete: required > 0 && required === healthy,
+    entries,
+  })
+}
