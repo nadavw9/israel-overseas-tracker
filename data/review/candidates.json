@@ -180,21 +180,6 @@
     "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
   },
   {
-    "id": "nikita-stoioanov",
-    "name": { "en": "Nikita Stoioanov" },
-    "sport": "football",
-    "tier": "senior-professional",
-    "genderCategory": "men",
-    "state": "needs-evidence",
-    "signals": [{
-      "sourceUrl": "https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3",
-      "sourceType": "primary-verification",
-      "discoveredAt": "2026-08-09T14:35:00.000Z",
-      "note": "Observed in the official IFA 2026 senior men's Team Squad roster; current overseas affiliation has not yet been independently verified."
-    }],
-    "reviewerNote": "Keep private until a current foreign-club source and approved localized name are verified."
-  },
-  {
     "id": "yarin-levi",
     "name": { "en": "Yarin Levi" },
     "sport": "football",

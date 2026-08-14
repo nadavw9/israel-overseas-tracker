@@ -50,7 +50,7 @@
       "lastAttemptAt": "2026-08-09T14:35:00.000Z",
       "lastSuccessAt": "2026-08-09T14:35:00.000Z",
       "health": "partial",
-      "counts": { "observed": 24, "matched": 10, "newCandidates": 14, "outOfScope": 0, "unresolved": 0, "conflicts": 0 },
+      "counts": { "observed": 24, "matched": 11, "newCandidates": 13, "outOfScope": 0, "unresolved": 0, "conflicts": 0 },
       "limitations": [
         "The official IFA senior men's roster has been enumerated into public matches and review-queue candidates, but non-public rows still require independent current foreign-club verification before publication."
       ]

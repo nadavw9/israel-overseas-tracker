@@ -31,6 +31,7 @@ describe('registry compiler', () => {
       'idan-nachmias',
       'gavriel-kanikovsky',
       'anan-khalaili',
+      'nikita-stoinov',
       'talia-sommer',
       'vital-kats',
       'lina-glushko',
@@ -125,7 +126,7 @@ describe('registry compiler', () => {
 
   it('publishes football men only when eligibility and current overseas affiliation are independently verified', () => {
     expect(publicRegistry.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'men'))
-      .toHaveLength(16)
+      .toHaveLength(17)
 
     expect(publicRegistry.find(({ id }) => id === 'stav-lemkin')).toMatchObject({
       name: { en: 'Stav Lemkin', he: 'סתיו למקין' },
@@ -319,6 +320,22 @@ describe('registry compiler', () => {
         },
       },
     })
+
+    expect(publicRegistry.find(({ id }) => id === 'nikita-stoinov')).toMatchObject({
+      aliases: ['Nikita Stoyanov', 'Nikita Stoioanov'],
+      eligibility: {
+        publisher: 'Israel Football Association',
+        sourceUrl: 'https://www.football.org.il/national-team-player/?player_id=164227',
+      },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'FC Dinamo 1948 București', country: 'Romania' },
+          competition: 'Romanian SuperLiga',
+          source: { publisher: 'FC Dinamo 1948 București', sourceUrl: 'https://dinamo1948.ro/team/nikita-stoinov/' },
+        },
+      },
+    })
   })
 })
 
@@ -341,7 +358,6 @@ describe('candidate queue', () => {
       'guy-mizrahi',
       'roy-revivo',
       'itay-rotman',
-      'nikita-stoioanov',
       'yarin-levi',
       'eliel-peretz',
       'yarden-shua',
@@ -403,7 +419,7 @@ describe('candidate queue', () => {
     expect(candidates.find(({ id }) => id === 'sofiia-nagornaia')?.signals[0]?.sourceUrl)
       .toBe('https://wtafiles.wtatennis.com/pdf/rankings/Singles_Numeric.pdf')
     expect(candidates.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'men'))
-      .toHaveLength(14)
+      .toHaveLength(13)
     expect(candidates.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'women'))
       .toHaveLength(22)
     expect(candidates.find(({ id }) => id === 'shon-abaev')?.name.he).toBeUndefined()
