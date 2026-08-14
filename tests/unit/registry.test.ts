@@ -439,6 +439,12 @@ describe('candidate queue', () => {
     expect(candidates.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'women'))
       .toHaveLength(22)
     expect(candidates.find(({ id }) => id === 'shon-abaev')?.name.he).toBeUndefined()
+    expect(candidates.find(({ id }) => id === 'shon-abaev')?.signals).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        sourceUrl: 'https://seminoles.com/sports/mens-basketball/roster/shon-abaev/8548',
+        sourceType: 'primary-verification',
+      }),
+    ]))
     expect(zeev?.signals.some(({ note }) => /USA representation/i.test(note))).toBe(true)
     expect(zeev?.reviewerNote).toMatch(/rejected/i)
     expect(candidates.some(({ id }) => publicIds.has(id))).toBe(false)

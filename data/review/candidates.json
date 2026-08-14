@@ -581,8 +581,13 @@
       "sourceType": "primary-verification",
       "discoveredAt": "2026-08-08T08:00:00.000Z",
       "note": "FIBA lists Israeli nationality, but an approved primary Hebrew localized name has not been captured."
+    }, {
+      "sourceUrl": "https://seminoles.com/sports/mens-basketball/roster/shon-abaev/8548",
+      "sourceType": "primary-verification",
+      "discoveredAt": "2026-08-14T04:15:00.000Z",
+      "note": "Florida State's official 2026-27 roster confirms current college affiliation; the approved primary Hebrew localized name is still missing."
     }],
-    "reviewerNote": "Eligibility evidence exists; keep private until an approved primary source supplies the Hebrew localized name, then revalidate current affiliation at promotion."
+    "reviewerNote": "Eligibility and current college affiliation are verified; keep private until an approved primary source supplies the Hebrew localized name."
   },
   {
     "id": "nir-tichon",

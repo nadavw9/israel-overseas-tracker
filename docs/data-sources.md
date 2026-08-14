@@ -47,7 +47,7 @@ The official [WTA Singles Rankings numeric PDF](https://wtafiles.wtatennis.com/p
 
 ## Private review inputs
 
-- Shon Abaev has an official [FIBA nationality record](https://www.fiba.basketball/en/players/362507-shon-abaev), but the approved localized Hebrew name and current affiliation are not yet independently verified.
+- Shon Abaev has an official [FIBA nationality record](https://www.fiba.basketball/en/players/362507-shon-abaev) and [Florida State 2026-27 roster entry](https://seminoles.com/sports/mens-basketball/roster/shon-abaev/8548); the approved localized Hebrew name is still missing, so he remains private.
 - Sofiia Nagornaia has an official WTA numeric-ranking row with `Nat ISR`, but independent eligibility and localized-name corroboration have not yet been captured for public promotion.
 - The official IFA [senior men's Team Squad](https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=3) and [senior women's Team Squad](https://www.football.org.il/en/national-team/?itemid=%7BF5FA369D-4E38-4D35-8BB9-3948CC7B16E4%7D&national_team_id=377) have been enumerated into public matches and review-queue candidates. Non-public rows still require independent current foreign-club verification before publication.
 - The [2026 IIHF Israel men's roster](https://www.iihf.com/en/events/2026/wmiib/teams/roster/68052/israel) and [women's roster](https://www.iihf.com/en/events/2026/wwiiib/teams/roster/68222/israel) are eligibility signals. Tournament-time club fields are not treated as proof of a current 2026-27 club.
