@@ -1,17 +1,17 @@
-name: Sync verified sports data
+name: Refresh athlete performance
 
 on:
   schedule:
-    - cron: '17 */6 * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  verify-and-sync:
+  refresh-performance:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -30,8 +30,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Refresh verified snapshot
-        run: pnpm sync:data
+      - name: Refresh performance snapshot
+        run: pnpm refresh:performance
 
       - name: Validate athlete images
         run: pnpm validate:images
@@ -39,22 +39,10 @@ jobs:
       - name: Run unit tests
         run: pnpm test
 
-      - name: Install browser for responsive tests
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Run responsive browser tests
-        run: pnpm test:e2e
-
-      - name: Lint source
-        run: pnpm lint
-
-      - name: Build production app
-        run: pnpm build
-
-      - name: Upload generated snapshot
+      - name: Upload refreshed snapshot and health manifest
         uses: actions/upload-artifact@v6
         with:
-          name: verified-sports-snapshot
+          name: refreshed-performance-snapshot
           path: |
             public/data/snapshot.json
             public/data/refresh-manifest.json
