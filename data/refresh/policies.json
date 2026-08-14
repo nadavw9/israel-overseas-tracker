@@ -1,0 +1,38 @@
+[
+  {
+    "id": "basketball-nba",
+    "sport": "basketball",
+    "competition": "NBA",
+    "cadenceMinutes": 360,
+    "activeEventCadenceMinutes": 1,
+    "retentionHours": 48,
+    "access": "licensed-or-permitted"
+  },
+  {
+    "id": "hockey-nhl",
+    "sport": "hockey",
+    "competition": "NHL",
+    "cadenceMinutes": 360,
+    "activeEventCadenceMinutes": 1,
+    "retentionHours": 48,
+    "access": "licensed-or-permitted"
+  },
+  {
+    "id": "football-default",
+    "sport": "football",
+    "competition": "*",
+    "cadenceMinutes": 1440,
+    "activeEventCadenceMinutes": 15,
+    "retentionHours": 72,
+    "access": "licensed-or-permitted"
+  },
+  {
+    "id": "tennis-default",
+    "sport": "tennis",
+    "competition": "*",
+    "cadenceMinutes": 1440,
+    "activeEventCadenceMinutes": 15,
+    "retentionHours": 72,
+    "access": "licensed-or-permitted"
+  }
+]
