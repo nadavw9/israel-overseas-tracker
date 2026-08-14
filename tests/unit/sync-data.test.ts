@@ -16,6 +16,7 @@ import {
   resolveSyncNow,
   writeSnapshotAtomically,
 } from '../../scripts/sync-data'
+import type { ProviderAdapterMap } from '../../scripts/providers/types'
 
 const generatedAt = '2026-08-08T08:00:00.000Z'
 const coverage = { required: 4, healthy: 0, complete: false } as const
@@ -642,6 +643,38 @@ describe('buildSnapshot', () => {
 })
 
 describe('fetchProviderRecord', () => {
+  it('dispatches through the injected adapter map', async () => {
+    const adapters: ProviderAdapterMap = {
+      'espn-nba': async ({ entry: current }) => ({
+        athleteId: current.id,
+        ...providerContext,
+        stats: null,
+        state: 'final',
+        sourceUrl: 'https://example.com/provider',
+        retrievedAt: generatedAt,
+      }),
+    }
+
+    const result = await fetchProviderRecord(
+      entry,
+      async () => new Response(null, { status: 200 }),
+      new Date(generatedAt),
+      { adapters },
+    )
+
+    expect(result.athleteId).toBe(entry.id)
+    expect(result.sourceUrl).toBe('https://example.com/provider')
+  })
+
+  it('rejects a binding when its provider is missing from the injected adapter map', async () => {
+    await expect(fetchProviderRecord(
+      entry,
+      async () => new Response(null, { status: 200 }),
+      new Date(generatedAt),
+      { adapters: {} },
+    )).rejects.toThrow(/adapter.*espn-nba|provider.*espn-nba/i)
+  })
+
   it('uses a season-specific ESPN endpoint whose payload verifies athlete and season', async () => {
     const requestedUrls: string[] = []
     const fakeFetch: typeof fetch = async (input) => {

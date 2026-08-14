@@ -3,10 +3,8 @@ import { randomUUID } from 'node:crypto'
 import { dirname, extname, join, basename } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { z } from 'zod'
-import { parseCuratedRecord } from './providers/curated'
-import { parseNbaFixture, parseNbaSeasonEndingYear } from './providers/nba'
-import { parseNhlFixture } from './providers/nhl'
-import type { ProviderResult } from './providers/types'
+import { defaultProviderAdapters } from './providers/registry'
+import type { ProviderAdapterMap, ProviderResult } from './providers/types'
 import { compilePublicRegistry, type RegistryAthlete } from '../src/data/registry'
 import { registryMigrationInstant } from '../src/domain/registry'
 import {
@@ -34,60 +32,24 @@ import {
 import { buildSnapshot, type PreviousSnapshot } from '../src/services/snapshot'
 
 const snapshotUrl = new URL('../public/data/snapshot.json', import.meta.url)
-const curatedDataUrl = new URL('../data/curated-stats.json', import.meta.url)
 const coverageLedgerUrl = new URL('../data/coverage/ledger.json', import.meta.url)
 
 export async function fetchProviderRecord(
   entry: RegistryAthlete,
   fetcher: typeof fetch = fetch,
   now: Date = new Date(),
+  options: { adapters?: ProviderAdapterMap } = {},
 ): Promise<ProviderResult> {
-  const retrievedAt = now.toISOString()
   const binding = entry.binding
   if (binding === undefined) {
     throw new Error(`Provider binding required for ${entry.id}`)
   }
 
-  if (binding.provider === 'curated') {
-    const records = JSON.parse(await readFile(curatedDataUrl, 'utf8')) as Record<
-      string,
-      unknown
-    >
-    return parseCuratedRecord(entry.id, records[binding.externalId])
+  const adapter = (options.adapters ?? defaultProviderAdapters)[binding.provider]
+  if (adapter === undefined) {
+    throw new Error(`Provider adapter missing for ${binding.provider}`)
   }
-
-  if (binding.provider === 'espn-nba') {
-    const seasonYear = parseNbaSeasonEndingYear(binding.season)
-    const sourceUrl = `https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/${seasonYear}/types/2/athletes/${binding.externalId}/statistics?lang=en&region=us`
-    const response = await fetcher(sourceUrl)
-    if (!response.ok) {
-      throw new Error(`ESPN returned HTTP ${response.status} for ${entry.id}`)
-    }
-    return parseNbaFixture(await response.json(), {
-      athleteId: entry.id,
-      externalId: binding.externalId,
-      seasonYear,
-      season: binding.season,
-      sourceUrl,
-      retrievedAt,
-    })
-  }
-
-  const sourceUrl = `https://api-web.nhle.com/v1/player/${binding.externalId}/landing`
-  const response = await fetcher(sourceUrl)
-  if (!response.ok) {
-    throw new Error(`NHL returned HTTP ${response.status} for ${entry.id}`)
-  }
-  const seasonId = Number(binding.season.replace('-', '20'))
-  return parseNhlFixture(await response.json(), {
-    athleteId: entry.id,
-    externalId: binding.externalId,
-    expectedName: entry.name.en,
-    seasonId,
-    season: binding.season,
-    sourceUrl,
-    retrievedAt,
-  })
+  return adapter({ entry, fetcher, now })
 }
 
 const nonEmptyStringSchema = z.string().trim().min(1)
