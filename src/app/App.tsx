@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Athlete, AthleteSnapshot } from '../domain/athlete'
+import type { RefreshManifest } from '../domain/refresh'
 import { AppHeader } from '../components/AppHeader'
 import { AthleteCard } from '../components/AthleteCard'
 import { AthleteDrawer } from '../components/AthleteDrawer'
@@ -17,6 +18,7 @@ import './styles.css'
 
 type TrackerAppProps = {
   snapshot: AthleteSnapshot
+  refreshManifest?: RefreshManifest | null
 }
 
 function matchesQuery(athlete: Athlete, query: string): boolean {
@@ -48,7 +50,7 @@ function matchesQuery(athlete: Athlete, query: string): boolean {
   return haystack.includes(query.trim().toLocaleLowerCase())
 }
 
-export function TrackerApp({ snapshot }: TrackerAppProps) {
+export function TrackerApp({ snapshot, refreshManifest = null }: TrackerAppProps) {
   const [query, setQuery] = useState('')
   const [filters, setFilters] = useState<DirectoryFilters>({
     sport: 'all',
@@ -113,7 +115,10 @@ export function TrackerApp({ snapshot }: TrackerAppProps) {
   return (
     <I18nContext.Provider value={{ locale, messages: copy }}>
     <div className="tracker-shell">
-      <AppHeader onToggleLocale={() => setLocale(locale === 'en' ? 'he' : 'en')} />
+      <AppHeader
+        onToggleLocale={() => setLocale(locale === 'en' ? 'he' : 'en')}
+        refreshManifest={refreshManifest}
+      />
       <main>
         <section className="hero" aria-labelledby="tracker-title">
           <div className="hero__glow" aria-hidden="true" />

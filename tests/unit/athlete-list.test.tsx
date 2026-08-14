@@ -5,11 +5,22 @@ import snapshotJson from '../../public/data/snapshot.json'
 import { TrackerApp } from '../../src/app/App'
 import { athleteSchema, snapshotSchema } from '../../src/domain/athlete'
 import type { Athlete } from '../../src/domain/athlete'
+import { refreshManifestSchema } from '../../src/domain/refresh'
 import { messages } from '../../src/i18n/messages'
 
 const snapshot = snapshotSchema.parse(snapshotJson)
 const deni = snapshot.athletes.find((athlete) => athlete.id === 'deni-avdija')!
 const oscar = snapshot.athletes.find((athlete) => athlete.id === 'oscar-gloukh')!
+const refreshManifest = refreshManifestSchema.parse({
+  generatedAt: snapshot.generatedAt,
+  snapshotGeneratedAt: snapshot.generatedAt,
+  durationMs: 42,
+  unboundSkipped: 33,
+  providers: [
+    { provider: 'curated', attempted: 1, succeeded: 1, failed: 0, skipped: 0, durationMs: 42 },
+    { provider: 'espn-nba', attempted: 3, succeeded: 3, failed: 0, skipped: 0, durationMs: 42 },
+  ],
+})
 
 function circuitAthlete(): Athlete {
   return athleteSchema.parse({
@@ -46,6 +57,15 @@ function renderSearchFixture() {
 }
 
 describe('verified athlete list', () => {
+  it('shows global refresh health and remains usable without a manifest', () => {
+    render(<TrackerApp snapshot={snapshot} refreshManifest={refreshManifest} />)
+    expect(screen.getByText(/Last refresh/)).toBeInTheDocument()
+    expect(screen.getByText(/37 athletes checked/)).toBeInTheDocument()
+
+    render(<TrackerApp snapshot={snapshot} refreshManifest={null} />)
+    expect(screen.getAllByText('Refresh status unavailable')).not.toHaveLength(0)
+  })
+
   it('shows the expanded verified count and honest source freshness', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(snapshot.generatedAt))
