@@ -159,14 +159,28 @@ export const providerBindingSchema = z
   })
   .strict()
   .superRefine((binding, context) => {
-    if (binding.provider !== 'espn-nba') return
-
-    if (!isCanonicalNbaSeason(binding.season)) {
+    if (binding.provider === 'espn-nba' && !isCanonicalNbaSeason(binding.season)) {
       context.addIssue({
         code: 'custom',
         message: 'ESPN NBA seasons must use canonical consecutive YYYY-YY format',
         path: ['season'],
       })
+    }
+
+    if (binding.provider === 'sportradar-soccer') {
+      const [seasonId, competitorId, playerId] = binding.externalId.split('|')
+      const urns = [seasonId, competitorId, playerId]
+      const valid = urns.length === 3 && urns.every((urn, index) => {
+        const expected = ['season', 'competitor', 'player'][index]
+        return urn !== undefined && new RegExp(`^sr:${expected}:[A-Za-z0-9_-]+$`).test(urn)
+      })
+      if (!valid) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Sportradar Soccer bindings must use season|competitor|player URNs',
+          path: ['externalId'],
+        })
+      }
     }
   })
 
@@ -302,6 +316,7 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
     const providerSport = {
       'espn-nba': 'basketball',
       nhl: 'hockey',
+      'sportradar-soccer': 'football',
     } as const
     const providerIdentities = new Set<string>()
     bundle.providerBindings.forEach((binding, index) => {

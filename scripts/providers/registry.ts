@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { parseCuratedRecord } from './curated'
 import { parseNbaFixture, parseNbaSeasonEndingYear } from './nba'
 import { parseNhlFixture } from './nhl'
+import { parseSportradarSoccerExternalId, parseSportradarSoccerFixture } from './soccer'
 import type { ProviderAdapter, ProviderAdapterMap } from './types'
 
 const curatedDataUrl = new URL('../../data/curated-stats.json', import.meta.url)
@@ -65,8 +66,46 @@ const nhlAdapter: ProviderAdapter = async ({ entry, fetcher, now }) => {
   })
 }
 
+const sportradarSoccerAdapter: ProviderAdapter = async ({ entry, fetcher, now }) => {
+  const binding = entry.binding
+  if (binding === undefined || binding.provider !== 'sportradar-soccer') {
+    throw new Error(`Sportradar Soccer binding required for ${entry.id}`)
+  }
+  const apiKey = process.env.SPORTRADAR_SOCCER_API_KEY
+  if (!apiKey) {
+    throw new Error('Sportradar Soccer adapter disabled: SPORTRADAR_SOCCER_API_KEY is not configured')
+  }
+  const accessLevel = process.env.SPORTRADAR_SOCCER_ACCESS_LEVEL ?? 'trial'
+  if (accessLevel !== 'trial' && accessLevel !== 'production') {
+    throw new Error(`Unsupported Sportradar Soccer access level: ${accessLevel}`)
+  }
+
+  const { seasonId, competitorId, playerId } = parseSportradarSoccerExternalId(binding.externalId)
+  const retrievedAt = now.toISOString()
+  const sourceUrl = `https://api.sportradar.com/soccer/${accessLevel}/v4/en/seasons/${seasonId}/competitors/${competitorId}/statistics.json`
+  const response = await fetcher(sourceUrl, {
+    headers: { accept: 'application/json', 'x-api-key': apiKey },
+  })
+  if (!response.ok) {
+    throw new Error(`Sportradar Soccer returned HTTP ${response.status} for ${entry.id}`)
+  }
+
+  return parseSportradarSoccerFixture(await response.json(), {
+    athleteId: entry.id,
+    expectedName: entry.name.en,
+    season: binding.season,
+    competition: binding.competition,
+    seasonId,
+    competitorId,
+    playerId,
+    sourceUrl,
+    retrievedAt,
+  })
+}
+
 export const defaultProviderAdapters: ProviderAdapterMap = {
   curated: curatedAdapter,
   'espn-nba': espnNbaAdapter,
   nhl: nhlAdapter,
+  'sportradar-soccer': sportradarSoccerAdapter,
 }

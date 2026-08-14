@@ -62,6 +62,6 @@ The ledger declares seven bounded universes: ATP men, WTA women, IFA senior men 
 
 ## Performance retention and rights
 
-The only currently bound statistics adapters are scheduled ESPN NBA observations and the curated football adapter. Provider failure may reuse an exact matching, verified, non-null performance observation for at most 48 hours, including the boundary; otherwise the athlete remains public with source-free unavailable performance. A public webpage or endpoint is not by itself permission for systematic retrieval or republication. See [sports-data-strategy.md](sports-data-strategy.md) for the provider and licensing plan.
+The only currently bound statistics adapters are scheduled ESPN NBA observations and the curated football identity adapter. A credential-gated Sportradar Soccer adapter is implemented but has no public bindings until a coverage entitlement and data-use agreement are verified. Provider failure may reuse an exact matching, verified, non-null performance observation for at most 48 hours, including the boundary; otherwise the athlete remains public with source-free unavailable performance. A public webpage or endpoint is not by itself permission for systematic retrieval or republication. See [sports-data-strategy.md](sports-data-strategy.md) for the provider and licensing plan.
 
 The public snapshot contains zero approved athlete images. Official portraits are not copied merely because they appear on an official page.

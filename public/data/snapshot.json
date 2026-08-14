@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-14T19:07:22.134Z",
+  "generatedAt": "2026-08-14T20:46:02.858Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -59,7 +59,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-14T19:07:22.134Z"
+          "retrievedAt": "2026-08-14T20:46:02.858Z"
         }
       }
     },
@@ -121,7 +121,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5242502/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-14T19:07:22.134Z"
+          "retrievedAt": "2026-08-14T20:46:02.858Z"
         }
       }
     },
@@ -179,7 +179,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5107173/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-14T19:07:22.134Z"
+          "retrievedAt": "2026-08-14T20:46:02.858Z"
         }
       }
     },

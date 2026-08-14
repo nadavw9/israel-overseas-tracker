@@ -86,7 +86,7 @@ export const rosterStatusSchema = z.enum([
   'unknown',
 ])
 
-export const providerSchema = z.enum(['espn-nba', 'nhl', 'curated'])
+export const providerSchema = z.enum(['espn-nba', 'nhl', 'curated', 'sportradar-soccer'])
 
 export type ProviderId = z.infer<typeof providerSchema>
 

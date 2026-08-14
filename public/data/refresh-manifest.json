@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-08-14T19:07:22.134Z",
-  "snapshotGeneratedAt": "2026-08-14T19:07:22.134Z",
-  "durationMs": 1220,
+  "generatedAt": "2026-08-14T20:46:02.858Z",
+  "snapshotGeneratedAt": "2026-08-14T20:46:02.858Z",
+  "durationMs": 1206,
   "unboundSkipped": 33,
   "providers": [
     {
@@ -10,7 +10,7 @@
       "succeeded": 1,
       "failed": 0,
       "skipped": 0,
-      "durationMs": 3
+      "durationMs": 1
     },
     {
       "provider": "espn-nba",
@@ -18,7 +18,7 @@
       "succeeded": 3,
       "failed": 0,
       "skipped": 0,
-      "durationMs": 1158
+      "durationMs": 1155
     }
   ]
 }

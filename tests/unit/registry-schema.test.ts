@@ -179,6 +179,20 @@ describe('normalized registry schemas', () => {
     }).success).toBe(true)
   })
 
+  it('validates Sportradar Soccer composite identity bindings', () => {
+    const binding = {
+      ...registryBundleFixture.providerBindings[0],
+      provider: 'sportradar-soccer',
+      sport: 'football',
+      competition: 'MLS',
+      season: '2025',
+      externalId: 'sr:season:127179|sr:competitor:2502|sr:player:45970',
+    }
+    expect(providerBindingSchema.safeParse(binding).success).toBe(true)
+    expect(providerBindingSchema.safeParse({ ...binding, externalId: 'season|competitor|player' }).success).toBe(false)
+    expect(providerBindingSchema.safeParse({ ...binding, externalId: 'sr:season:127179|sr:player:45970|sr:competitor:2502' }).success).toBe(false)
+  })
+
   it('accepts the strict circuit activity shape', () => {
     expect(circuitActivitySchema.parse(circuitActivity)).toEqual(circuitActivity)
     expect(circuitActivitySchema.safeParse({ ...circuitActivity, competition: '   ' }).success).toBe(false)

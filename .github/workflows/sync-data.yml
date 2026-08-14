@@ -31,6 +31,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Refresh verified snapshot
+        env:
+          SPORTRADAR_SOCCER_API_KEY: ${{ secrets.SPORTRADAR_SOCCER_API_KEY }}
+          SPORTRADAR_SOCCER_ACCESS_LEVEL: production
         run: pnpm sync:data
 
       - name: Validate athlete images

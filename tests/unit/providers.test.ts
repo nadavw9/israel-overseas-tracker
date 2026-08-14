@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import deniFixture from '../../data/fixtures/nba-deni.json'
 import zeevFixture from '../../data/fixtures/nhl-zeev.json'
+import soccerFixture from '../../data/fixtures/sportradar-soccer.json'
 import { parseCuratedRecord } from '../../scripts/providers/curated'
 import { parseNbaFixture, parseNbaSeasonEndingYear } from '../../scripts/providers/nba'
 import { parseNhlFixture } from '../../scripts/providers/nhl'
+import { parseSportradarSoccerExternalId, parseSportradarSoccerFixture } from '../../scripts/providers/soccer'
 import * as providerTypes from '../../scripts/providers/types'
 
 const providerResultSchema = (providerTypes as unknown as {
@@ -150,6 +152,56 @@ describe('NHL provider', () => {
       seasonId: 20252026, season: '2025-26',
       sourceUrl: 'https://api-web.nhle.com/v1/player/8484798/landing', retrievedAt: '2026-07-19T08:00:00.000Z',
     })).toThrow(/player|identity/i)
+  })
+})
+
+describe('Sportradar Soccer provider', () => {
+  const options = {
+    athleteId: 'liel-abada',
+    expectedName: 'Liel Abada',
+    season: '2025',
+    competition: 'MLS',
+    seasonId: 'sr:season:127179',
+    competitorId: 'sr:competitor:2502',
+    playerId: 'sr:player:45970',
+    sourceUrl: 'https://api.sportradar.com/soccer/trial/v4/en/seasons/sr:season:127179/competitors/sr:competitor:2502/statistics.json',
+    retrievedAt: '2026-08-14T19:20:00.000Z',
+  } as const
+
+  it('maps season totals and verifies the season, club, player id, and name', () => {
+    const result = parseSportradarSoccerFixture(soccerFixture, options)
+
+    expect(result).toMatchObject({
+      athleteId: 'liel-abada',
+      sport: 'football',
+      competition: 'MLS',
+      season: '2025',
+      observedOrganization: 'Charlotte FC',
+      state: 'final',
+      stats: { kind: 'football', appearances: 16, goals: 7, assists: 4 },
+    })
+  })
+
+  it('accepts the provider surname-first name format but rejects another player', () => {
+    expect(parseSportradarSoccerExternalId('sr:season:127179|sr:competitor:2502|sr:player:45970'))
+      .toEqual({
+        seasonId: 'sr:season:127179',
+        competitorId: 'sr:competitor:2502',
+        playerId: 'sr:player:45970',
+      })
+    expect(() => parseSportradarSoccerFixture(soccerFixture, {
+      ...options,
+      playerId: 'sr:player:99999',
+    })).toThrow(/missing|duplicated/i)
+    expect(() => parseSportradarSoccerFixture(soccerFixture, {
+      ...options,
+      expectedName: 'Another Player',
+    })).toThrow(/identity/i)
+  })
+
+  it('rejects malformed composite bindings', () => {
+    expect(() => parseSportradarSoccerExternalId('sr:season:127179|sr:competitor:2502')).toThrow(/season\|competitor\|player/i)
+    expect(() => parseSportradarSoccerExternalId('bad|sr:competitor:2502|sr:player:45970')).toThrow()
   })
 })
 

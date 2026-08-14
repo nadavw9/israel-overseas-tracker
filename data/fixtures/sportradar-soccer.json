@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-08-14T19:20:00+00:00",
+  "season": {
+    "id": "sr:season:127179",
+    "name": "MLS 2025",
+    "start_date": "2025-02-22",
+    "end_date": "2025-12-08",
+    "year": "2025",
+    "competition_id": "sr:competition:242",
+    "sport": { "id": "sr:sport:1", "name": "Soccer" }
+  },
+  "competitor": {
+    "id": "sr:competitor:2502",
+    "name": "Charlotte FC",
+    "country": "USA",
+    "country_code": "USA",
+    "abbreviation": "CLT",
+    "gender": "male",
+    "statistics": { "matches_played": 24, "goals_scored": 32 },
+    "players": [
+      {
+        "id": "sr:player:45970",
+        "name": "Abada, Liel",
+        "statistics": {
+          "assists": 4,
+          "goals_scored": 7,
+          "matches_played": 16
+        }
+      }
+    ]
+  }
+}

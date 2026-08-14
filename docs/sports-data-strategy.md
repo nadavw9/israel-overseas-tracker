@@ -17,6 +17,14 @@ The fail-closed worker runs from `.github/workflows/refresh-performance.yml` eve
 
 The 30-minute schedule is a bounded polling SLA, not a claim of second-by-second live coverage. Live or near-live behavior is only possible when a licensed provider and competition-specific entitlement exist. The current public snapshot has 37 verified athletes, four adapter-bound records, and three numeric performance records; the remaining 33 are still published as identity records with explicit `not-integrated` performance status. A hosting deployment must publish the generated artifact after the workflow succeeds; the repository workflow intentionally does not commit or deploy data on its own.
 
+### First football provider: Sportradar Soccer
+
+The first production adapter targets Sportradar Soccer v4 seasonal competitor statistics. The endpoint returns team context and player season totals, including appearances, goals, and assists, and documents a 30-second cache/update interval for this feed. The adapter accepts a verified composite binding in the form `sr:season:<id>|sr:competitor:<id>|sr:player:<id>`, checks all three identifiers and the provider's player name, and sends the API key only in the `x-api-key` header. It never calls the provider when `SPORTRADAR_SOCCER_API_KEY` is absent.
+
+Before creating a binding, use Sportradar's [account setup](https://developer.sportradar.com/football/docs/football-ig-account-setup), [Soccer v4 seasonal-statistics reference](https://developer.sportradar.com/soccer/reference/soccer-seasonal-competitor-statistics), and [coverage matrix](https://coverage-matrix.sportradar.com/) to confirm the target competition, women’s coverage, player-statistics entitlement, retention/caching rights, display rights, rate limits, and production access level. The workflow reads `SPORTRADAR_SOCCER_API_KEY` from a deployment secret and uses `SPORTRADAR_SOCCER_ACCESS_LEVEL=production`; no credential is stored in this repository.
+
+Stats Perform/Opta remains the secondary football vendor to evaluate through its [official contact channel](https://www.statsperform.com/contact/). Do not add an Opta adapter or publish Opta-derived values until the contract specifies the same identity, competition, season, caching, and display permissions.
+
 ## Sport matrix
 
 | Sport | Bounded discovery and verification sources | Recommended public metrics | Target refresh | Current integration | Fail-closed behavior |

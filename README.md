@@ -25,6 +25,8 @@ pnpm test:e2e
 
 `pnpm sync:data` and `pnpm refresh:performance` both write the public snapshot and the refresh health manifest. Before accepting statistics, the ESPN adapter validates that response reference URLs bind the configured external athlete ID, season, and regular-season type. A provider failure can retain a still-valid verified observation as `stale`, and otherwise fails closed. Every verified athlete remains in the snapshot; athletes without a permitted performance binding are explicitly marked `not-integrated` rather than given invented totals.
 
+The first licensed-football integration path is prepared for Sportradar Soccer v4. Add the provider-issued key as `SPORTRADAR_SOCCER_API_KEY` in the deployment secret store and keep `SPORTRADAR_SOCCER_ACCESS_LEVEL=production`; do not put either value in source control. A binding is added only after the provider confirms competition/player coverage and the contract permits the intended caching and display.
+
 ## Trust and scope
 
 - The public snapshot is separate from the private review registry. Candidates and review notes never appear in public counts, filters, rankings, map locations, or browser artifacts.
