@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-14T04:11:56.437Z",
+  "generatedAt": "2026-08-14T04:19:53.070Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -59,7 +59,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-14T04:11:56.437Z"
+          "retrievedAt": "2026-08-14T04:19:53.070Z"
         }
       }
     },
@@ -121,7 +121,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5242502/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-14T04:11:56.437Z"
+          "retrievedAt": "2026-08-14T04:19:53.070Z"
         }
       }
     },
@@ -179,7 +179,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5107173/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-14T04:11:56.437Z"
+          "retrievedAt": "2026-08-14T04:19:53.070Z"
         }
       }
     },
@@ -1212,6 +1212,53 @@
             "publisher": "FK Crvena zvezda",
             "sourceUrl": "https://www.crvenazvezdafk.com/en/zvezda-tim/omri-glazer",
             "retrievedAt": "2026-08-09T15:15:00.000Z"
+          }
+        }
+      },
+      "performance": {
+        "status": "unavailable",
+        "state": "unavailable",
+        "stats": null,
+        "reason": "not-integrated"
+      }
+    },
+    {
+      "id": "mohammad-abu-fani",
+      "name": {
+        "en": "Mohammad Abu Fani",
+        "he": "מוחמד אבו פני"
+      },
+      "aliases": [
+        "Muhammad Abu Fani",
+        "Mohammed Abu Fani"
+      ],
+      "sport": "football",
+      "genderCategory": "men",
+      "tier": "senior-professional",
+      "lifecycleStatus": "active",
+      "visibility": "public",
+      "eligibility": {
+        "basis": "represents-israel",
+        "sourceUrl": "https://www.football.org.il/national-team-player/?player_id=75387",
+        "publisher": "Israel Football Association",
+        "retrievedAt": "2026-08-14T04:16:00.000Z"
+      },
+      "participation": {
+        "kind": "team-affiliation",
+        "affiliation": {
+          "organization": {
+            "name": "Ferencvárosi TC",
+            "type": "club",
+            "country": "Hungary"
+          },
+          "competition": "Nemzeti Bajnokság I",
+          "season": "2026-27",
+          "rosterStatus": "active",
+          "countsAsOverseas": true,
+          "source": {
+            "publisher": "Ferencvárosi TC",
+            "sourceUrl": "https://www.fradi.hu/en/football/men-s/squad?p=743",
+            "retrievedAt": "2026-08-14T04:16:00.000Z"
           }
         }
       },

@@ -226,7 +226,7 @@ const addDuplicateIdIssues = (
 
 export type RegistryAsOf = Date | string
 /** Required provenance watermark for the normalized registry migration. */
-export const registryMigrationInstant = '2026-08-09T15:15:00.000Z'
+export const registryMigrationInstant = '2026-08-14T04:16:00.000Z'
 
 export function registryInstantMs(value: Date | string) {
   const milliseconds = value instanceof Date ? value.getTime() : new Date(value).getTime()

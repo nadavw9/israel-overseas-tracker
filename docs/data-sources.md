@@ -1,6 +1,6 @@
 # Data-source register
 
-Checked 8-9 August 2026. Registry source observations keep per-record retrieval timestamps; the current registry watermark is `2026-08-09T15:15:00.000Z`.
+Checked 8-14 August 2026. Registry source observations keep per-record retrieval timestamps; the current registry watermark is `2026-08-14T04:16:00.000Z`.
 
 Eligibility and current participation are separate claims. A federation or FIBA record can establish Israeli eligibility; a current club, league, or university roster establishes participation. A provider binding, when present, describes a separate performance season and never substitutes for either claim.
 
@@ -34,6 +34,7 @@ Eligibility and current participation are separate claims. A federation or FIBA 
 | Anan Khalaili | [IFA player record](https://www.football.org.il/national-team-player/?player_id=137896) | [Royale Union Saint-Gilloise player profile](https://rusg.brussels/en/team/anan-khalaili) and [17 June 2024 signing](https://rusg.brussels/en/news/anan-khalaili-signs-four-seasons-union) | Not integrated |
 | Nikita Stoinov | [IFA player record](https://www.football.org.il/national-team-player/?player_id=164227) | [FC Dinamo 1948 București player profile](https://dinamo1948.ro/team/nikita-stoinov/) | Not integrated |
 | Omri Glazer | [IFA player record](https://www.football.org.il/national-team-player/?player_id=78956) | [FK Crvena zvezda player profile](https://www.crvenazvezdafk.com/en/zvezda-tim/omri-glazer) | Not integrated |
+| Mohammad Abu Fani | [IFA player record](https://www.football.org.il/national-team-player/?player_id=75387) | [Ferencvárosi TC squad](https://www.fradi.hu/en/football/men-s/squad?p=743) and [March 2026 match report](https://www.fradi.hu/en/football/men-s/news/abu-fani-was-the-hero-of-the-match-in-nyiregyhaza) | Not integrated |
 | Talia Sommer | [Official Israel call-up](https://www.gothamfc.com/news/five-gotham-fc-players-earn-international-callups-for-june-fifa-window) | [Gotham player profile](https://www.gothamfc.com/roster/talia-sommer-14) and [2026 roster](https://www.gothamfc.com/news/gotham-fc-announces-leadership-group-roster-ahead-of-2026-season) | Not integrated |
 | Vital Kats | [Israel national-team match record](https://www.football.org.il/en/national-team-game/?game_id=9272&national_team_id=377) | [Mainz renewal for 2026-27](https://www.mainz05.de/news/vital-kats-bleibt-dem-fsv-treu) | Not integrated |
 
@@ -57,7 +58,7 @@ Review data is not imported by the public application and must not appear in `pu
 
 ## Coverage universes
 
-The ledger declares seven bounded universes: ATP men, WTA women, IFA senior men and women, per-event FIBA rosters, and IIHF senior men and women. ATP men is healthy with `8 observed / 5 matched / 3 new candidates / 0 out-of-scope / 0 unresolved / 0 conflicts`; WTA women is healthy for the 3 August 2026 numeric PDF with `4 observed / 3 matched / 1 new candidate / 0 out-of-scope / 0 unresolved / 0 conflicts`. IFA men and women are enumerated but partial: men has `24 observed / 12 matched / 12 review candidates`, women has `24 observed / 2 matched / 22 review candidates`; those non-public rows still need current foreign-club verification. The six added overseas football men outside the current IFA senior-squad match set are targeted source-backed promotions, not a new bounded coverage universe. Overall coverage remains incomplete. No statement in the UI or documentation should call the 36-athlete batch a complete census.
+The ledger declares seven bounded universes: ATP men, WTA women, IFA senior men and women, per-event FIBA rosters, and IIHF senior men and women. ATP men is healthy with `8 observed / 5 matched / 3 new candidates / 0 out-of-scope / 0 unresolved / 0 conflicts`; WTA women is healthy for the 3 August 2026 numeric PDF with `4 observed / 3 matched / 1 new candidate / 0 out-of-scope / 0 unresolved / 0 conflicts`. IFA men and women are enumerated but partial: men has `24 observed / 12 matched / 12 review candidates`, women has `24 observed / 2 matched / 22 review candidates`; those non-public rows still need current foreign-club verification. The seven added overseas football men outside the current IFA senior-squad match set are targeted source-backed promotions, not a new bounded coverage universe. Overall coverage remains incomplete. No statement in the UI or documentation should call the 37-athlete batch a complete census.
 
 ## Performance retention and rights
 

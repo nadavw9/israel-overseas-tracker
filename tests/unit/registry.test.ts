@@ -33,6 +33,7 @@ describe('registry compiler', () => {
       'anan-khalaili',
       'nikita-stoinov',
       'omri-glazer',
+      'mohammad-abu-fani',
       'talia-sommer',
       'vital-kats',
       'lina-glushko',
@@ -127,7 +128,7 @@ describe('registry compiler', () => {
 
   it('publishes football men only when eligibility and current overseas affiliation are independently verified', () => {
     expect(publicRegistry.filter(({ sport, genderCategory }) => sport === 'football' && genderCategory === 'men'))
-      .toHaveLength(18)
+      .toHaveLength(19)
 
     expect(publicRegistry.find(({ id }) => id === 'stav-lemkin')).toMatchObject({
       name: { en: 'Stav Lemkin', he: 'סתיו למקין' },
@@ -350,6 +351,23 @@ describe('registry compiler', () => {
           organization: { name: 'FK Crvena zvezda', country: 'Serbia' },
           competition: 'Serbian SuperLiga',
           source: { publisher: 'FK Crvena zvezda', sourceUrl: 'https://www.crvenazvezdafk.com/en/zvezda-tim/omri-glazer' },
+        },
+      },
+    })
+
+    expect(publicRegistry.find(({ id }) => id === 'mohammad-abu-fani')).toMatchObject({
+      name: { en: 'Mohammad Abu Fani', he: 'מוחמד אבו פני' },
+      aliases: ['Muhammad Abu Fani', 'Mohammed Abu Fani'],
+      eligibility: {
+        publisher: 'Israel Football Association',
+        sourceUrl: 'https://www.football.org.il/national-team-player/?player_id=75387',
+      },
+      participation: {
+        kind: 'team-affiliation',
+        affiliation: {
+          organization: { name: 'Ferencvárosi TC', country: 'Hungary' },
+          competition: 'Nemzeti Bajnokság I',
+          source: { publisher: 'Ferencvárosi TC', sourceUrl: 'https://www.fradi.hu/en/football/men-s/squad?p=743' },
         },
       },
     })

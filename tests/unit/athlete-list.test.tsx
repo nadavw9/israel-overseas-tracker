@@ -54,7 +54,7 @@ describe('verified athlete list', () => {
       day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC',
     }).format(new Date(snapshot.generatedAt))
 
-    expect(screen.getByText('36 verified athletes')).toBeInTheDocument()
+    expect(screen.getByText('37 verified athletes')).toBeInTheDocument()
     expect(screen.getByText(`Snapshot generated ${generatedDate}`)).toBeInTheDocument()
     expect(screen.queryByText(/^live$/i)).not.toBeInTheDocument()
     expect(screen.getAllByText(/source checked/i)).toHaveLength(3)
@@ -71,7 +71,7 @@ describe('verified athlete list', () => {
 
     for (const [label, count] of [
       ['Basketball', '8'],
-      ['Football', '20'],
+      ['Football', '21'],
       ['Tennis', '8'],
       ['Women', '7'],
       ['Circuit', '8'],
