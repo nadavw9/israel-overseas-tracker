@@ -11,6 +11,12 @@ Checked 8-14 August 2026. This document separates census discovery, eligibility,
 
 The current census and participation registry is manual. ESPN NBA performance collection is scheduled, not live play-by-play. Any future feed must preserve observed time, provider identity, competition, and season.
 
+## Operational performance refresh
+
+The fail-closed worker runs from `.github/workflows/refresh-performance.yml` every 30 minutes and can also be started manually with `pnpm refresh:performance`. It polls only adapters with an approved binding and permitted access, writes `public/data/snapshot.json`, and atomically writes `public/data/refresh-manifest.json`. The manifest records the generation time, provider attempts, successes, failures, skips, duration, and the number of verified athletes intentionally skipped because they have no binding.
+
+The 30-minute schedule is a bounded polling SLA, not a claim of second-by-second live coverage. Live or near-live behavior is only possible when a licensed provider and competition-specific entitlement exist. The current public snapshot has 37 verified athletes, four adapter-bound records, and three numeric performance records; the remaining 33 are still published as identity records with explicit `not-integrated` performance status. A hosting deployment must publish the generated artifact after the workflow succeeds; the repository workflow intentionally does not commit or deploy data on its own.
+
 ## Sport matrix
 
 | Sport | Bounded discovery and verification sources | Recommended public metrics | Target refresh | Current integration | Fail-closed behavior |
