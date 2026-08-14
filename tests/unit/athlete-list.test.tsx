@@ -54,7 +54,7 @@ describe('verified athlete list', () => {
       day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC',
     }).format(new Date(snapshot.generatedAt))
 
-    expect(screen.getByText('35 verified athletes')).toBeInTheDocument()
+    expect(screen.getByText('36 verified athletes')).toBeInTheDocument()
     expect(screen.getByText(`Snapshot generated ${generatedDate}`)).toBeInTheDocument()
     expect(screen.queryByText(/^live$/i)).not.toBeInTheDocument()
     expect(screen.getAllByText(/source checked/i)).toHaveLength(3)
@@ -71,7 +71,7 @@ describe('verified athlete list', () => {
 
     for (const [label, count] of [
       ['Basketball', '8'],
-      ['Football', '19'],
+      ['Football', '20'],
       ['Tennis', '8'],
       ['Women', '7'],
       ['Circuit', '8'],
@@ -177,7 +177,7 @@ describe('verified athlete list', () => {
     expect(screen.getByText('5/8 matched · 3 new · 0 conflicts')).toBeVisible()
     expect(screen.getByText('WTA Singles Rankings numeric PDF ISR rows as of 03 August 2026')).toBeVisible()
     expect(screen.getByText('3/4 matched · 1 new · 0 conflicts')).toBeVisible()
-    expect(screen.getByText(messages.en.coverageCounts(24, 11, 13, 0, 0, 0))).toBeVisible()
+    expect(screen.getByText(messages.en.coverageCounts(24, 12, 12, 0, 0, 0))).toBeVisible()
     expect(screen.getByText(messages.en.coverageCounts(24, 2, 22, 0, 0, 0))).toBeVisible()
     expect(screen.getAllByText('Healthy')).toHaveLength(2)
     expect(screen.getAllByText('Partial')).toHaveLength(5)

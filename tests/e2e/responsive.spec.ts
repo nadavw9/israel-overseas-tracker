@@ -153,13 +153,13 @@ test('desktop and Hebrew RTL controls remain usable', async ({ page }) => {
 })
 
 test('expanded review snapshot distinguishes team, circuit, identity-only, and locationless records', async ({ page }) => {
-  expect(snapshotJson.athletes).toHaveLength(35)
+  expect(snapshotJson.athletes).toHaveLength(36)
   expect(snapshotJson.coverage.complete).toBe(false)
 
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.goto('/')
 
-  await expect(page.getByText('35 verified athletes', { exact: true })).toBeVisible()
+  await expect(page.getByText('36 verified athletes', { exact: true })).toBeVisible()
   await expect(page.getByRole('status', { name: 'Coverage incomplete: 2 of 7 universes healthy' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Deni Avdija' })).toBeVisible()
 
