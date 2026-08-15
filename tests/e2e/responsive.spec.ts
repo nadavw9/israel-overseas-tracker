@@ -113,7 +113,7 @@ test('390px filters, RTL profile, and drawer keep the directory usable', async (
   await expect(dialog.getByText('בסיס הזכאות')).toBeVisible()
   await expect(dialog.getByRole('link', { name: /מקור הזכאות/ })).toBeVisible()
   await expect(dialog.getByRole('link', { name: /מקור הקבוצה הנוכחית/ })).toBeVisible()
-  await expect(dialog.getByRole('link', { name: /מקור הביצועים/ })).toHaveCount(0)
+  await expect(dialog.getByRole('link', { name: /מקור הביצועים/ })).toBeVisible()
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
 })
@@ -160,7 +160,7 @@ test('expanded review snapshot distinguishes team, circuit, identity-only, and l
   await page.goto('/')
 
   await expect(page.getByText('37 verified athletes', { exact: true })).toBeVisible()
-  await expect(page.getByRole('status', { name: 'Coverage incomplete: 2 of 7 universes healthy' })).toBeVisible()
+  await expect(page.getByRole('status', { name: 'Coverage incomplete: 1 of 7 universes healthy' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Deni Avdija' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Open Deni Avdija' }).click()

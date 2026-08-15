@@ -1,0 +1,27 @@
+{
+  "season": { "year": 2026, "displayName": "2026 MLS" },
+  "team": { "id": "21300", "displayName": "Charlotte FC" },
+  "athletes": [
+    {
+      "id": "312976",
+      "fullName": "Liel Abada",
+      "statistics": {
+        "splits": {
+          "categories": [
+            {
+              "name": "general",
+              "stats": [{ "name": "appearances", "value": 12 }]
+            },
+            {
+              "name": "offensive",
+              "stats": [
+                { "name": "goalAssists", "value": 3 },
+                { "name": "totalGoals", "value": 1 }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

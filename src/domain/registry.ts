@@ -198,6 +198,22 @@ export const providerBindingSchema = z
         })
       }
     }
+
+    if (binding.provider === 'espn-soccer') {
+      const parts = binding.externalId.split('|')
+      const [leagueSlug, teamId, athleteId] = parts
+      const valid = parts.length === 3 &&
+        leagueSlug !== undefined && /^[a-z0-9.]+$/.test(leagueSlug) &&
+        teamId !== undefined && /^\d+$/.test(teamId) &&
+        athleteId !== undefined && /^\d+$/.test(athleteId)
+      if (!valid) {
+        context.addIssue({
+          code: 'custom',
+          message: 'ESPN Soccer bindings must use league-slug|team|athlete numeric ids',
+          path: ['externalId'],
+        })
+      }
+    }
   })
 
 export const mediaAssetSchema = z
@@ -331,6 +347,7 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
     const athletesById = new Map(bundle.athletes.map((athlete) => [athlete.id, athlete]))
     const providerSport = {
       'espn-nba': 'basketball',
+      'espn-soccer': 'football',
       nhl: 'hockey',
       'sportradar-soccer': 'football',
       'api-football': 'football',

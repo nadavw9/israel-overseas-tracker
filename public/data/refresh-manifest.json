@@ -1,24 +1,24 @@
 {
-  "generatedAt": "2026-08-15T07:31:54.134Z",
-  "snapshotGeneratedAt": "2026-08-15T07:31:54.134Z",
-  "durationMs": 972,
-  "unboundSkipped": 33,
+  "generatedAt": "2026-08-15T08:57:53.239Z",
+  "snapshotGeneratedAt": "2026-08-15T08:57:53.239Z",
+  "durationMs": 851,
+  "unboundSkipped": 26,
   "providers": [
-    {
-      "provider": "curated",
-      "attempted": 1,
-      "succeeded": 1,
-      "failed": 0,
-      "skipped": 0,
-      "durationMs": 1
-    },
     {
       "provider": "espn-nba",
       "attempted": 3,
       "succeeded": 3,
       "failed": 0,
       "skipped": 0,
-      "durationMs": 952
+      "durationMs": 715
+    },
+    {
+      "provider": "espn-soccer",
+      "attempted": 8,
+      "succeeded": 8,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 793
     }
   ]
 }

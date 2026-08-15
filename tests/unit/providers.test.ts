@@ -3,10 +3,12 @@ import deniFixture from '../../data/fixtures/nba-deni.json'
 import zeevFixture from '../../data/fixtures/nhl-zeev.json'
 import apiFootballFixture from '../../data/fixtures/api-football-player.json'
 import soccerFixture from '../../data/fixtures/sportradar-soccer.json'
+import espnSoccerFixture from '../../data/fixtures/espn-soccer-roster.json'
 import { parseApiFootballExternalId, parseApiFootballFixture } from '../../scripts/providers/api-football'
 import { parseCuratedRecord } from '../../scripts/providers/curated'
 import { parseNbaFixture, parseNbaSeasonEndingYear } from '../../scripts/providers/nba'
 import { parseNhlFixture } from '../../scripts/providers/nhl'
+import { parseEspnSoccerExternalId, parseEspnSoccerFixture } from '../../scripts/providers/espn-soccer'
 import { parseSportradarSoccerExternalId, parseSportradarSoccerFixture } from '../../scripts/providers/soccer'
 import * as providerTypes from '../../scripts/providers/types'
 
@@ -204,6 +206,56 @@ describe('Sportradar Soccer provider', () => {
   it('rejects malformed composite bindings', () => {
     expect(() => parseSportradarSoccerExternalId('sr:season:127179|sr:competitor:2502')).toThrow(/season\|competitor\|player/i)
     expect(() => parseSportradarSoccerExternalId('bad|sr:competitor:2502|sr:player:45970')).toThrow()
+  })
+})
+
+describe('ESPN Soccer provider', () => {
+  const options = {
+    athleteId: 'liel-abada',
+    expectedName: 'Liel Abada',
+    season: '2026',
+    competition: 'MLS',
+    seasonYear: 2026,
+    teamId: 21300,
+    athleteIdExternal: 312976,
+    sourceUrl: 'https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/21300/roster',
+    retrievedAt: '2026-08-14T19:20:00.000Z',
+  } as const
+
+  it('maps current roster totals and verifies team, season, player id, and name', () => {
+    const result = parseEspnSoccerFixture(espnSoccerFixture, options)
+    expect(result).toMatchObject({
+      athleteId: 'liel-abada',
+      sport: 'football',
+      competition: 'MLS',
+      season: '2026',
+      state: 'provisional',
+      stats: { kind: 'football', appearances: 12, goals: 1, assists: 3 },
+    })
+    expect(result.observedOrganization).toBeUndefined()
+  })
+
+  it('parses and validates composite bindings', () => {
+    expect(parseEspnSoccerExternalId('usa.1|21300|312976')).toEqual({
+      leagueSlug: 'usa.1', teamId: 21300, athleteId: 312976,
+    })
+    expect(() => parseEspnSoccerExternalId('usa.1|21300')).toThrow(/league-slug/i)
+    expect(() => parseEspnSoccerExternalId('USA|21300|312976')).toThrow()
+  })
+
+  it.each([
+    ['another team', { team: { id: '139', displayName: 'Ajax' } }],
+    ['another season', { season: { year: 2025, displayName: '2025 MLS' } }],
+  ])('rejects a roster for %s', (_label, replacement) => {
+    expect(() => parseEspnSoccerFixture({ ...espnSoccerFixture, ...replacement }, options)).toThrow(/team|season/i)
+  })
+
+  it('rejects another player and missing required stats', () => {
+    expect(() => parseEspnSoccerFixture(espnSoccerFixture, { ...options, athleteIdExternal: 99999 })).toThrow(/missing|duplicated/i)
+    const malformed = structuredClone(espnSoccerFixture)
+    malformed.athletes[0].statistics.splits.categories[1].stats = malformed.athletes[0].statistics.splits.categories[1].stats
+      .filter((stat) => stat.name !== 'totalGoals')
+    expect(() => parseEspnSoccerFixture(malformed, options)).toThrow(/totalGoals/i)
   })
 })
 

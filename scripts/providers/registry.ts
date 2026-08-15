@@ -3,6 +3,7 @@ import { parseCuratedRecord } from './curated'
 import { parseApiFootballExternalId, parseApiFootballFixture } from './api-football'
 import { parseNbaFixture, parseNbaSeasonEndingYear } from './nba'
 import { parseNhlFixture } from './nhl'
+import { parseEspnSoccerExternalId, parseEspnSoccerFixture } from './espn-soccer'
 import { parseSportradarSoccerExternalId, parseSportradarSoccerFixture } from './soccer'
 import type { ProviderAdapter, ProviderAdapterMap } from './types'
 
@@ -62,6 +63,33 @@ const nhlAdapter: ProviderAdapter = async ({ entry, fetcher, now }) => {
     expectedName: entry.name.en,
     seasonId,
     season: binding.season,
+    sourceUrl,
+    retrievedAt,
+  })
+}
+
+const espnSoccerAdapter: ProviderAdapter = async ({ entry, fetcher, now }) => {
+  const binding = entry.binding
+  if (binding === undefined || binding.provider !== 'espn-soccer') {
+    throw new Error(`ESPN Soccer binding required for ${entry.id}`)
+  }
+
+  const { leagueSlug, teamId, athleteId } = parseEspnSoccerExternalId(binding.externalId)
+  const retrievedAt = now.toISOString()
+  const sourceUrl = `https://site.api.espn.com/apis/site/v2/sports/soccer/${leagueSlug}/teams/${teamId}/roster`
+  const response = await fetcher(sourceUrl, { headers: { accept: 'application/json' } })
+  if (!response.ok) {
+    throw new Error(`ESPN Soccer returned HTTP ${response.status} for ${entry.id}`)
+  }
+
+  return parseEspnSoccerFixture(await response.json(), {
+    athleteId: entry.id,
+    expectedName: entry.name.en,
+    season: binding.season,
+    competition: binding.competition,
+    seasonYear: Number(binding.season.slice(0, 4)),
+    teamId,
+    athleteIdExternal: athleteId,
     sourceUrl,
     retrievedAt,
   })
@@ -141,6 +169,7 @@ export const defaultProviderAdapters: ProviderAdapterMap = {
   curated: curatedAdapter,
   'api-football': apiFootballAdapter,
   'espn-nba': espnNbaAdapter,
+  'espn-soccer': espnSoccerAdapter,
   nhl: nhlAdapter,
   'sportradar-soccer': sportradarSoccerAdapter,
 }

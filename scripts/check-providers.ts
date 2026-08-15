@@ -144,6 +144,30 @@ async function checkPublicEndpoint(provider: string, url: string): Promise<Provi
   }
 }
 
+async function checkEspnSoccer(): Promise<ProviderCheck> {
+  const url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/21300/roster'
+  try {
+    const response = await fetchWithTimeout(url)
+    const payload = await response.json() as {
+      season?: { year?: number }
+      team?: { id?: string | number }
+      athletes?: Array<{ id?: string | number; statistics?: unknown }>
+    }
+    const hasBoundAthlete = payload.athletes?.some((athlete) => String(athlete.id) === '312976' && athlete.statistics !== undefined) ?? false
+    return {
+      provider: 'espn-soccer',
+      status: response.ok && payload.season?.year !== undefined && String(payload.team?.id) === '21300' && hasBoundAthlete ? 'ready' : 'failed',
+      detail: response.ok && hasBoundAthlete
+        ? 'Current roster and player totals responded for a verified MLS binding'
+        : response.ok ? 'Roster responded but the verified player/stat probe did not match' : `HTTP ${response.status}`,
+      httpStatus: response.status,
+      capabilities: { currentSeasonPlayerStats: response.ok && hasBoundAthlete ? 'available' : 'unknown' },
+    }
+  } catch (error) {
+    return { provider: 'espn-soccer', status: 'failed', detail: error instanceof Error ? error.message : String(error) }
+  }
+}
+
 async function checkTheSportsDb(): Promise<ProviderCheck> {
   const key = process.env.THESPORTSDB_API_KEY ?? '123'
   try {
@@ -167,6 +191,7 @@ export async function checkProviders(): Promise<ProviderCheck[]> {
     checkApiFootball(),
     checkApiNba(),
     checkTheSportsDb(),
+    checkEspnSoccer(),
     checkPublicEndpoint(
       'espn-nba',
       'https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us',

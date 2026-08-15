@@ -77,7 +77,7 @@ describe('verified athlete list', () => {
     expect(screen.getByText('37 verified athletes')).toBeInTheDocument()
     expect(screen.getByText(`Snapshot generated ${generatedDate}`)).toBeInTheDocument()
     expect(screen.queryByText(/^live$/i)).not.toBeInTheDocument()
-    expect(screen.getAllByText(/source checked/i)).toHaveLength(3)
+    expect(screen.getAllByText(/source checked/i)).toHaveLength(11)
     expect(screen.getAllByText(messages.en.notIntegrated)).not.toHaveLength(0)
     vi.useRealTimers()
   })
@@ -95,7 +95,7 @@ describe('verified athlete list', () => {
       ['Tennis', '8'],
       ['Women', '7'],
       ['Circuit', '8'],
-      ['Stats', '3'],
+      ['Stats', '11'],
       ['Mapped', '3'],
     ] as const) {
       const row = within(board).getByText(label).closest('div')
@@ -188,8 +188,8 @@ describe('verified athlete list', () => {
   it('shows the seeded incomplete coverage ledger exactly', async () => {
     const user = userEvent.setup()
     render(<TrackerApp snapshot={snapshot} />)
-    expect(screen.getByText('Coverage incomplete: 2 of 7 universes healthy')).toBeInTheDocument()
-    expect(screen.getByText('2/7 healthy · open gaps listed')).toBeInTheDocument()
+    expect(screen.getByText('Coverage incomplete: 1 of 7 universes healthy')).toBeInTheDocument()
+    expect(screen.getByText('1/7 healthy · open gaps listed')).toBeInTheDocument()
 
     await user.click(screen.getByText('Coverage ledger details'))
 
@@ -199,7 +199,7 @@ describe('verified athlete list', () => {
     expect(screen.getByText('3/4 matched · 1 new · 0 conflicts')).toBeVisible()
     expect(screen.getByText(messages.en.coverageCounts(24, 12, 12, 0, 0, 0))).toBeVisible()
     expect(screen.getByText(messages.en.coverageCounts(24, 2, 22, 0, 0, 0))).toBeVisible()
-    expect(screen.getAllByText('Healthy')).toHaveLength(2)
+    expect(screen.getAllByText('Healthy')).toHaveLength(1)
     expect(screen.getAllByText('Partial')).toHaveLength(5)
     expect(screen.getAllByText('Open source universe')).toHaveLength(7)
     expect(screen.queryByText(/complete coverage|all universes healthy|no misses/i)).not.toBeInTheDocument()

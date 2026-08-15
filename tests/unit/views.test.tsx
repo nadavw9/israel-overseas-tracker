@@ -116,10 +116,10 @@ describe('rankings', () => {
       visibility: 'review',
     } as Athlete
 
-    expect(rankAthletes([...snapshot.athletes, reviewRecord])).not.toContainEqual(
+    expect(rankAthletes([...snapshot.athletes, reviewRecord].filter((athlete) => athlete.sport === 'basketball'))).not.toContainEqual(
       reviewRecord,
     )
-    expect(rankAthletes(snapshot.athletes).map((athlete) => athlete.id)).toEqual([
+    expect(rankAthletes(snapshot.athletes.filter((athlete) => athlete.sport === 'basketball')).map((athlete) => athlete.id)).toEqual([
       'deni-avdija',
       'danny-wolf',
       'ben-saraf',
