@@ -102,7 +102,7 @@
 .athlete-card__visual { position: relative; height: 240px; overflow: hidden; background: radial-gradient(circle at 50% 85%,color-mix(in srgb,var(--card-accent) 30%,transparent),transparent 55%),color-mix(in srgb,var(--bg) 82%,black); }
 .athlete-card__visual::after { position: absolute; z-index: 1; inset: 45% 0 0; pointer-events: none; background: linear-gradient(transparent,var(--surface)); content: ''; }
 .athlete-photo { position: relative; display: grid; width: 100%; height: 100%; place-items: center; }
-.athlete-photo img { width: 100%; height: 100%; object-fit: contain; object-position: center bottom; filter: saturate(.86) contrast(1.04); }
+.athlete-photo img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; filter: saturate(.86) contrast(1.04); }
 .athlete-photo--fallback { gap: .45rem; color: rgba(255,255,255,.34); background: radial-gradient(circle at 50% 35%,rgba(31,111,235,.16),transparent 34%),repeating-linear-gradient(-45deg,transparent 0 12px,rgba(255,255,255,.02) 12px 13px); }
 .athlete-photo--fallback svg { grid-area: 1/1; opacity: .28; }
 .athlete-photo__initials { grid-area: 1/1; color: var(--text); font: 900 clamp(3rem,8vw,5.4rem)/1 var(--display); letter-spacing: .03em; text-shadow: 0 12px 40px rgba(0,0,0,.45); }

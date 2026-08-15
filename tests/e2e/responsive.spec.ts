@@ -44,6 +44,35 @@ function filterSnapshot() {
   }
 }
 
+test('every athlete portrait is constrained to its card image frame', async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 900 })
+  await page.goto('/')
+
+  const portraits = page.locator('.athlete-card__visual img')
+  await expect(portraits).toHaveCount(snapshotJson.athletes.filter((athlete) => athlete.image !== undefined).length)
+  await expect.poll(() => portraits.evaluateAll((images) => images.every((image) => {
+    const portrait = image as HTMLImageElement
+    return portrait.complete && portrait.naturalWidth > 0
+  }))).toBe(true)
+
+  const dimensions = await portraits.evaluateAll((images) => images.map((image) => {
+    const imageBox = image.getBoundingClientRect()
+    const frameBox = image.closest('.athlete-card__visual')?.getBoundingClientRect()
+    return {
+      alt: image.getAttribute('alt'),
+      imageWidth: imageBox.width,
+      imageHeight: imageBox.height,
+      frameWidth: frameBox?.width,
+      frameHeight: frameBox?.height,
+    }
+  }))
+
+  for (const portrait of dimensions) {
+    expect(portrait.imageWidth, portrait.alt ?? 'portrait').toBeCloseTo(portrait.frameWidth ?? 0, 0)
+    expect(portrait.imageHeight, portrait.alt ?? 'portrait').toBeCloseTo(portrait.frameHeight ?? 0, 0)
+  }
+})
+
 test('mobile layout has no page-level horizontal overflow', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
