@@ -29,6 +29,13 @@ The provider's current guide says the free plan is activated after registration 
 | Jolpica F1 | Open Formula 1 results/history | Open-source volunteer service; no key, but hosting is community-funded | **Fallback only.** Keep a provider watermark and fail closed if unavailable. |
 | Tennis API / Live Tennis API | ATP/WTA/ITF profiles, rankings, matches and statistics | Third-party services offer free or limited access, usually through RapidAPI or a token | **Investigate separately.** ATP terms prohibit systematic retrieval from its website without written permission, so do not scrape official pages. |
 
+## Individual-sport gaps
+
+- **Athletics:** World Athletics offers a dedicated Stats Pro service, but access is request-based rather than a public free developer key. Keep World Athletics pages as manual evidence until written API access is granted.
+- **Aquatics:** World Aquatics describes a results database and API endpoints maintained with its technology partners, but it does not expose a public self-serve developer plan. Use official event result pages or a licensed feed.
+- **Golf:** OpenGolfAPI is genuinely free and open, but its public dataset is course-focused; it is not a sufficient source for professional player performance. PGA/major-tour player feeds still need a provider or permission review.
+- **Cycling, judo, gymnastics, sailing, combat, and similar circuits:** no reliable, permissively licensed, public player-stat API was found in this pass. Do not replace the gap with scraping; record official result pages as manual observations until a provider is approved.
+
 ## Recommended build order
 
 1. Activate API-Football after the key is added and target player/league IDs are verified.
@@ -48,3 +55,6 @@ The provider's current guide says the free plan is activated after registration 
 - [football-data.org policies](https://docs.football-data.org/general/v4/policies.html)
 - [Sportradar trial limits](https://developer.sportradar.com/football/docs/football-ig-account-maintenance)
 - [ATP terms](https://www.atptour.com/en/terms-and-conditions)
+- [World Athletics Stats Pro](https://stats.worldathletics.org/)
+- [World Aquatics digital/data strategy](https://resources.fina.org/fina/document/2026/01/13/1c692349-3985-4aac-a8ee-9808a60d7cf9/Document-3-Digital-Platform-and-Data-Strategy.pdf)
+- [OpenGolfAPI access and license](https://courses.opengolfapi.org/pricing)
