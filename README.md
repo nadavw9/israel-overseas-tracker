@@ -29,6 +29,8 @@ The free-first football integration path is prepared for API-Football. Add the f
 
 The current provider comparison and free-tier decisions are recorded in [`docs/provider-research.md`](docs/provider-research.md).
 
+For local testing, create `.env.local` in the repository root and add one line: `API_FOOTBALL_KEY=your_key_here`. This file is ignored by Git. Run `pnpm refresh:performance` after saving it; never paste the key into `src/`, `public/`, or the browser.
+
 ## Trust and scope
 
 - The public snapshot is separate from the private review registry. Candidates and review notes never appear in public counts, filters, rankings, map locations, or browser artifacts.

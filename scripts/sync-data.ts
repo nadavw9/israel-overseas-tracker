@@ -35,6 +35,7 @@ import {
   sportSchema,
 } from '../src/domain/taxonomy'
 import { buildSnapshot, type PreviousSnapshot } from '../src/services/snapshot'
+import { loadLocalEnv } from './load-env'
 
 const snapshotUrl = new URL('../public/data/snapshot.json', import.meta.url)
 const refreshManifestUrl = new URL('../public/data/refresh-manifest.json', import.meta.url)
@@ -386,6 +387,7 @@ export async function syncData(now?: Date): Promise<AthleteSnapshot> {
 
 const invokedPath = process.argv[1]
 if (invokedPath && import.meta.url === pathToFileURL(invokedPath).href) {
+  loadLocalEnv()
   syncData()
     .then((snapshot) => {
       console.log(
