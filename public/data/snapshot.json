@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-15T06:51:29.544Z",
+  "generatedAt": "2026-08-15T07:31:54.134Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -59,7 +59,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-15T06:51:29.544Z"
+          "retrievedAt": "2026-08-15T07:31:54.134Z"
         }
       }
     },
@@ -77,7 +77,7 @@
       "visibility": "public",
       "eligibility": {
         "basis": "represents-israel",
-        "sourceUrl": "https://reports.fiba.basketball/reports/2025/FIBA%20U19%20Basketball%20World%20Cup/rosters.pdf",
+        "sourceUrl": "https://www.fiba.basketball/en/players/295661-ben-saraf",
         "publisher": "FIBA",
         "retrievedAt": "2026-08-08T08:00:00.000Z"
       },
@@ -121,7 +121,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5242502/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-15T06:51:29.544Z"
+          "retrievedAt": "2026-08-15T07:31:54.134Z"
         }
       }
     },
@@ -179,7 +179,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5107173/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-15T06:51:29.544Z"
+          "retrievedAt": "2026-08-15T07:31:54.134Z"
         }
       }
     },
@@ -1025,8 +1025,8 @@
           "countsAsOverseas": true,
           "source": {
             "publisher": "PFC Ludogorets",
-            "sourceUrl": "https://www.ludogorets.com/en/a-team/",
-            "retrievedAt": "2026-08-09T15:15:00.000Z"
+            "sourceUrl": "https://ludogorets.com/en/news/?c=3&i=7044",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
           }
         }
       },
@@ -1210,8 +1210,8 @@
           "countsAsOverseas": true,
           "source": {
             "publisher": "FK Crvena zvezda",
-            "sourceUrl": "https://www.crvenazvezdafk.com/en/zvezda-tim/omri-glazer",
-            "retrievedAt": "2026-08-09T15:15:00.000Z"
+            "sourceUrl": "https://www.crvenazvezdafk.com/en/search?query=omri%20glazer",
+            "retrievedAt": "2026-08-08T08:00:00.000Z"
           }
         }
       },

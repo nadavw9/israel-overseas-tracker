@@ -1,0 +1,41 @@
+{
+  "checkedAt": "2026-08-15T07:30:49.126Z",
+  "providers": [
+    {
+      "provider": "curated",
+      "status": "ready",
+      "detail": "Local verified fixture data is available"
+    },
+    {
+      "provider": "api-football",
+      "status": "ready",
+      "detail": "Account and API key accepted",
+      "httpStatus": 200,
+      "plan": "Free",
+      "dailyLimit": 100,
+      "requestsUsed": 0
+    },
+    {
+      "provider": "thesportsdb",
+      "status": "ready",
+      "detail": "Free metadata/image lookup responded",
+      "httpStatus": 200
+    },
+    {
+      "provider": "espn-nba",
+      "status": "ready",
+      "detail": "Public endpoint responded",
+      "httpStatus": 200
+    },
+    {
+      "provider": "nhl",
+      "status": "not-configured",
+      "detail": "No NHL player binding is currently published"
+    },
+    {
+      "provider": "sportradar-soccer",
+      "status": "not-configured",
+      "detail": "SPORTRADAR_SOCCER_API_KEY is not set"
+    }
+  ]
+}

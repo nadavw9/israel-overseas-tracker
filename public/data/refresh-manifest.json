@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-08-15T06:51:29.544Z",
-  "snapshotGeneratedAt": "2026-08-15T06:51:29.544Z",
-  "durationMs": 825,
+  "generatedAt": "2026-08-15T07:31:54.134Z",
+  "snapshotGeneratedAt": "2026-08-15T07:31:54.134Z",
+  "durationMs": 972,
   "unboundSkipped": 33,
   "providers": [
     {
@@ -18,7 +18,7 @@
       "succeeded": 3,
       "failed": 0,
       "skipped": 0,
-      "durationMs": 806
+      "durationMs": 952
     }
   ]
 }

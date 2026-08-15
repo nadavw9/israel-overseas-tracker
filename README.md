@@ -23,6 +23,16 @@ pnpm build
 pnpm test:e2e
 ```
 
+Run the current provider and source audits with:
+
+```bash
+pnpm check:providers -- --write
+pnpm audit:sources -- --write
+pnpm discover:media
+```
+
+These commands write review-only reports under `data/review/`. Provider checks never print secrets. Source checks distinguish unavailable/blocked pages from confirmed 404/410 links. The media discovery report uses TheSportsDB's free metadata endpoint to find per-athlete image candidates, but every candidate remains `rightsStatus: review` until reuse rights and attribution are documented; review candidates never enter the public snapshot.
+
 `pnpm sync:data` and `pnpm refresh:performance` both write the public snapshot and the refresh health manifest. Before accepting statistics, the ESPN adapter validates that response reference URLs bind the configured external athlete ID, season, and regular-season type. A provider failure can retain a still-valid verified observation as `stale`, and otherwise fails closed. Every verified athlete remains in the snapshot; athletes without a permitted performance binding are explicitly marked `not-integrated` rather than given invented totals.
 
 The free-first football integration path is prepared for API-Football. Add the free-plan key as `API_FOOTBALL_KEY` in the deployment secret store; do not put it in source control. A binding is added only after the provider's current coverage and terms are checked for the target competition. Sportradar Soccer remains an optional higher-coverage adapter.

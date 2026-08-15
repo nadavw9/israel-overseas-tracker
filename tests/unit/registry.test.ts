@@ -115,7 +115,7 @@ describe('registry compiler', () => {
 
     expect(ben?.eligibility).toMatchObject({
       publisher: 'FIBA',
-      sourceUrl: 'https://reports.fiba.basketball/reports/2025/FIBA%20U19%20Basketball%20World%20Cup/rosters.pdf',
+      sourceUrl: 'https://www.fiba.basketball/en/players/295661-ben-saraf',
     })
     expect(ben?.participation.kind).toBe('team-affiliation')
     if (ben?.participation.kind !== 'team-affiliation') throw new Error('Expected team participation')
@@ -286,7 +286,7 @@ describe('registry compiler', () => {
         affiliation: {
           organization: { name: 'PFC Ludogorets', country: 'Bulgaria' },
           competition: 'Bulgarian First League',
-          source: { publisher: 'PFC Ludogorets', sourceUrl: 'https://www.ludogorets.com/en/a-team/' },
+          source: { publisher: 'PFC Ludogorets', sourceUrl: 'https://ludogorets.com/en/news/?c=3&i=7044' },
         },
       },
     })
@@ -350,7 +350,7 @@ describe('registry compiler', () => {
         affiliation: {
           organization: { name: 'FK Crvena zvezda', country: 'Serbia' },
           competition: 'Serbian SuperLiga',
-          source: { publisher: 'FK Crvena zvezda', sourceUrl: 'https://www.crvenazvezdafk.com/en/zvezda-tim/omri-glazer' },
+          source: { publisher: 'FK Crvena zvezda', sourceUrl: 'https://www.crvenazvezdafk.com/en/search?query=omri%20glazer' },
         },
       },
     })
