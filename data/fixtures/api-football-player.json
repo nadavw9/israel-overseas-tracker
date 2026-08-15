@@ -1,0 +1,26 @@
+{
+  "get": "players",
+  "parameters": { "id": "12345", "league": "253", "season": "2025" },
+  "errors": [],
+  "results": 1,
+  "paging": { "current": 1, "total": 1 },
+  "response": [
+    {
+      "player": {
+        "id": 12345,
+        "name": "Abada, Liel",
+        "firstname": "Liel",
+        "lastname": "Abada",
+        "nationality": "Israel"
+      },
+      "statistics": [
+        {
+          "team": { "id": 253, "name": "Charlotte FC" },
+          "league": { "id": 253, "name": "Major League Soccer", "season": 2025 },
+          "games": { "appearences": 16 },
+          "goals": { "total": 7, "assists": 4 }
+        }
+      ]
+    }
+  ]
+}

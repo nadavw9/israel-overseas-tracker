@@ -193,6 +193,20 @@ describe('normalized registry schemas', () => {
     expect(providerBindingSchema.safeParse({ ...binding, externalId: 'sr:season:127179|sr:player:45970|sr:competitor:2502' }).success).toBe(false)
   })
 
+  it('validates API-Football numeric composite identity bindings', () => {
+    const binding = {
+      ...registryBundleFixture.providerBindings[0],
+      provider: 'api-football',
+      sport: 'football',
+      competition: 'MLS',
+      season: '2025',
+      externalId: '12345|253|2025',
+    }
+    expect(providerBindingSchema.safeParse(binding).success).toBe(true)
+    expect(providerBindingSchema.safeParse({ ...binding, externalId: '12345|253|25' }).success).toBe(false)
+    expect(providerBindingSchema.safeParse({ ...binding, externalId: '12345|253|2025|extra' }).success).toBe(false)
+  })
+
   it('accepts the strict circuit activity shape', () => {
     expect(circuitActivitySchema.parse(circuitActivity)).toEqual(circuitActivity)
     expect(circuitActivitySchema.safeParse({ ...circuitActivity, competition: '   ' }).success).toBe(false)

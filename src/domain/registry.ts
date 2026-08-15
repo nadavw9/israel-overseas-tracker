@@ -182,6 +182,22 @@ export const providerBindingSchema = z
         })
       }
     }
+
+    if (binding.provider === 'api-football') {
+      const parts = binding.externalId.split('|')
+      const [playerId, leagueId, seasonYear] = parts
+      const valid = parts.length === 3 &&
+        playerId !== undefined && /^\d+$/.test(playerId) &&
+        leagueId !== undefined && /^\d+$/.test(leagueId) &&
+        seasonYear !== undefined && /^\d{4}$/.test(seasonYear)
+      if (!valid) {
+        context.addIssue({
+          code: 'custom',
+          message: 'API-Football bindings must use player|league|season numeric ids',
+          path: ['externalId'],
+        })
+      }
+    }
   })
 
 export const mediaAssetSchema = z
@@ -317,6 +333,7 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
       'espn-nba': 'basketball',
       nhl: 'hockey',
       'sportradar-soccer': 'football',
+      'api-football': 'football',
     } as const
     const providerIdentities = new Set<string>()
     bundle.providerBindings.forEach((binding, index) => {

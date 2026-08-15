@@ -25,7 +25,7 @@ pnpm test:e2e
 
 `pnpm sync:data` and `pnpm refresh:performance` both write the public snapshot and the refresh health manifest. Before accepting statistics, the ESPN adapter validates that response reference URLs bind the configured external athlete ID, season, and regular-season type. A provider failure can retain a still-valid verified observation as `stale`, and otherwise fails closed. Every verified athlete remains in the snapshot; athletes without a permitted performance binding are explicitly marked `not-integrated` rather than given invented totals.
 
-The first licensed-football integration path is prepared for Sportradar Soccer v4. Add the provider-issued key as `SPORTRADAR_SOCCER_API_KEY` in the deployment secret store and keep `SPORTRADAR_SOCCER_ACCESS_LEVEL=production`; do not put either value in source control. A binding is added only after the provider confirms competition/player coverage and the contract permits the intended caching and display.
+The free-first football integration path is prepared for API-Football. Add the free-plan key as `API_FOOTBALL_KEY` in the deployment secret store; do not put it in source control. A binding is added only after the provider's current coverage and terms are checked for the target competition. Sportradar Soccer remains an optional higher-coverage adapter.
 
 ## Trust and scope
 
@@ -43,6 +43,6 @@ The default athlete view uses no analytics and no third-party font service. Open
 
 ## Automation
 
-`.github/workflows/refresh-performance.yml` runs the permitted performance adapters every 30 minutes and uploads both `snapshot.json` and `refresh-manifest.json` as an artifact. `.github/workflows/sync-data.yml` performs the broader verified-registry refresh every six hours. These workflows do not commit or deploy automatically; connect the artifact to the chosen hosting/deployment system before treating the public site as continuously updated.
+`.github/workflows/refresh-performance.yml` runs the permitted performance adapters once nightly after the Israeli day closes and uploads both `snapshot.json` and `refresh-manifest.json` as an artifact. `.github/workflows/sync-data.yml` performs the broader verified-registry refresh shortly before it. Keeping both jobs nightly keeps the free API-Football tier within its 100-request daily quota. These workflows do not commit or deploy automatically; connect the artifact to the chosen hosting/deployment system before treating the public site as updated.
 
 This independent project is not affiliated with the athletes, clubs, leagues, ESPN, NBA, NHL, Ajax, CARTO, or OpenStreetMap.

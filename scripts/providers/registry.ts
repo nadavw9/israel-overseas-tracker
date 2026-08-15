@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { parseCuratedRecord } from './curated'
+import { parseApiFootballExternalId, parseApiFootballFixture } from './api-football'
 import { parseNbaFixture, parseNbaSeasonEndingYear } from './nba'
 import { parseNhlFixture } from './nhl'
 import { parseSportradarSoccerExternalId, parseSportradarSoccerFixture } from './soccer'
@@ -66,6 +67,39 @@ const nhlAdapter: ProviderAdapter = async ({ entry, fetcher, now }) => {
   })
 }
 
+const apiFootballAdapter: ProviderAdapter = async ({ entry, fetcher, now }) => {
+  const binding = entry.binding
+  if (binding === undefined || binding.provider !== 'api-football') {
+    throw new Error(`API-Football binding required for ${entry.id}`)
+  }
+  const apiKey = process.env.API_FOOTBALL_KEY
+  if (!apiKey) {
+    throw new Error('API-Football adapter disabled: API_FOOTBALL_KEY is not configured')
+  }
+
+  const { playerId, leagueId, seasonYear } = parseApiFootballExternalId(binding.externalId)
+  const retrievedAt = now.toISOString()
+  const sourceUrl = `https://v3.football.api-sports.io/players?id=${playerId}&league=${leagueId}&season=${seasonYear}`
+  const response = await fetcher(sourceUrl, {
+    headers: { accept: 'application/json', 'x-apisports-key': apiKey },
+  })
+  if (!response.ok) {
+    throw new Error(`API-Football returned HTTP ${response.status} for ${entry.id}`)
+  }
+
+  return parseApiFootballFixture(await response.json(), {
+    athleteId: entry.id,
+    expectedName: entry.name.en,
+    season: binding.season,
+    competition: binding.competition,
+    playerId,
+    leagueId,
+    seasonYear,
+    sourceUrl,
+    retrievedAt,
+  })
+}
+
 const sportradarSoccerAdapter: ProviderAdapter = async ({ entry, fetcher, now }) => {
   const binding = entry.binding
   if (binding === undefined || binding.provider !== 'sportradar-soccer') {
@@ -105,6 +139,7 @@ const sportradarSoccerAdapter: ProviderAdapter = async ({ entry, fetcher, now })
 
 export const defaultProviderAdapters: ProviderAdapterMap = {
   curated: curatedAdapter,
+  'api-football': apiFootballAdapter,
   'espn-nba': espnNbaAdapter,
   nhl: nhlAdapter,
   'sportradar-soccer': sportradarSoccerAdapter,

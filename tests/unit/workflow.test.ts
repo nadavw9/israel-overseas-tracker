@@ -10,6 +10,8 @@ describe('refresh workflow', () => {
 
     expect(workflow).toContain('pnpm refresh:performance')
     expect(workflow).toContain('public/data/refresh-manifest.json')
+    expect(workflow).toContain("cron: '30 22 * * *'")
+    expect(workflow).toContain('API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}')
     expect(workflow).not.toMatch(/(?:api[_-]?key|secret)\s*:\s*[^$\s]/i)
   })
 })

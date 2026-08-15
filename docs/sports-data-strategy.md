@@ -13,9 +13,9 @@ The current census and participation registry is manual. ESPN NBA performance co
 
 ## Operational performance refresh
 
-The fail-closed worker runs from `.github/workflows/refresh-performance.yml` every 30 minutes and can also be started manually with `pnpm refresh:performance`. It polls only adapters with an approved binding and permitted access, writes `public/data/snapshot.json`, and atomically writes `public/data/refresh-manifest.json`. The manifest records the generation time, provider attempts, successes, failures, skips, duration, and the number of verified athletes intentionally skipped because they have no binding.
+The fail-closed worker runs from `.github/workflows/refresh-performance.yml` once nightly after the Israeli day closes (22:30 UTC) and can also be started manually with `pnpm refresh:performance`. It polls only adapters with an approved binding and permitted access, writes `public/data/snapshot.json`, and atomically writes `public/data/refresh-manifest.json`. The manifest records the generation time, provider attempts, successes, failures, skips, duration, and the number of verified athletes intentionally skipped because they have no binding.
 
-The 30-minute schedule is a bounded polling SLA, not a claim of second-by-second live coverage. Live or near-live behavior is only possible when a licensed provider and competition-specific entitlement exist. The current public snapshot has 37 verified athletes, four adapter-bound records, and three numeric performance records; the remaining 33 are still published as identity records with explicit `not-integrated` performance status. A hosting deployment must publish the generated artifact after the workflow succeeds; the repository workflow intentionally does not commit or deploy data on its own.
+The nightly schedule is a bounded end-of-day polling SLA, not a claim of second-by-second live coverage. Live or near-live behavior is only possible when a licensed provider and competition-specific entitlement exist. The current public snapshot has 37 verified athletes, four adapter-bound records, and three numeric performance records; the remaining 33 are still published as identity records with explicit `not-integrated` performance status. A hosting deployment must publish the generated artifact after the workflow succeeds; the repository workflow intentionally does not commit or deploy data on its own.
 
 ### First football provider: Sportradar Soccer
 
@@ -24,6 +24,10 @@ The first production adapter targets Sportradar Soccer v4 seasonal competitor st
 Before creating a binding, use Sportradar's [account setup](https://developer.sportradar.com/football/docs/football-ig-account-setup), [Soccer v4 seasonal-statistics reference](https://developer.sportradar.com/soccer/reference/soccer-seasonal-competitor-statistics), and [coverage matrix](https://coverage-matrix.sportradar.com/) to confirm the target competition, women’s coverage, player-statistics entitlement, retention/caching rights, display rights, rate limits, and production access level. The workflow reads `SPORTRADAR_SOCCER_API_KEY` from a deployment secret and uses `SPORTRADAR_SOCCER_ACCESS_LEVEL=production`; no credential is stored in this repository.
 
 Stats Perform/Opta remains the secondary football vendor to evaluate through its [official contact channel](https://www.statsperform.com/contact/). Do not add an Opta adapter or publish Opta-derived values until the contract specifies the same identity, competition, season, caching, and display permissions.
+
+### Free-first fallback: API-Football
+
+API-Football currently lists a $0 plan with 100 requests per day and player statistics included, but notes that free seasons and available data are limited and may change. The adapter uses one request per verified player-season binding, so it is compatible with a nightly refresh of the current football census but not a 30-minute poll. The key is read from `API_FOOTBALL_KEY`; no key or binding means no request and no published totals. Before public deployment, confirm the provider's current terms and each target competition's coverage in its [coverage list](https://www.api-football.com/coverage).
 
 ## Sport matrix
 

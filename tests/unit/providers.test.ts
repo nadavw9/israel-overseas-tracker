@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import deniFixture from '../../data/fixtures/nba-deni.json'
 import zeevFixture from '../../data/fixtures/nhl-zeev.json'
+import apiFootballFixture from '../../data/fixtures/api-football-player.json'
 import soccerFixture from '../../data/fixtures/sportradar-soccer.json'
+import { parseApiFootballExternalId, parseApiFootballFixture } from '../../scripts/providers/api-football'
 import { parseCuratedRecord } from '../../scripts/providers/curated'
 import { parseNbaFixture, parseNbaSeasonEndingYear } from '../../scripts/providers/nba'
 import { parseNhlFixture } from '../../scripts/providers/nhl'
@@ -202,6 +204,55 @@ describe('Sportradar Soccer provider', () => {
   it('rejects malformed composite bindings', () => {
     expect(() => parseSportradarSoccerExternalId('sr:season:127179|sr:competitor:2502')).toThrow(/season\|competitor\|player/i)
     expect(() => parseSportradarSoccerExternalId('bad|sr:competitor:2502|sr:player:45970')).toThrow()
+  })
+})
+
+describe('API-Football provider', () => {
+  const options = {
+    athleteId: 'liel-abada',
+    expectedName: 'Liel Abada',
+    season: '2025',
+    competition: 'MLS',
+    playerId: 12345,
+    leagueId: 253,
+    seasonYear: 2025,
+    sourceUrl: 'https://v3.football.api-sports.io/players?id=12345&league=253&season=2025',
+    retrievedAt: '2026-08-14T19:20:00.000Z',
+  } as const
+
+  it('maps player season totals and accepts the provider surname-first name', () => {
+    const result = parseApiFootballFixture(apiFootballFixture, options)
+
+    expect(result).toMatchObject({
+      athleteId: 'liel-abada',
+      sport: 'football',
+      competition: 'MLS',
+      season: '2025',
+      observedOrganization: 'Charlotte FC',
+      state: 'final',
+      stats: { kind: 'football', appearances: 16, goals: 7, assists: 4 },
+    })
+  })
+
+  it('aggregates multiple teams in one league season without inventing missing totals', () => {
+    const payload = structuredClone(apiFootballFixture)
+    payload.response[0].statistics.push({
+      team: { id: 254, name: 'Former Club' },
+      league: { id: 253, name: 'Major League Soccer', season: 2025 },
+      games: { appearences: 4 },
+      goals: { total: 1, assists: 2 },
+    })
+
+    const result = parseApiFootballFixture(payload, options)
+    expect(result.stats).toEqual({ kind: 'football', appearances: 20, goals: 8, assists: 6 })
+    expect(result.observedOrganization).toBeUndefined()
+  })
+
+  it('rejects context and identity mismatches', () => {
+    expect(parseApiFootballExternalId('12345|253|2025')).toEqual({ playerId: 12345, leagueId: 253, seasonYear: 2025 })
+    expect(() => parseApiFootballExternalId('player|league|season')).toThrow()
+    expect(() => parseApiFootballFixture(apiFootballFixture, { ...options, leagueId: 999 })).toThrow(/league|season/i)
+    expect(() => parseApiFootballFixture(apiFootballFixture, { ...options, expectedName: 'Another Player' })).toThrow(/identity/i)
   })
 })
 
