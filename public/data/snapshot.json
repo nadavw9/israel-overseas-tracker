@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-15T08:57:53.239Z",
+  "generatedAt": "2026-08-15T10:23:59.527Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -59,8 +59,19 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-15T08:57:53.239Z"
+          "retrievedAt": "2026-08-15T10:23:59.527Z"
         }
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Deni_Avdija.jpg/960px-Deni_Avdija.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Deni_Avdija.jpg",
+        "alt": "Deni Avdija playing basketball for Israel",
+        "rightsStatus": "approved",
+        "rightsHolder": "Sven Mandel",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Sven Mandel / Wikimedia Commons"
       }
     },
     {
@@ -121,8 +132,19 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5242502/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-15T08:57:53.239Z"
+          "retrievedAt": "2026-08-15T10:23:59.527Z"
         }
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Ben_Saraf_77_Ratiopharm_Ulm_EuroCup_20241014_%281%29.jpg/960px-Ben_Saraf_77_Ratiopharm_Ulm_EuroCup_20241014_%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ben_Saraf_77_Ratiopharm_Ulm_EuroCup_20241014_(1).jpg",
+        "alt": "Ben Saraf playing basketball for Ratiopharm Ulm",
+        "rightsStatus": "approved",
+        "rightsHolder": "Zafer",
+        "license": "cc-by",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Zafer / Wikimedia Commons"
       }
     },
     {
@@ -179,8 +201,19 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5107173/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-15T08:57:53.239Z"
+          "retrievedAt": "2026-08-15T10:23:59.527Z"
         }
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/20241115_Danny_Wolf.jpg/960px-20241115_Danny_Wolf.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:20241115_Danny_Wolf.jpg",
+        "alt": "Danny Wolf playing basketball for Michigan",
+        "rightsStatus": "approved",
+        "rightsHolder": "MGoBlog",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: MGoBlog / Wikimedia Commons"
       }
     },
     {
@@ -359,6 +392,17 @@
         "state": "unavailable",
         "stats": null,
         "reason": "not-integrated"
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/OmerMayer26.10.24.jpg/960px-OmerMayer26.10.24.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:OmerMayer26.10.24.jpg",
+        "alt": "Omer Mayer playing basketball for Maccabi Tel Aviv",
+        "rightsStatus": "approved",
+        "rightsHolder": "שיר",
+        "license": "public-domain",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: שיר / Wikimedia Commons"
       }
     },
     {
@@ -464,8 +508,19 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/teams/139/roster",
-          "retrievedAt": "2026-08-15T08:57:53.239Z"
+          "retrievedAt": "2026-08-15T10:23:59.527Z"
         }
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Oscar_Gloukh_%28cropped%29.jpg/960px-Oscar_Gloukh_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Oscar_Gloukh_(cropped).jpg",
+        "alt": "Oscar Gloukh playing for Ajax",
+        "rightsStatus": "approved",
+        "rightsHolder": "Mtjonenfa",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Mtjonenfa / Wikimedia Commons"
       }
     },
     {
@@ -510,6 +565,17 @@
         "state": "unavailable",
         "stats": null,
         "reason": "not-integrated"
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Manor_Solomon_15032025_%281%29.jpg/960px-Manor_Solomon_15032025_%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Manor_Solomon_15032025_(1).jpg",
+        "alt": "Manor Solomon after a football match",
+        "rightsStatus": "approved",
+        "rightsHolder": "Timmy96",
+        "license": "public-domain",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Timmy96 / Wikimedia Commons"
       }
     },
     {
@@ -554,6 +620,17 @@
         "state": "unavailable",
         "stats": null,
         "reason": "not-integrated"
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Daniel_Peretz_2022_%28cropped%29.jpg/960px-Daniel_Peretz_2022_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Daniel_Peretz_2022_(cropped).jpg",
+        "alt": "Daniel Peretz playing goalkeeper",
+        "rightsStatus": "approved",
+        "rightsHolder": "Adir Benyamini",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Adir Benyamini / Wikimedia Commons"
       }
     },
     {
@@ -598,6 +675,17 @@
         "state": "unavailable",
         "stats": null,
         "reason": "not-integrated"
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Stav_Lemkin.jpg/960px-Stav_Lemkin.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Stav_Lemkin.jpg",
+        "alt": "Stav Lemkin during the FC Twente squad presentation",
+        "rightsStatus": "approved",
+        "rightsHolder": "BasFCT",
+        "license": "public-domain",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: BasFCT / Wikimedia Commons"
       }
     },
     {
@@ -698,8 +786,19 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/jpn.1/teams/22167/roster",
-          "retrievedAt": "2026-08-15T08:57:53.239Z"
+          "retrievedAt": "2026-08-15T10:23:59.527Z"
         }
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Neta_Lavi_-_27_January_2016.JPG/960px-Neta_Lavi_-_27_January_2016.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Neta_Lavi_-_27_January_2016.JPG",
+        "alt": "Neta Lavi playing football",
+        "rightsStatus": "approved",
+        "rightsHolder": "Botend",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Botend / Wikimedia Commons"
       }
     },
     {
@@ -755,8 +854,19 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/189/roster",
-          "retrievedAt": "2026-08-15T08:57:53.239Z"
+          "retrievedAt": "2026-08-15T10:23:59.527Z"
         }
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Dylan_Nealis_Dor_Turgeman_Red_Bulls_Revolution-067.jpg/960px-Dylan_Nealis_Dor_Turgeman_Red_Bulls_Revolution-067.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Dylan_Nealis_Dor_Turgeman_Red_Bulls_Revolution-067.jpg",
+        "alt": "Dor Turgeman playing for the New England Revolution",
+        "rightsStatus": "approved",
+        "rightsHolder": "Bryan Berlin",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Bryan Berlin / Wikimedia Commons"
       }
     },
     {
@@ -813,8 +923,19 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/21300/roster",
-          "retrievedAt": "2026-08-15T08:57:53.239Z"
+          "retrievedAt": "2026-08-15T10:23:59.527Z"
         }
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Idan_Toklomati_NYCFC_v_Charlotte_20_Sep_2025-056.jpg/960px-Idan_Toklomati_NYCFC_v_Charlotte_20_Sep_2025-056.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Idan_Toklomati_NYCFC_v_Charlotte_20_Sep_2025-056.jpg",
+        "alt": "Idan Toklomati playing for Charlotte FC",
+        "rightsStatus": "approved",
+        "rightsHolder": "Bryan Berlin",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Bryan Berlin / Wikimedia Commons"
       }
     },
     {
@@ -868,8 +989,19 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/21300/roster",
-          "retrievedAt": "2026-08-15T08:57:53.239Z"
+          "retrievedAt": "2026-08-15T10:23:59.527Z"
         }
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Liel_Abada_%28cropped_v2%29.jpg/960px-Liel_Abada_%28cropped_v2%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Liel_Abada_(cropped_v2).jpg",
+        "alt": "Liel Abada playing football",
+        "rightsStatus": "approved",
+        "rightsHolder": "Jim Easton",
+        "license": "public-domain",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Jim Easton / Wikimedia Commons"
       }
     },
     {
@@ -923,8 +1055,19 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/189/roster",
-          "retrievedAt": "2026-08-15T08:57:53.239Z"
+          "retrievedAt": "2026-08-15T10:23:59.527Z"
         }
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Ilay_Feingold_Revolution_Nashville_6.25.25-069.jpg/960px-Ilay_Feingold_Revolution_Nashville_6.25.25-069.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ilay_Feingold_Revolution_Nashville_6.25.25-069.jpg",
+        "alt": "Ilay Feingold playing for the New England Revolution",
+        "rightsStatus": "approved",
+        "rightsHolder": "Bryan Berlin",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Bryan Berlin / Wikimedia Commons"
       }
     },
     {
@@ -978,8 +1121,19 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/193/roster",
-          "retrievedAt": "2026-08-15T08:57:53.239Z"
+          "retrievedAt": "2026-08-15T10:23:59.527Z"
         }
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Tai_Baribo_Philadelphia_Chicago_10.26.25-095.jpg/960px-Tai_Baribo_Philadelphia_Chicago_10.26.25-095.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tai_Baribo_Philadelphia_Chicago_10.26.25-095.jpg",
+        "alt": "Tai Baribo playing football",
+        "rightsStatus": "approved",
+        "rightsHolder": "Bryan Berlin",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Bryan Berlin / Wikimedia Commons"
       }
     },
     {
@@ -1024,6 +1178,17 @@
         "state": "unavailable",
         "stats": null,
         "reason": "not-integrated"
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Omri_Gandelman_2022_%28cropped%29.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Omri_Gandelman_2022_(cropped).jpg",
+        "alt": "Omri Gandelman playing football",
+        "rightsStatus": "approved",
+        "rightsHolder": "Adir Benyamini",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Adir Benyamini / Wikimedia Commons"
       }
     },
     {
@@ -1206,6 +1371,17 @@
         "state": "unavailable",
         "stats": null,
         "reason": "not-integrated"
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Anan_Khalaili_Union_2025.jpg/960px-Anan_Khalaili_Union_2025.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anan_Khalaili_Union_2025.jpg",
+        "alt": "Anan Khalaili playing for Royale Union Saint-Gilloise",
+        "rightsStatus": "approved",
+        "rightsHolder": "Sidney.Cortez",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Sidney.Cortez / Wikimedia Commons"
       }
     },
     {
@@ -1297,6 +1473,17 @@
         "state": "unavailable",
         "stats": null,
         "reason": "not-integrated"
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Omri_Glazer_Haifa.jpg/960px-Omri_Glazer_Haifa.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Omri_Glazer_Haifa.jpg",
+        "alt": "Omri Glazer playing goalkeeper",
+        "rightsStatus": "approved",
+        "rightsHolder": "Botend",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Botend / Wikimedia Commons"
       }
     },
     {
@@ -1344,6 +1531,17 @@
         "state": "unavailable",
         "stats": null,
         "reason": "not-integrated"
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Mohammad_Abu_Fani%2C_June_2023_%28GPOABG145038%29_%28cropped%29.jpeg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mohammad_Abu_Fani,_June_2023_(GPOABG145038)_(cropped).jpeg",
+        "alt": "Mohammad Abu Fani with the Israel national football team",
+        "rightsStatus": "approved",
+        "rightsHolder": "Amos Ben Gershom",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Amos Ben Gershom / Wikimedia Commons"
       }
     },
     {
@@ -1397,8 +1595,19 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.nwsl/teams/15364/roster",
-          "retrievedAt": "2026-08-15T08:57:53.239Z"
+          "retrievedAt": "2026-08-15T10:23:59.527Z"
         }
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Talia_Sommer_Gotham_NC_Courage_Mar_21_2026-156.jpg/960px-Talia_Sommer_Gotham_NC_Courage_Mar_21_2026-156.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Talia_Sommer_Gotham_NC_Courage_Mar_21_2026-156.jpg",
+        "alt": "Talia Sommer playing for Gotham FC",
+        "rightsStatus": "approved",
+        "rightsHolder": "Bryan Berlin",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: Bryan Berlin / Wikimedia Commons"
       }
     },
     {
@@ -1783,6 +1992,17 @@
         "state": "unavailable",
         "stats": null,
         "reason": "not-integrated"
+      },
+      "image": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Yshai_Oliel.png",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Yshai_Oliel.png",
+        "alt": "Yshai Oliel playing tennis",
+        "rightsStatus": "approved",
+        "rightsHolder": "ZooTennis",
+        "license": "cc-by-sa",
+        "usage": "remote-editorial-display",
+        "retrievedAt": "2026-08-15T10:22:45.803Z",
+        "attribution": "Photo: ZooTennis / Wikimedia Commons"
       }
     }
   ],

@@ -12,9 +12,9 @@ import snapshot from '../../public/data/snapshot.json'
 import manifest from '../../public/images/athletes/manifest.json'
 
 describe('athlete imagery', () => {
-  it('accepts the current empty snapshot and empty manifest boundary', () => {
+  it('accepts the current approved snapshot and matching manifest boundary', () => {
     expect(typeof assertImageManifestMatchesSnapshot).toBe('function')
-    expect(assertImageManifestMatchesSnapshot(snapshot, manifest)).toEqual({})
+    expect(assertImageManifestMatchesSnapshot(snapshot, manifest)).toEqual(manifest)
   })
 
   it('rejects a snapshot approved image missing from the manifest', () => {

@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-08-15T08:57:53.239Z",
-  "snapshotGeneratedAt": "2026-08-15T08:57:53.239Z",
-  "durationMs": 851,
+  "generatedAt": "2026-08-15T10:23:59.527Z",
+  "snapshotGeneratedAt": "2026-08-15T10:23:59.527Z",
+  "durationMs": 1341,
   "unboundSkipped": 26,
   "providers": [
     {
@@ -10,7 +10,7 @@
       "succeeded": 3,
       "failed": 0,
       "skipped": 0,
-      "durationMs": 715
+      "durationMs": 1139
     },
     {
       "provider": "espn-soccer",
@@ -18,7 +18,7 @@
       "succeeded": 8,
       "failed": 0,
       "skipped": 0,
-      "durationMs": 793
+      "durationMs": 1286
     }
   ]
 }

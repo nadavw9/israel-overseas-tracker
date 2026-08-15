@@ -38,6 +38,9 @@ jobs:
           SPORTRADAR_SOCCER_ACCESS_LEVEL: production
         run: pnpm refresh:performance
 
+      - name: Sync approved image manifest
+        run: pnpm sync:images
+
       - name: Validate athlete images
         run: pnpm validate:images
 

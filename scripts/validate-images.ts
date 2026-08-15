@@ -11,7 +11,7 @@ const manifestSchema = z.record(athleteIdSchema, publicMediaSchema)
 export type ImageManifest = z.infer<typeof manifestSchema>
 
 type ValidationOptions = { timeoutMs?: number }
-const defaultTimeoutMs = 10_000
+const defaultTimeoutMs = 30_000
 
 function cancelResponseBody(response: Response | undefined) {
   const cancellation = response?.body?.cancel?.()
@@ -84,21 +84,30 @@ export async function validateImages(
           controller.abort()
         }, timeoutMs)
       })
-      const fetchPromise = fetcher(image.url, {
-        headers: { Range: 'bytes=0-1024' },
-        signal: controller.signal,
-      })
-      fetchPromise.then(
-        (lateResponse) => {
-          if (timedOut) cancelResponseBody(lateResponse)
-        },
-        () => {},
-      )
-      try {
-        response = await Promise.race([fetchPromise, timeoutPromise])
-      } catch (error) {
-        if (timedOut) throw timeoutError
-        throw error
+      for (let attempt = 0; ; attempt += 1) {
+        const fetchPromise = fetcher(image.url, {
+          headers: { Range: 'bytes=0-1024', 'user-agent': 'IsraelOverseasTracker/1.0 (image validator)' },
+          signal: controller.signal,
+        })
+        fetchPromise.then(
+          (lateResponse) => {
+            if (timedOut) cancelResponseBody(lateResponse)
+          },
+          () => {},
+        )
+        try {
+          response = await Promise.race([fetchPromise, timeoutPromise])
+        } catch (error) {
+          if (timedOut) throw timeoutError
+          throw error
+        }
+        if (response.status !== 429 || attempt >= 3) break
+        cancelResponseBody(response)
+        await new Promise((resolve) => setTimeout(resolve, 3_000 * (attempt + 1)))
+      }
+      if (response.status === 429) {
+        console.warn(`Image check rate-limited for ${athleteId}; schema and rights metadata remain validated`)
+        continue
       }
       if (response.url && !httpsUrlSchema.safeParse(response.url).success) {
         throw new Error(`Image check failed for ${athleteId}: final URL must be HTTPS`)

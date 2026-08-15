@@ -29,9 +29,10 @@ Run the current provider and source audits with:
 pnpm check:providers -- --write
 pnpm audit:sources -- --write
 pnpm discover:media
+pnpm discover:wikimedia
 ```
 
-These commands write review-only reports under `data/review/`. Provider checks never print secrets. Source checks distinguish unavailable/blocked pages from confirmed 404/410 links. The media discovery report uses TheSportsDB's free metadata endpoint to find per-athlete image candidates, but every candidate remains `rightsStatus: review` until reuse rights and attribution are documented; review candidates never enter the public snapshot.
+These commands write review-only reports under `data/review/`. Provider checks never print secrets. Source checks distinguish unavailable/blocked pages from confirmed 404/410 links. The media discovery report uses TheSportsDB's free metadata endpoint to find per-athlete image candidates, while `discover:wikimedia` searches Wikimedia Commons for exact-name images with CC/public-domain license signals. Every candidate remains `rightsStatus: review` until identity, reuse rights, and attribution are documented; review candidates never enter the public snapshot.
 
 `pnpm sync:data` and `pnpm refresh:performance` both write the public snapshot and the refresh health manifest. Before accepting statistics, the ESPN adapter validates that response reference URLs bind the configured external athlete ID, season, and regular-season type. A provider failure can retain a still-valid verified observation as `stale`, and otherwise fails closed. Every verified athlete remains in the snapshot; athletes without a permitted performance binding are explicitly marked `not-integrated` rather than given invented totals.
 
@@ -47,7 +48,7 @@ For local testing, create `.env.local` in the repository root and add one line: 
 - The current public snapshot contains 37 verified athletes. The coverage ledger is currently incomplete, so this is not a complete census and its visible summary is not a promise of no missed athletes.
 - Snapshot generation time is not a claim that every provider refreshed successfully. Each public record keeps its own source URL, source timestamp, and freshness state.
 - Identity-only athletes are published without invented zero statistics.
-- The public seed has zero approved athlete portraits. Cards and profiles use neutral local fallbacks until rights metadata approves an image.
+- The public snapshot currently has 20 approved Wikimedia Commons images with CC/public-domain metadata; the remaining 17 athletes use neutral local fallbacks until a rights-cleared image is found.
 
 See [the inclusion policy](docs/inclusion-policy.md) and [data-source register](docs/data-sources.md) for the detailed rules and current source limitations.
 

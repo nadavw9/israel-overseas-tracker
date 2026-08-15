@@ -1,0 +1,589 @@
+{
+  "checkedAt": "2026-08-15T10:21:12.959Z",
+  "provider": "Wikimedia Commons",
+  "rightsNote": "Candidates remain review-only until identity, license, attribution, and display terms are approved.",
+  "summary": {
+    "athletes": 37,
+    "candidates": 20,
+    "notFound": 17,
+    "errors": 0,
+    "ccBy": 1,
+    "ccBySa": 15,
+    "publicDomain": 4
+  },
+  "records": [
+    {
+      "athleteId": "deni-avdija",
+      "athleteName": "Deni Avdija",
+      "query": "Deni Avdija",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Deni Avdija.jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Deni_Avdija.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Deni_Avdija.jpg/960px-Deni_Avdija.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 3829,
+        "height": 3283,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Sven Mandel",
+        "description": "Israel vs Argentinia 106:83 during Basketball Albert Schweitzer Turnier at GBG Halle, Mannheim, Baden-Württemberg, Germany on 2018-04-02, Photo: Sven Mandel",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "ben-saraf",
+      "athleteName": "Ben Saraf",
+      "query": "Ben Saraf",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Ben Saraf 77 Ratiopharm Ulm EuroCup 20241014 (1).jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Ben_Saraf_77_Ratiopharm_Ulm_EuroCup_20241014_(1).jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Ben_Saraf_77_Ratiopharm_Ulm_EuroCup_20241014_%281%29.jpg/960px-Ben_Saraf_77_Ratiopharm_Ulm_EuroCup_20241014_%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 3456,
+        "height": 5184,
+        "license": "cc-by",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+        "artist": "Zafer",
+        "description": "Ben Saraf 77 Ratiopharm Ulm EuroCup 20241014",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "danny-wolf",
+      "athleteName": "Danny Wolf",
+      "query": "Danny Wolf",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:20241115 Danny Wolf.jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:20241115_Danny_Wolf.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/20241115_Danny_Wolf.jpg/960px-20241115_Danny_Wolf.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 1512,
+        "height": 3025,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+        "artist": "MGoBlog",
+        "description": "w:Danny Wolf for the w:2024–25 Michigan Wolverines men's basketball team on November 15, 2025 against the w:2024–25 TCU Horned Frogs men's basketball team",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "emanuel-sharp",
+      "athleteName": "Emanuel Sharp",
+      "query": "Emanuel Sharp",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "yarden-garzon",
+      "athleteName": "Yarden Garzon",
+      "query": "Yarden Garzon",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "gal-raviv",
+      "athleteName": "Gal Raviv",
+      "query": "Gal Raviv",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "omer-mayer",
+      "athleteName": "Omer Mayer",
+      "query": "Omer Mayer",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:OmerMayer26.10.24.jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:OmerMayer26.10.24.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/OmerMayer26.10.24.jpg/960px-OmerMayer26.10.24.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 3000,
+        "height": 4000,
+        "license": "public-domain",
+        "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "artist": "שיר",
+        "description": "שחקן הכדורסל עומר מאייר במשחק של מכבי תל אביב נגד אליצור עירוני נתניה בתאריך ה-26 באוקטובר 2024",
+        "score": 80
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "noam-yaacov",
+      "athleteName": "Noam Yaacov",
+      "query": "Noam Yaacov",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "oscar-gloukh",
+      "athleteName": "Oscar Gloukh",
+      "query": "Oscar Gloukh",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:FC Salzburg gegen Paris Saint-Germain UEFA Champions League 49 (cropped).jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:FC_Salzburg_gegen_Paris_Saint-Germain_UEFA_Champions_League_49_(cropped).jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/FC_Salzburg_gegen_Paris_Saint-Germain_UEFA_Champions_League_49_%28cropped%29.jpg/960px-FC_Salzburg_gegen_Paris_Saint-Germain_UEFA_Champions_League_49_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 1198,
+        "height": 1504,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Werner100359",
+        "description": "FC Salzburg gegen Paris Saint-Germain (UEFA Champions League 2024-12-10) 6. Runde 0-3",
+        "score": 90
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "manor-solomon",
+      "athleteName": "Manor Solomon",
+      "query": "Manor Solomon",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Manor Solomon 15032025 (1).jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Manor_Solomon_15032025_(1).jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Manor_Solomon_15032025_%281%29.jpg/960px-Manor_Solomon_15032025_%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 1779,
+        "height": 3824,
+        "license": "public-domain",
+        "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "artist": "Timmy96",
+        "description": "Manor Solomon pictured after the Queens Park Rangers and Leeds United match.",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "daniel-peretz",
+      "athleteName": "Daniel Peretz",
+      "query": "Daniel Peretz",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Daniel Peretz 2022 (cropped).jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Daniel_Peretz_2022_(cropped).jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Daniel_Peretz_2022_%28cropped%29.jpg/960px-Daniel_Peretz_2022_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 1395,
+        "height": 2373,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Adir Benyamini",
+        "description": "Israeli goalkeeper Daniel Peretz playing for Maccabi Tel Aviv in 2022",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "stav-lemkin",
+      "athleteName": "Stav Lemkin",
+      "query": "Stav Lemkin",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Stav Lemkin.jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Stav_Lemkin.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Stav_Lemkin.jpg/960px-Stav_Lemkin.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 1080,
+        "height": 2400,
+        "license": "public-domain",
+        "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "artist": "BasFCT",
+        "description": "Stav Lemkin during the FC Twente squad presentation in July 2025",
+        "score": 120
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "tai-abed",
+      "athleteName": "Tai Abed",
+      "query": "Tai Abed",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "neta-lavi",
+      "athleteName": "Neta Lavi",
+      "query": "Neta Lavi",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Neta Lavi - 27 January 2016.JPG",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Neta_Lavi_-_27_January_2016.JPG",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Neta_Lavi_-_27_January_2016.JPG/960px-Neta_Lavi_-_27_January_2016.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 1953,
+        "height": 2613,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Botend",
+        "description": "Maccabi Haifa vs. Hapoel Haifa - January 27, 2016",
+        "score": 120
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "dor-turgeman",
+      "athleteName": "Dor Turgeman",
+      "query": "Dor Turgeman",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Dylan Nealis Dor Turgeman Red Bulls Revolution-067.jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Dylan_Nealis_Dor_Turgeman_Red_Bulls_Revolution-067.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Dylan_Nealis_Dor_Turgeman_Red_Bulls_Revolution-067.jpg/960px-Dylan_Nealis_Dor_Turgeman_Red_Bulls_Revolution-067.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 5000,
+        "height": 3333,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Bryan Berlin",
+        "description": "Dylan Nealis Dor Turgeman during the New York Red Bulls vs New England Revolution on Feb 28, 2026 at Sports Illustrated Stadium",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "idan-toklomati",
+      "athleteName": "Idan Toklomati",
+      "query": "Idan Toklomati",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Idan Toklomati NYCFC v Charlotte 20 Sep 2025-056.jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Idan_Toklomati_NYCFC_v_Charlotte_20_Sep_2025-056.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Idan_Toklomati_NYCFC_v_Charlotte_20_Sep_2025-056.jpg/960px-Idan_Toklomati_NYCFC_v_Charlotte_20_Sep_2025-056.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 3333,
+        "height": 5000,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Bryan Berlin",
+        "description": "Idan Toklomati during New York City FC vs Charlotte FC on 20 Sep 2025",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "liel-abada",
+      "athleteName": "Liel Abada",
+      "query": "Liel Abada",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Liel Abada (cropped v2).jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Liel_Abada_(cropped_v2).jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Liel_Abada_%28cropped_v2%29.jpg/960px-Liel_Abada_%28cropped_v2%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 1271,
+        "height": 2947,
+        "license": "public-domain",
+        "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "artist": "Jim Easton",
+        "description": "Rangers 1 Celtic 0",
+        "score": 120
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "ilay-feingold",
+      "athleteName": "Ilay Feingold",
+      "query": "Ilay Feingold",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Ilay Feingold Revolution Nashville 6.25.25-069.jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Ilay_Feingold_Revolution_Nashville_6.25.25-069.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Ilay_Feingold_Revolution_Nashville_6.25.25-069.jpg/960px-Ilay_Feingold_Revolution_Nashville_6.25.25-069.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 3333,
+        "height": 5000,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Bryan Berlin",
+        "description": "Ilay Feingold during NE Revolution vs Nashville SC on 6.25.25",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "tai-baribo",
+      "athleteName": "Tai Baribo",
+      "query": "Tai Baribo",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Tai Baribo Philadelphia Chicago 10.26.25-095.jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Tai_Baribo_Philadelphia_Chicago_10.26.25-095.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Tai_Baribo_Philadelphia_Chicago_10.26.25-095.jpg/960px-Tai_Baribo_Philadelphia_Chicago_10.26.25-095.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 5000,
+        "height": 3333,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Bryan Berlin",
+        "description": "Tai Baribo during Philadelphia Union vs Chicago Fire Oct 26 2025",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "omri-gandelman",
+      "athleteName": "Omri Gandelman",
+      "query": "Omri Gandelman",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Omri Gandelman 2022 (cropped).jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Omri_Gandelman_2022_(cropped).jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Omri_Gandelman_2022_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+        "mime": "image/jpeg",
+        "width": 817,
+        "height": 2578,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Adir Benyamini",
+        "description": "עמרי גאנדלמן (במרכז) ביחד עם רז שלמה ועדן קרצב 2022",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "mahmoud-jaber",
+      "athleteName": "Mahmoud Jaber",
+      "query": "Mahmoud Jaber",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "idan-nachmias",
+      "athleteName": "Idan Nachmias",
+      "query": "Idan Nachmias",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "gavriel-kanikovsky",
+      "athleteName": "Gavriel Kanikovsky",
+      "query": "Gavriel Kanikovsky",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "anan-khalaili",
+      "athleteName": "Anan Khalaili",
+      "query": "Anan Khalaili",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Anan Khalaili Union 2025.jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Anan_Khalaili_Union_2025.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Anan_Khalaili_Union_2025.jpg/960px-Anan_Khalaili_Union_2025.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 1780,
+        "height": 2621,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Sidney.Cortez",
+        "description": "Israeli football player Anan Khalaili for Royale Union Saint-Gilloise in 2025",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "nikita-stoinov",
+      "athleteName": "Nikita Stoinov",
+      "query": "Nikita Stoinov",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "omri-glazer",
+      "athleteName": "Omri Glazer",
+      "query": "Omri Glazer",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Omri Glazer Haifa.jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Omri_Glazer_Haifa.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Omri_Glazer_Haifa.jpg/960px-Omri_Glazer_Haifa.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 2193,
+        "height": 2193,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Botend",
+        "description": "Omri Glazer",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "mohammad-abu-fani",
+      "athleteName": "Mohammad Abu Fani",
+      "query": "Mohammad Abu Fani",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Mohammad Abu Fani, June 2023 (GPOABG145038) (cropped).jpeg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Mohammad_Abu_Fani,_June_2023_(GPOABG145038)_(cropped).jpeg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Mohammad_Abu_Fani%2C_June_2023_%28GPOABG145038%29_%28cropped%29.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+        "mime": "image/jpeg",
+        "width": 401,
+        "height": 478,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+        "artist": "Amos Ben Gershom",
+        "description": "נשיא המדינה יצחק הרצוג ורעייתו מיכל, עם שחקן נבחרת ישראל בכדורגל מוחמד אבו פאני. יום שלישי, א' בתמוז תשפ\"ג, 20 ביוני 2023. קרדיט צילום: עמוס בן גרשום/ לע\"מ.",
+        "score": 120
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "talia-sommer",
+      "athleteName": "Talia Sommer",
+      "query": "Talia Sommer",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Talia Sommer Gotham NC Courage Mar 21 2026-156.jpg",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Talia_Sommer_Gotham_NC_Courage_Mar_21_2026-156.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Talia_Sommer_Gotham_NC_Courage_Mar_21_2026-156.jpg/960px-Talia_Sommer_Gotham_NC_Courage_Mar_21_2026-156.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "mime": "image/jpeg",
+        "width": 3333,
+        "height": 5000,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "Bryan Berlin",
+        "description": "Talia Sommer during Gotham FC vs North Carolina Courage on March 21, 2026",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    },
+    {
+      "athleteId": "vital-kats",
+      "athleteName": "Vital Kats",
+      "query": "Vital Kats",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "lina-glushko",
+      "athleteName": "Lina Glushko",
+      "query": "Lina Glushko",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "maayan-laron",
+      "athleteName": "Maayan Laron",
+      "query": "Maayan Laron",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "mika-buchnik",
+      "athleteName": "Mika Buchnik",
+      "query": "Mika Buchnik",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "amit-vales",
+      "athleteName": "Amit Vales",
+      "query": "Amit Vales",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "orel-kimhi",
+      "athleteName": "Orel Kimhi",
+      "query": "Orel Kimhi",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "ofek-shimanov",
+      "athleteName": "Ofek Shimanov",
+      "query": "Ofek Shimanov",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "daniel-cukierman",
+      "athleteName": "Daniel Cukierman",
+      "query": "Daniel Cukierman",
+      "status": "not-found",
+      "candidate": null,
+      "rightsStatus": "review",
+      "note": "No exact-name, image, and approved-license candidate was found."
+    },
+    {
+      "athleteId": "yshai-oliel",
+      "athleteName": "Yshai Oliel",
+      "query": "Yshai Oliel",
+      "status": "candidate",
+      "candidate": {
+        "title": "File:Yshai Oliel.png",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Yshai_Oliel.png",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Yshai_Oliel.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+        "mime": "image/png",
+        "width": 530,
+        "height": 862,
+        "license": "cc-by-sa",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "artist": "ZooTennis",
+        "description": "Oliel in 2014",
+        "score": 130
+      },
+      "rightsStatus": "review",
+      "note": "Candidate has a Commons license signal; verify the person, attribution, and intended display before approval."
+    }
+  ]
+}

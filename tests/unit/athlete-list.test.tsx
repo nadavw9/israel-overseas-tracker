@@ -205,11 +205,11 @@ describe('verified athlete list', () => {
     expect(screen.queryByText(/complete coverage|all universes healthy|no misses/i)).not.toBeInTheDocument()
   })
 
-  it('uses a local fallback without a broken or unapproved remote image', () => {
+  it('uses approved images and local fallbacks without broken or unapproved media', () => {
     render(<TrackerApp snapshot={snapshot} />)
-    expect(screen.getAllByLabelText('Photo unavailable')).toHaveLength(snapshot.athletes.length)
-    expect(screen.getAllByText('Image rights pending')).toHaveLength(snapshot.athletes.length)
-    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+    expect(screen.getAllByLabelText('Photo unavailable')).toHaveLength(17)
+    expect(screen.getAllByText('Image rights pending')).toHaveLength(17)
+    expect(screen.getAllByRole('img')).toHaveLength(20)
   })
 
   it('labels identity-only records without fake totals', () => {
