@@ -54,17 +54,16 @@ test('mobile layout has no page-level horizontal overflow', async ({ page }) => 
   const filterBar = page.locator('.filter-bar')
   await expect(filterBar).toBeVisible()
   expect(await filterBar.evaluate((element) => getComputedStyle(element).position)).toBe('static')
-  await page.getByText('Coverage ledger details').scrollIntoViewIfNeeded()
-  await page.getByText('Coverage ledger details').click()
+  const coverage = page.locator('details.coverage-ledger-panel')
+  await page.getByText('Source coverage').scrollIntoViewIfNeeded()
+  await expect(coverage).not.toHaveAttribute('open', '')
+  await page.getByText('Source coverage').click()
+  await expect(coverage).toHaveAttribute('open', '')
+  await expect(coverage.locator('.coverage-ledger-panel__chevron')).toHaveCSS('transform', /matrix/)
   await expect(page.getByText('WTA Singles Rankings numeric PDF ISR rows as of 03 August 2026')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
 
-  const lifecycle = page.getByRole('combobox', { name: /lifecycle status/i })
-  await lifecycle.scrollIntoViewIfNeeded()
-  await expect(lifecycle).toBeVisible()
-  const lifecycleBox = await lifecycle.boundingBox()
-  expect(lifecycleBox?.y).toBeGreaterThanOrEqual(0)
-  expect((lifecycleBox?.y ?? 0) + (lifecycleBox?.height ?? 0)).toBeLessThanOrEqual(844)
+  await expect(page.getByRole('combobox', { name: /lifecycle status/i })).toHaveCount(0)
 })
 
 test('390px filters, RTL profile, and drawer keep the directory usable', async ({ page }) => {
@@ -149,7 +148,25 @@ test('desktop and Hebrew RTL controls remain usable', async ({ page }) => {
     'placeholder',
     'חיפוש ספורטאים, קבוצות ותחרויות…',
   )
+  await page.getByRole('button', { name: /פתיחת דני אבדיה/ }).click()
+  const dialog = page.getByRole('dialog')
+  const close = page.getByRole('button', { name: /סגירת הפרטים של דני אבדיה/ })
+  const [dialogBox, closeBox] = await Promise.all([dialog.boundingBox(), close.boundingBox()])
+  expect(closeBox?.x).toBeGreaterThanOrEqual(dialogBox?.x ?? 0)
+  expect((closeBox?.x ?? 0) + (closeBox?.width ?? 0)).toBeLessThanOrEqual(
+    (dialogBox?.x ?? 0) + (dialogBox?.width ?? 0),
+  )
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
+})
+
+test('unavailable refresh status does not use the healthy color', async ({ page }) => {
+  await page.route('**/data/refresh-manifest.json', (route) => route.fulfill({ status: 404, body: '' }))
+  await page.goto('/')
+
+  const status = page.getByRole('status').filter({ hasText: 'Refresh status unavailable' })
+  await expect(status).toHaveClass(/refresh-status--unavailable/)
+  await expect(status).toHaveCSS('color', 'rgb(145, 165, 181)')
+  await expect(status).not.toHaveCSS('border-color', 'rgba(71, 199, 165, 0.3)')
 })
 
 test('expanded review snapshot distinguishes team, circuit, identity-only, and locationless records', async ({ page }) => {
@@ -160,7 +177,7 @@ test('expanded review snapshot distinguishes team, circuit, identity-only, and l
   await page.goto('/')
 
   await expect(page.getByText('37 verified athletes', { exact: true })).toBeVisible()
-  await expect(page.getByRole('status', { name: 'Coverage incomplete: 1 of 7 universes healthy' })).toBeVisible()
+  await expect(page.getByText('1/7 source groups fully reconciled · gaps listed')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Deni Avdija' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Open Deni Avdija' }).click()
@@ -201,7 +218,5 @@ test('expanded review snapshot distinguishes team, circuit, identity-only, and l
   await expect(page.getByText('Rankings only include sourced season totals. Identity-only records stay out until their statistics are verified.')).toBeVisible()
   await expect(page.getByText('Amit Vales', { exact: true })).toHaveCount(0)
 
-  await page.getByRole('button', { name: 'Map' }).click()
-  await expect(page.getByRole('button', { name: 'Open Amit Vales from map' })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Open Deni Avdija from map' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Map' })).toHaveCount(0)
 })

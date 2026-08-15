@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import snapshotJson from '../../public/data/snapshot.json'
@@ -59,11 +59,19 @@ function renderSearchFixture() {
 describe('verified athlete list', () => {
   it('shows global refresh health and remains usable without a manifest', () => {
     render(<TrackerApp snapshot={snapshot} refreshManifest={refreshManifest} />)
-    expect(screen.getByText(/Last refresh/)).toBeInTheDocument()
+    expect(screen.getByText(/Last refresh/)).toHaveClass('refresh-status--healthy')
     expect(screen.getByText(/37 athletes checked/)).toBeInTheDocument()
+    expect(screen.queryByText('Sources attached')).not.toBeInTheDocument()
+    expect(screen.queryByText('Global')).not.toBeInTheDocument()
 
     render(<TrackerApp snapshot={snapshot} refreshManifest={null} />)
-    expect(screen.getAllByText('Refresh status unavailable')).not.toHaveLength(0)
+    expect(screen.getAllByText('Refresh status unavailable').at(-1)).toHaveClass('refresh-status--unavailable')
+
+    render(<TrackerApp snapshot={snapshot} refreshManifest={{
+      ...refreshManifest,
+      providers: [{ ...refreshManifest.providers[0], succeeded: 0, failed: 1 }],
+    }} />)
+    expect(screen.getByText(/Refresh degraded/)).toHaveClass('refresh-status--degraded')
   })
 
   it('shows the expanded verified count and honest source freshness', () => {
@@ -82,26 +90,15 @@ describe('verified athlete list', () => {
     vi.useRealTimers()
   })
 
-  it('summarizes the public registry shape before the directory controls', () => {
+  it('keeps the explorer focused on actionable views and one coverage disclosure', () => {
     render(<TrackerApp snapshot={snapshot} />)
 
-    const board = screen.getByRole('region', { name: /verified registry board/i })
-    expect(within(board).getByText('Verified records, visible limits')).toBeInTheDocument()
-    expect(within(board).getByText(/missing stats and photos stay explicit/i)).toBeInTheDocument()
-
-    for (const [label, count] of [
-      ['Basketball', '8'],
-      ['Football', '21'],
-      ['Tennis', '8'],
-      ['Women', '7'],
-      ['Circuit', '8'],
-      ['Stats', '13'],
-      ['Mapped', '3'],
-    ] as const) {
-      const row = within(board).getByText(label).closest('div')
-      expect(row).not.toBeNull()
-      expect(within(row as HTMLElement).getByText(count)).toBeInTheDocument()
-    }
+    expect(screen.queryByRole('region', { name: /verified registry board/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Map' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Athletes' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Rankings' })).toBeInTheDocument()
+    expect(screen.getByText('1/7 source groups fully reconciled · gaps listed')).toBeInTheDocument()
+    expect(screen.queryByRole('status', { name: /coverage incomplete/i })).not.toBeInTheDocument()
   })
 
   it('filters by athlete, team, competition, and sport', async () => {
@@ -179,6 +176,17 @@ describe('verified athlete list', () => {
     expect(screen.queryByRole('button', { name: /open ben saraf/i })).not.toBeInTheDocument()
   })
 
+  it('hides single-value filters and impossible options from the current snapshot', () => {
+    render(<TrackerApp snapshot={snapshot} />)
+
+    expect(screen.queryByRole('combobox', { name: /lifecycle status/i })).not.toBeInTheDocument()
+    const gender = screen.getByRole('combobox', { name: /gender category/i })
+    expect(gender).toHaveTextContent('Men')
+    expect(gender).toHaveTextContent('Women')
+    expect(gender).not.toHaveTextContent('Mixed')
+    expect(gender).not.toHaveTextContent('Open')
+  })
+
   it('shows tier and lifecycle tags on cards', () => {
     render(<TrackerApp snapshot={snapshot} />)
     expect(screen.getAllByText('Senior professional')).not.toHaveLength(0)
@@ -188,10 +196,9 @@ describe('verified athlete list', () => {
   it('shows the seeded incomplete coverage ledger exactly', async () => {
     const user = userEvent.setup()
     render(<TrackerApp snapshot={snapshot} />)
-    expect(screen.getByText('Coverage incomplete: 1 of 7 universes healthy')).toBeInTheDocument()
-    expect(screen.getByText('1/7 healthy · open gaps listed')).toBeInTheDocument()
+    expect(screen.getByText('1/7 source groups fully reconciled · gaps listed')).toBeInTheDocument()
 
-    await user.click(screen.getByText('Coverage ledger details'))
+    await user.click(screen.getByText('Source coverage'))
 
     expect(screen.getByText('ATP singles players filtered to ISR')).toBeVisible()
     expect(screen.getByText('5/8 matched · 3 new · 0 conflicts')).toBeVisible()
@@ -199,10 +206,21 @@ describe('verified athlete list', () => {
     expect(screen.getByText('3/4 matched · 1 new · 0 conflicts')).toBeVisible()
     expect(screen.getByText(messages.en.coverageCounts(24, 12, 12, 0, 0, 0))).toBeVisible()
     expect(screen.getByText(messages.en.coverageCounts(24, 2, 22, 0, 0, 0))).toBeVisible()
-    expect(screen.getAllByText('Healthy')).toHaveLength(1)
-    expect(screen.getAllByText('Partial')).toHaveLength(5)
+    expect(screen.getAllByText('Fully reconciled')).toHaveLength(1)
+    expect(screen.getAllByText('Checked with gaps')).toHaveLength(5)
     expect(screen.getAllByText('Open source universe')).toHaveLength(7)
     expect(screen.queryByText(/complete coverage|all universes healthy|no misses/i)).not.toBeInTheDocument()
+  })
+
+  it('keeps incomplete coverage visible when detailed entries are unavailable', () => {
+    render(<TrackerApp snapshot={{
+      ...snapshot,
+      coverage: { required: 7, healthy: 1, complete: false },
+    }} />)
+
+    expect(screen.getByText('Source coverage')).toBeInTheDocument()
+    expect(screen.getByText('1/7 source groups fully reconciled · gaps listed')).toBeInTheDocument()
+    expect(screen.getByText('Detailed source checks are unavailable for this snapshot.')).toBeInTheDocument()
   })
 
   it('uses approved images and local fallbacks without broken or unapproved media', () => {

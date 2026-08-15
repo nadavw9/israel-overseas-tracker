@@ -1,3 +1,4 @@
+import { ChevronDown } from 'lucide-react'
 import type { CoverageSummary, PublicCoverageEntry } from '../domain/coverage'
 import { useI18n } from '../i18n/context'
 
@@ -30,7 +31,17 @@ function coverageCounts(entry: PublicCoverageEntry, messages: ReturnType<typeof 
 export function CoverageLedgerPanel({ coverage }: CoverageLedgerPanelProps) {
   const { messages } = useI18n()
   const entries = coverage.entries ?? []
-  if (entries.length === 0) return null
+  if (entries.length === 0) {
+    return (
+      <section className="coverage-ledger-panel coverage-ledger-panel--summary-only" role="status">
+        <div className="coverage-ledger-panel__summary">
+          <span>{messages.coverageDetailsTitle}</span>
+          <strong>{messages.coverageDetailsSummary(coverage.healthy, coverage.required, coverage.complete)}</strong>
+          <small>{messages.coverageDetailsUnavailable}</small>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <details className="coverage-ledger-panel">
@@ -38,6 +49,7 @@ export function CoverageLedgerPanel({ coverage }: CoverageLedgerPanelProps) {
         <span>{messages.coverageDetailsTitle}</span>
         <strong>{messages.coverageDetailsSummary(coverage.healthy, coverage.required, coverage.complete)}</strong>
         <small>{messages.coverageDetailsHint}</small>
+        <ChevronDown className="coverage-ledger-panel__chevron" size={16} aria-hidden="true" />
       </summary>
       <div className="coverage-ledger-panel__entries">
         {entries.map((entry) => {

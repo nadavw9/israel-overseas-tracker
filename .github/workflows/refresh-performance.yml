@@ -2,12 +2,16 @@ name: Refresh athlete performance
 
 on:
   schedule:
-    # 22:30 UTC = 00:30 Israel in winter / 01:30 Israel in summer.
-    - cron: '30 22 * * *'
+    # 20:30 UTC = 22:30 Israel in winter / 23:30 Israel in summer.
+    - cron: '30 20 * * *'
   workflow_dispatch:
 
+concurrency:
+  group: verified-data-refresh
+  cancel-in-progress: false
+
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   refresh-performance:
@@ -46,6 +50,18 @@ jobs:
 
       - name: Run unit tests
         run: pnpm test
+
+      - name: Persist refreshed performance data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/snapshot.json public/data/refresh-manifest.json public/images/athletes/manifest.json
+          if git diff --cached --quiet; then
+            echo "No verified performance changes to publish"
+            exit 0
+          fi
+          git commit -m "data: refresh athlete performance"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Upload refreshed snapshot and health manifest
         uses: actions/upload-artifact@v6

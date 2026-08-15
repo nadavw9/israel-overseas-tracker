@@ -13,6 +13,7 @@ dist-ssr
 .worktrees/
 test-results
 playwright-report
+artifacts/
 *.local
 
 # Editor directories and files

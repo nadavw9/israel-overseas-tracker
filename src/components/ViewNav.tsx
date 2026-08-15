@@ -1,7 +1,7 @@
-import { List, Map, Trophy } from 'lucide-react'
+import { List, Trophy } from 'lucide-react'
 import { useI18n } from '../i18n/context'
 
-export type TrackerView = 'athletes' | 'rankings' | 'map'
+export type TrackerView = 'athletes' | 'rankings'
 
 type ViewNavProps = {
   view: TrackerView
@@ -11,7 +11,6 @@ type ViewNavProps = {
 const views = [
   { value: 'athletes', icon: List },
   { value: 'rankings', icon: Trophy },
-  { value: 'map', icon: Map },
 ] as const
 
 export function ViewNav({ view, onChange }: ViewNavProps) {

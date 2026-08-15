@@ -66,10 +66,10 @@ describe('Hebrew experience', () => {
     render(<TrackerApp snapshot={snapshot} />)
     await user.click(screen.getByRole('button', { name: messages.en.languageToggle }))
 
-    expect(screen.getByText(messages.he.coverageStatus(1, 7, false))).toBeInTheDocument()
+    expect(screen.getByText(messages.he.coverageDetailsSummary(1, 7, false))).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: messages.he.filterTier })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: messages.he.filterGender })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: messages.he.filterStatus })).toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: messages.he.filterStatus })).not.toBeInTheDocument()
     expect(screen.getAllByText(messages.he.tiers['senior-professional'])).not.toHaveLength(0)
     expect(screen.getAllByText(messages.he.lifecycleStatuses.active)).not.toHaveLength(0)
     expect(document.querySelector('.filter-dimensions')).toHaveAttribute('dir', 'rtl')

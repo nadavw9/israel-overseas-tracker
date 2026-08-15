@@ -4,12 +4,9 @@ import type { RefreshManifest } from '../domain/refresh'
 import { AppHeader } from '../components/AppHeader'
 import { AthleteCard } from '../components/AthleteCard'
 import { AthleteDrawer } from '../components/AthleteDrawer'
-import { AthleteMap } from '../components/AthleteMap'
 import { CoverageLedgerPanel } from '../components/CoverageLedgerPanel'
-import { CoverageStatus } from '../components/CoverageStatus'
 import { FilterBar, type DirectoryFilters } from '../components/FilterBar'
 import { Leaderboard } from '../components/Leaderboard'
-import { RegistryBoard } from '../components/RegistryBoard'
 import { ViewNav, type TrackerView } from '../components/ViewNav'
 import { I18nContext } from '../i18n/context'
 import { messages, type Locale } from '../i18n/messages'
@@ -67,12 +64,32 @@ export function TrackerApp({ snapshot, refreshManifest = null }: TrackerAppProps
     () => [...new Set(snapshot.athletes.map((athlete) => athlete.sport))],
     [snapshot.athletes],
   )
+  const tiers = useMemo(
+    () => [...new Set(snapshot.athletes.map((athlete) => athlete.tier))],
+    [snapshot.athletes],
+  )
+  const genders = useMemo(
+    () => [...new Set(snapshot.athletes.map((athlete) => athlete.genderCategory))],
+    [snapshot.athletes],
+  )
+  const statuses = useMemo(
+    () => [...new Set(snapshot.athletes.map((athlete) => athlete.lifecycleStatus))],
+    [snapshot.athletes],
+  )
 
   useEffect(() => {
-    if (filters.sport !== 'all' && !sports.includes(filters.sport)) {
-      setFilters((current) => ({ ...current, sport: 'all' }))
-    }
-  }, [filters.sport, sports])
+    setFilters((current) => {
+      const next: DirectoryFilters = {
+        sport: current.sport !== 'all' && !sports.includes(current.sport) ? 'all' : current.sport,
+        tier: current.tier !== 'all' && !tiers.includes(current.tier) ? 'all' : current.tier,
+        gender: current.gender !== 'all' && !genders.includes(current.gender) ? 'all' : current.gender,
+        status: current.status !== 'all' && !statuses.includes(current.status) ? 'all' : current.status,
+      }
+      return Object.keys(next).some((key) => next[key as keyof DirectoryFilters] !== current[key as keyof DirectoryFilters])
+        ? next
+        : current
+    })
+  }, [genders, sports, statuses, tiers])
 
   useEffect(() => {
     const previousLang = document.documentElement.lang
@@ -135,14 +152,12 @@ export function TrackerApp({ snapshot, refreshManifest = null }: TrackerAppProps
                 <span>{copy.noInvented}</span>
               </div>
             </div>
-            <CoverageStatus coverage={snapshot.coverage} />
           </div>
         </section>
 
         <section className="content" aria-label={copy.explorer}>
-          <RegistryBoard athletes={snapshot.athletes} sports={sports} />
-          <CoverageLedgerPanel coverage={snapshot.coverage} />
           <ViewNav view={view} onChange={setView} />
+          <CoverageLedgerPanel coverage={snapshot.coverage} />
 
           {view === 'athletes' && (
             <div className="section-heading">
@@ -160,6 +175,9 @@ export function TrackerApp({ snapshot, refreshManifest = null }: TrackerAppProps
             filters={filters}
             onFiltersChange={setFilters}
             sports={sports}
+            tiers={tiers}
+            genders={genders}
+            statuses={statuses}
           />
 
           {view === 'athletes' && athletes.length > 0 ? (
@@ -181,9 +199,6 @@ export function TrackerApp({ snapshot, refreshManifest = null }: TrackerAppProps
           ) : null}
 
           {view === 'rankings' && <Leaderboard athletes={athletes} />}
-          {view === 'map' && (
-            <AthleteMap athletes={athletes} onOpen={openAthlete} />
-          )}
         </section>
       </main>
       {selectedAthlete && (

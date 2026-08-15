@@ -302,7 +302,7 @@ describe('rankings', () => {
     expect(footballGroup).toHaveTextContent('01')
   })
 
-  it('switches between rankings and the location map', async () => {
+  it('switches between the directory and verified rankings without exposing the incomplete map', async () => {
     const user = userEvent.setup()
     render(<TrackerApp snapshot={snapshot} />)
 
@@ -310,53 +310,9 @@ describe('rankings', () => {
     expect(
       screen.getByRole('heading', { name: /verified leaders/i }),
     ).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Map' })).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Map' }))
-    expect(
-      screen.getByRole('region', { name: /athlete locations/i }),
-    ).toBeInTheDocument()
-  })
-
-  it('keeps the active directory filter across rankings and map views', async () => {
-    const user = userEvent.setup()
-    render(<TrackerApp snapshot={snapshot} />)
-
-    await user.click(screen.getByRole('button', { name: 'Basketball' }))
-    expect(screen.queryByRole('button', { name: /open oscar gloukh/i })).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: 'Rankings' }))
-    expect(screen.getByRole('heading', { name: 'Basketball' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Football' })).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: 'Map' }))
-    expect(screen.getByText('2 mapped')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /open deni avdija from map/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /open ben saraf from map/i })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /open oscar gloukh from map/i })).not.toBeInTheDocument()
-  })
-
-  it('offers a keyboard-accessible map location list that opens details', async () => {
-    const user = userEvent.setup()
-    render(<TrackerApp snapshot={snapshot} />)
-
-    await user.click(screen.getByRole('button', { name: 'Map' }))
-    await user.click(
-      screen.getByRole('button', { name: /open deni avdija from map/i }),
-    )
-
-    expect(
-      screen.getByRole('dialog', { name: /deni avdija/i }),
-    ).toBeInTheDocument()
-  })
-
-  it('omits a locationless circuit activity from the map while retaining team markers and list actions', async () => {
-    const user = userEvent.setup()
-    render(<TrackerApp snapshot={{ ...snapshot, athletes: [...snapshot.athletes, circuitAthlete()] }} />)
-
-    await user.click(screen.getByRole('button', { name: 'Map' }))
-    expect(screen.getByText('3 mapped')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /open circuit athlete from map/i })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: /open deni avdija from map/i }))
-    expect(screen.getByRole('dialog', { name: /deni avdija/i })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Athletes' }))
+    expect(screen.getByRole('heading', { name: /athletes abroad/i })).toBeInTheDocument()
   })
 })

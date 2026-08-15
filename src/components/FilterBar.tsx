@@ -15,11 +15,10 @@ type FilterBarProps = {
   filters: DirectoryFilters
   onFiltersChange: (filters: DirectoryFilters) => void
   sports: Sport[]
+  tiers: AthleteTier[]
+  genders: GenderCategory[]
+  statuses: LifecycleStatus[]
 }
-
-const tiers: DirectoryFilters['tier'][] = ['all', 'senior-professional', 'college', 'development', 'international-circuit']
-const genders: DirectoryFilters['gender'][] = ['all', 'men', 'women', 'mixed', 'open']
-const statuses: DirectoryFilters['status'][] = ['all', 'active', 'injured', 'inactive', 'free-agent', 'retired', 'unknown']
 
 export function FilterBar({
   query,
@@ -27,6 +26,9 @@ export function FilterBar({
   filters,
   onFiltersChange,
   sports,
+  tiers,
+  genders,
+  statuses,
 }: FilterBarProps) {
   const { locale, messages } = useI18n()
   const update = <Key extends keyof DirectoryFilters>(key: Key, value: DirectoryFilters[Key]) => {
@@ -58,26 +60,34 @@ export function FilterBar({
           </button>
         ))}
       </div>
-      <div className="filter-dimensions" dir={locale === 'he' ? 'rtl' : 'ltr'}>
-        <label>
-          <span>{messages.filterTier}</span>
-          <select value={filters.tier} onChange={(event) => update('tier', event.target.value as DirectoryFilters['tier'])}>
-            {tiers.map((tier) => <option key={tier} value={tier}>{messages.tiers[tier]}</option>)}
-          </select>
-        </label>
-        <label>
-          <span>{messages.filterGender}</span>
-          <select value={filters.gender} onChange={(event) => update('gender', event.target.value as DirectoryFilters['gender'])}>
-            {genders.map((gender) => <option key={gender} value={gender}>{messages.genders[gender]}</option>)}
-          </select>
-        </label>
-        <label>
-          <span>{messages.filterStatus}</span>
-          <select value={filters.status} onChange={(event) => update('status', event.target.value as DirectoryFilters['status'])}>
-            {statuses.map((status) => <option key={status} value={status}>{messages.lifecycleStatuses[status]}</option>)}
-          </select>
-        </label>
-      </div>
+      {(tiers.length > 1 || genders.length > 1 || statuses.length > 1) && (
+        <div className="filter-dimensions" dir={locale === 'he' ? 'rtl' : 'ltr'}>
+          {tiers.length > 1 && (
+            <label>
+              <span>{messages.filterTier}</span>
+              <select value={filters.tier} onChange={(event) => update('tier', event.target.value as DirectoryFilters['tier'])}>
+                {(['all', ...tiers] as DirectoryFilters['tier'][]).map((tier) => <option key={tier} value={tier}>{messages.tiers[tier]}</option>)}
+              </select>
+            </label>
+          )}
+          {genders.length > 1 && (
+            <label>
+              <span>{messages.filterGender}</span>
+              <select value={filters.gender} onChange={(event) => update('gender', event.target.value as DirectoryFilters['gender'])}>
+                {(['all', ...genders] as DirectoryFilters['gender'][]).map((gender) => <option key={gender} value={gender}>{messages.genders[gender]}</option>)}
+              </select>
+            </label>
+          )}
+          {statuses.length > 1 && (
+            <label>
+              <span>{messages.filterStatus}</span>
+              <select value={filters.status} onChange={(event) => update('status', event.target.value as DirectoryFilters['status'])}>
+                {(['all', ...statuses] as DirectoryFilters['status'][]).map((status) => <option key={status} value={status}>{messages.lifecycleStatuses[status]}</option>)}
+              </select>
+            </label>
+          )}
+        </div>
+      )}
     </div>
   )
 }

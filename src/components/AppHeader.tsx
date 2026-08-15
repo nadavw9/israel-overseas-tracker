@@ -1,5 +1,4 @@
-import { Activity, Globe2, ShieldCheck } from 'lucide-react'
-import { Languages } from 'lucide-react'
+import { Activity, Languages } from 'lucide-react'
 import type { RefreshManifest } from '../domain/refresh'
 import { useI18n } from '../i18n/context'
 
@@ -47,8 +46,6 @@ export function AppHeader({
         </span>
       </a>
       <div className="app-header__status">
-        <span><ShieldCheck size={15} aria-hidden="true" /> {messages.sourcesAttached}</span>
-        <span><Globe2 size={15} aria-hidden="true" /> {messages.global}</span>
         <span className={`refresh-status refresh-status--${refreshManifest === null ? 'unavailable' : failedProviders === 0 ? 'healthy' : 'degraded'}`} role="status">
           <Activity size={15} aria-hidden="true" /> {refreshLabel}
         </span>

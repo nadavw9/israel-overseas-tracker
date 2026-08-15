@@ -48,7 +48,7 @@ For local testing, create `.env.local` in the repository root and add one line: 
 
 ## Trust and scope
 
-- The public snapshot is separate from the private review registry. Candidates and review notes never appear in public counts, filters, rankings, map locations, or browser artifacts.
+- The public snapshot is separate from the private review registry. Candidates and review notes never appear in public counts, filters, rankings, or browser artifacts.
 - The current public snapshot contains 37 verified athletes. The coverage ledger is currently incomplete, so this is not a complete census and its visible summary is not a promise of no missed athletes.
 - Snapshot generation time is not a claim that every provider refreshed successfully. Each public record keeps its own source URL, source timestamp, and freshness state.
 - Identity-only athletes are published without invented zero statistics.
@@ -58,10 +58,10 @@ See [the inclusion policy](docs/inclusion-policy.md) and [data-source register](
 
 ## Privacy and external services
 
-The default athlete view uses no analytics and no third-party font service. Opening the map requests CARTO tiles that include OpenStreetMap data; attribution remains visible in the map. Deployments should document or proxy that external request when their privacy policy requires it.
+The tracker uses no analytics and no third-party font service. Athlete images are loaded only from approved, attributed sources recorded in the public snapshot.
 
 ## Automation
 
-`.github/workflows/refresh-performance.yml` runs the permitted performance adapters once nightly after the Israeli day closes and uploads both `snapshot.json` and `refresh-manifest.json` as an artifact. `.github/workflows/sync-data.yml` performs the broader verified-registry refresh shortly before it. Keeping both jobs nightly keeps the free API-Football tier within its 100-request daily quota. These workflows do not commit or deploy automatically; connect the artifact to the chosen hosting/deployment system before treating the public site as updated.
+`.github/workflows/sync-data.yml` performs the broader verified-registry refresh at 20:17 UTC, followed by `.github/workflows/refresh-performance.yml` at 20:30 UTC. That is late evening in Israel throughout the year and keeps the free API-Football tier within its 100-request daily quota. Each workflow validates the generated snapshot, commits only changed public data, and pushes it to the default branch. `.github/workflows/deploy-pages.yml` then builds the repository-aware Vite bundle and publishes it to GitHub Pages. `API_FOOTBALL_KEY` must be stored as a GitHub Actions repository secret; optional provider credentials fail closed when absent.
 
 This independent project is not affiliated with the athletes, clubs, leagues, ESPN, NBA, NHL, Ajax, CARTO, or OpenStreetMap.

@@ -3,13 +3,17 @@ import { TrackerApp } from './app/App'
 import { snapshotSchema, type AthleteSnapshot } from './domain/athlete'
 import { refreshManifestSchema, type RefreshManifest } from './domain/refresh'
 
+function publicDataUrl(fileName: string) {
+  return `${import.meta.env.BASE_URL}data/${fileName}`
+}
+
 function App() {
   const [snapshot, setSnapshot] = useState<AthleteSnapshot | null>(null)
   const [refreshManifest, setRefreshManifest] = useState<RefreshManifest | null>(null)
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    fetch('/data/snapshot.json')
+    fetch(publicDataUrl('snapshot.json'))
       .then((response) => {
         if (!response.ok) throw new Error(`Snapshot HTTP ${response.status}`)
         return response.json()
@@ -17,7 +21,7 @@ function App() {
       .then((data) => setSnapshot(snapshotSchema.parse(data)))
       .catch(() => setError(true))
 
-    fetch('/data/refresh-manifest.json')
+    fetch(publicDataUrl('refresh-manifest.json'))
       .then((response) => {
         if (!response.ok) throw new Error(`Refresh manifest HTTP ${response.status}`)
         return response.json()
