@@ -23,6 +23,7 @@ describe('refresh workflow', () => {
     expect(performanceWorkflow).toContain("cron: '30 20 * * *'")
     for (const workflow of [syncWorkflow, performanceWorkflow]) {
       expect(workflow).toContain('contents: write')
+      expect(workflow).toContain('ref: main')
       expect(workflow).toContain('github-actions[bot]')
       expect(workflow).toContain('git push')
     }
