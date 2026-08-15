@@ -5,6 +5,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Sync verified sports data
+      - Refresh athlete performance
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -17,10 +23,13 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+        with:
+          ref: main
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
