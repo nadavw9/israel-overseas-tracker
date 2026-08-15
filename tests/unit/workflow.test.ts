@@ -37,9 +37,9 @@ describe('refresh workflow', () => {
     const appSource = readFileSync('src/App.tsx', 'utf8')
     const viteConfig = readFileSync('vite.config.ts', 'utf8')
 
-    expect(workflow).toContain('actions/configure-pages@v5')
-    expect(workflow).toContain('actions/upload-pages-artifact@v4')
-    expect(workflow).toContain('actions/deploy-pages@v4')
+    expect(workflow).toContain('actions/configure-pages@v6')
+    expect(workflow).toContain('actions/upload-pages-artifact@v5')
+    expect(workflow).toContain('actions/deploy-pages@v5')
     expect(workflow).toContain('path: dist')
     expect(appSource).toContain('import.meta.env.BASE_URL')
     expect(viteConfig).toContain("'/israel-overseas-tracker/'")
