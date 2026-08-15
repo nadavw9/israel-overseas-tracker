@@ -35,7 +35,7 @@ These commands write review-only reports under `data/review/`. Provider checks n
 
 `pnpm sync:data` and `pnpm refresh:performance` both write the public snapshot and the refresh health manifest. Before accepting statistics, the ESPN adapter validates that response reference URLs bind the configured external athlete ID, season, and regular-season type. A provider failure can retain a still-valid verified observation as `stale`, and otherwise fails closed. Every verified athlete remains in the snapshot; athletes without a permitted performance binding are explicitly marked `not-integrated` rather than given invented totals.
 
-The free-first football integration path is prepared for API-Football. Add the free-plan key as `API_FOOTBALL_KEY` in the deployment secret store; do not put it in source control. A binding is added only after the provider's current coverage and terms are checked for the target competition. Sportradar Soccer remains an optional higher-coverage adapter.
+The free-first football integration path is prepared for API-Football. Add the free-plan key as `API_FOOTBALL_KEY` in the deployment secret store; do not put it in source control. The key is currently accepted, but a direct probe shows the Free plan rejects 2025+ player searches, so no current-season football binding is published yet. A binding is added only after the provider's current coverage and terms are checked for the target competition. Sportradar Soccer remains an optional higher-coverage adapter.
 
 The current provider comparison and free-tier decisions are recorded in [`docs/provider-research.md`](docs/provider-research.md).
 

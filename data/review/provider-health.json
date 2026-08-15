@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-08-15T07:30:49.126Z",
+  "checkedAt": "2026-08-15T08:45:52.611Z",
   "providers": [
     {
       "provider": "curated",
@@ -9,11 +9,26 @@
     {
       "provider": "api-football",
       "status": "ready",
-      "detail": "Account and API key accepted",
+      "detail": "Account accepted; Free plan rejects current-season player searches",
       "httpStatus": 200,
       "plan": "Free",
       "dailyLimit": 100,
-      "requestsUsed": 0
+      "requestsUsed": 3,
+      "capabilities": {
+        "currentSeasonPlayerStats": "unsupported"
+      }
+    },
+    {
+      "provider": "api-nba-capability",
+      "status": "ready",
+      "detail": "Same API-Sports key accepted; no NBA adapter is published",
+      "httpStatus": 200,
+      "plan": "Free",
+      "dailyLimit": 100,
+      "requestsUsed": 0,
+      "capabilities": {
+        "currentSeasonPlayerStats": "unsupported"
+      }
     },
     {
       "provider": "thesportsdb",

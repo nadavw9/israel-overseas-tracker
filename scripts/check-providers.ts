@@ -10,6 +10,7 @@ type ProviderCheck = {
   plan?: string
   dailyLimit?: number
   requestsUsed?: number
+  capabilities?: Record<string, 'available' | 'unsupported' | 'unknown'>
 }
 
 const timeoutMs = 8_000
@@ -59,17 +60,73 @@ async function checkApiFootball(): Promise<ProviderCheck> {
     }
     const subscription = payload.response?.subscription
     const requests = payload.response?.requests
+    let currentSeasonPlayerStats: 'available' | 'unsupported' | 'unknown' = 'unknown'
+    if (subscription?.active !== false) {
+      try {
+        const probe = await fetchWithTimeout(
+          'https://v3.football.api-sports.io/players?search=Manor%20Solomon&league=39&season=2026',
+          { headers: { 'x-apisports-key': key } },
+        )
+        const probePayload = await probe.json() as { errors?: Record<string, unknown> | unknown[]; response?: unknown[] }
+        const probeErrors = Array.isArray(probePayload.errors)
+          ? probePayload.errors.map(String)
+          : Object.values(probePayload.errors ?? {}).map(String)
+        currentSeasonPlayerStats = probeErrors.some((error) => /free plans do not have access to this season/i.test(error))
+          ? 'unsupported'
+          : probe.ok && (probePayload.response?.length ?? 0) > 0
+            ? 'available'
+            : 'unknown'
+      } catch {
+        currentSeasonPlayerStats = 'unknown'
+      }
+    }
     return {
       provider: 'api-football',
       status: subscription?.active === false ? 'failed' : 'ready',
-      detail: subscription?.active === false ? 'Subscription is inactive' : 'Account and API key accepted',
+      detail: subscription?.active === false
+        ? 'Subscription is inactive'
+        : currentSeasonPlayerStats === 'unsupported'
+          ? 'Account accepted; Free plan rejects current-season player searches'
+          : 'Account and API key accepted',
       httpStatus: response.status,
       plan: subscription?.plan,
       dailyLimit: requests?.limit_day,
       requestsUsed: requests?.current,
+      capabilities: { currentSeasonPlayerStats },
     }
   } catch (error) {
     return { provider: 'api-football', status: 'failed', detail: error instanceof Error ? error.message : String(error) }
+  }
+}
+
+async function checkApiNba(): Promise<ProviderCheck> {
+  const key = process.env.API_FOOTBALL_KEY
+  if (!key) return { provider: 'api-nba-capability', status: 'not-configured', detail: 'API_FOOTBALL_KEY is not set' }
+  try {
+    const response = await fetchWithTimeout('https://v2.nba.api-sports.io/status', {
+      headers: { 'x-apisports-key': key },
+    })
+    const payload = await response.json() as {
+      errors?: Record<string, unknown> | unknown[]
+      response?: { subscription?: { plan?: string; active?: boolean }; requests?: { current?: number; limit_day?: number } }
+    }
+    const errors = Array.isArray(payload.errors) ? payload.errors : Object.values(payload.errors ?? {})
+    if (!response.ok || errors.length > 0) {
+      return { provider: 'api-nba-capability', status: 'failed', detail: errors.map(String).join('; ') || `HTTP ${response.status}`, httpStatus: response.status }
+    }
+    const active = payload.response?.subscription?.active !== false
+    return {
+      provider: 'api-nba-capability',
+      status: active ? 'ready' : 'failed',
+      detail: active ? 'Same API-Sports key accepted; no NBA adapter is published' : 'Subscription is inactive',
+      httpStatus: response.status,
+      plan: payload.response?.subscription?.plan,
+      dailyLimit: payload.response?.requests?.limit_day,
+      requestsUsed: payload.response?.requests?.current,
+      capabilities: { currentSeasonPlayerStats: 'unsupported' },
+    }
+  } catch (error) {
+    return { provider: 'api-nba-capability', status: 'failed', detail: error instanceof Error ? error.message : String(error) }
   }
 }
 
@@ -108,6 +165,7 @@ export async function checkProviders(): Promise<ProviderCheck[]> {
   const results = await Promise.all([
     Promise.resolve({ provider: 'curated', status: 'ready' as const, detail: 'Local verified fixture data is available' }),
     checkApiFootball(),
+    checkApiNba(),
     checkTheSportsDb(),
     checkPublicEndpoint(
       'espn-nba',
