@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-15T10:23:59.527Z",
+  "generatedAt": "2026-08-15T11:52:13.766Z",
   "athletes": [
     {
       "id": "deni-avdija",
@@ -59,7 +59,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-15T10:23:59.527Z"
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
         }
       },
       "image": {
@@ -132,7 +132,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5242502/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-15T10:23:59.527Z"
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
         }
       },
       "image": {
@@ -201,7 +201,7 @@
         "source": {
           "provider": "espn-nba",
           "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/5107173/statistics?lang=en&region=us",
-          "retrievedAt": "2026-08-15T10:23:59.527Z"
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
         }
       },
       "image": {
@@ -344,10 +344,22 @@
         }
       },
       "performance": {
-        "status": "unavailable",
-        "state": "unavailable",
-        "stats": null,
-        "reason": "not-integrated"
+        "status": "available",
+        "state": "final",
+        "competition": "NCAA Division I",
+        "season": "2025-26",
+        "stats": {
+          "kind": "basketball",
+          "games": 8,
+          "pointsPerGame": 14.9,
+          "reboundsPerGame": 2.1,
+          "assistsPerGame": 3.3
+        },
+        "source": {
+          "provider": "espn-ncaa-basketball",
+          "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/womens-college-basketball/seasons/2026/types/2/athletes/5242255/statistics?lang=en&region=us",
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
+        }
       }
     },
     {
@@ -388,10 +400,22 @@
         }
       },
       "performance": {
-        "status": "unavailable",
-        "state": "unavailable",
-        "stats": null,
-        "reason": "not-integrated"
+        "status": "available",
+        "state": "final",
+        "competition": "NCAA Division I",
+        "season": "2025-26",
+        "stats": {
+          "kind": "basketball",
+          "games": 35,
+          "pointsPerGame": 5.7,
+          "reboundsPerGame": 1.1,
+          "assistsPerGame": 1.2
+        },
+        "source": {
+          "provider": "espn-ncaa-basketball",
+          "sourceUrl": "https://sports.core.api.espn.com/v2/sports/basketball/leagues/mens-college-basketball/seasons/2026/types/2/athletes/5312035/statistics?lang=en&region=us",
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
+        }
       },
       "image": {
         "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/OmerMayer26.10.24.jpg/960px-OmerMayer26.10.24.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -508,7 +532,7 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/teams/139/roster",
-          "retrievedAt": "2026-08-15T10:23:59.527Z"
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
         }
       },
       "image": {
@@ -786,7 +810,7 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/jpn.1/teams/22167/roster",
-          "retrievedAt": "2026-08-15T10:23:59.527Z"
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
         }
       },
       "image": {
@@ -854,7 +878,7 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/189/roster",
-          "retrievedAt": "2026-08-15T10:23:59.527Z"
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
         }
       },
       "image": {
@@ -923,7 +947,7 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/21300/roster",
-          "retrievedAt": "2026-08-15T10:23:59.527Z"
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
         }
       },
       "image": {
@@ -989,7 +1013,7 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/21300/roster",
-          "retrievedAt": "2026-08-15T10:23:59.527Z"
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
         }
       },
       "image": {
@@ -1055,7 +1079,7 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/189/roster",
-          "retrievedAt": "2026-08-15T10:23:59.527Z"
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
         }
       },
       "image": {
@@ -1121,7 +1145,7 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/193/roster",
-          "retrievedAt": "2026-08-15T10:23:59.527Z"
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
         }
       },
       "image": {
@@ -1595,7 +1619,7 @@
         "source": {
           "provider": "espn-soccer",
           "sourceUrl": "https://site.api.espn.com/apis/site/v2/sports/soccer/usa.nwsl/teams/15364/roster",
-          "retrievedAt": "2026-08-15T10:23:59.527Z"
+          "retrievedAt": "2026-08-15T11:52:13.766Z"
         }
       },
       "image": {

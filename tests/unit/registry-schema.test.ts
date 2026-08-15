@@ -207,6 +207,20 @@ describe('normalized registry schemas', () => {
     expect(providerBindingSchema.safeParse({ ...binding, externalId: '12345|253|2025|extra' }).success).toBe(false)
   })
 
+  it('validates ESPN NCAA basketball composite identity bindings', () => {
+    const binding = {
+      ...registryBundleFixture.providerBindings[0],
+      provider: 'espn-ncaa-basketball',
+      sport: 'basketball',
+      competition: 'NCAA Division I',
+      season: '2025-26',
+      externalId: 'mens-college-basketball|2509|5312035|2026',
+    }
+    expect(providerBindingSchema.safeParse(binding).success).toBe(true)
+    expect(providerBindingSchema.safeParse({ ...binding, externalId: 'mens-college-basketball|2509|5312035' }).success).toBe(false)
+    expect(providerBindingSchema.safeParse({ ...binding, season: '2026-27' }).success).toBe(false)
+  })
+
   it('accepts the strict circuit activity shape', () => {
     expect(circuitActivitySchema.parse(circuitActivity)).toEqual(circuitActivity)
     expect(circuitActivitySchema.safeParse({ ...circuitActivity, competition: '   ' }).success).toBe(false)

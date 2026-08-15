@@ -167,6 +167,24 @@ export const providerBindingSchema = z
       })
     }
 
+    if (binding.provider === 'espn-ncaa-basketball') {
+      const parts = binding.externalId.split('|')
+      const [leagueSlug, teamId, athleteId, seasonYear] = parts
+      const valid = parts.length === 4 &&
+        (leagueSlug === 'mens-college-basketball' || leagueSlug === 'womens-college-basketball') &&
+        teamId !== undefined && /^\d+$/.test(teamId) &&
+        athleteId !== undefined && /^\d+$/.test(athleteId) &&
+        seasonYear !== undefined && /^\d{4}$/.test(seasonYear) &&
+        binding.season === `${Number(seasonYear) - 1}-${String(Number(seasonYear)).slice(-2)}`
+      if (!valid) {
+        context.addIssue({
+          code: 'custom',
+          message: 'ESPN NCAA basketball bindings must use league-slug|team|athlete|season numeric ids and a matching YYYY-YY season',
+          path: ['externalId'],
+        })
+      }
+    }
+
     if (binding.provider === 'sportradar-soccer') {
       const [seasonId, competitorId, playerId] = binding.externalId.split('|')
       const urns = [seasonId, competitorId, playerId]
@@ -345,9 +363,10 @@ export function createRegistryBundleSchema(asOf: RegistryAsOf) {
     })
 
     const athletesById = new Map(bundle.athletes.map((athlete) => [athlete.id, athlete]))
-    const providerSport = {
-      'espn-nba': 'basketball',
-      'espn-soccer': 'football',
+      const providerSport = {
+        'espn-nba': 'basketball',
+        'espn-ncaa-basketball': 'basketball',
+        'espn-soccer': 'football',
       nhl: 'hockey',
       'sportradar-soccer': 'football',
       'api-football': 'football',

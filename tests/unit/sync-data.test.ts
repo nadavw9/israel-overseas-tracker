@@ -991,7 +991,7 @@ describe('legacy snapshot migration', () => {
     )
     expect(previous.athletes.filter(
       (athlete) => athlete.performance.status === 'available',
-    )).toHaveLength(11)
+    )).toHaveLength(13)
   })
 
   it('accepts the checked-in current unavailable record without a performance source', async () => {

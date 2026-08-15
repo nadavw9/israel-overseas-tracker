@@ -7,6 +7,7 @@ import espnSoccerFixture from '../../data/fixtures/espn-soccer-roster.json'
 import { parseApiFootballExternalId, parseApiFootballFixture } from '../../scripts/providers/api-football'
 import { parseCuratedRecord } from '../../scripts/providers/curated'
 import { parseNbaFixture, parseNbaSeasonEndingYear } from '../../scripts/providers/nba'
+import { parseEspnNcaaBasketballExternalId, parseEspnNcaaBasketballFixture } from '../../scripts/providers/ncaa-basketball'
 import { parseNhlFixture } from '../../scripts/providers/nhl'
 import { parseEspnSoccerExternalId, parseEspnSoccerFixture } from '../../scripts/providers/espn-soccer'
 import { parseSportradarSoccerExternalId, parseSportradarSoccerFixture } from '../../scripts/providers/soccer'
@@ -109,6 +110,70 @@ describe('NBA provider', () => {
       athleteId: 'deni-avdija', externalId: '4683021', seasonYear: 2026, season: '2025-26',
       sourceUrl: 'https://example.com/source', retrievedAt: '2026-07-19T08:00:00.000Z',
     })).toThrow(/mismatch/i)
+  })
+})
+
+describe('ESPN NCAA basketball provider', () => {
+  const options = {
+    athleteIdInternal: 'omer-mayer',
+    expectedName: 'Omer Mayer',
+    competition: 'NCAA Division I',
+    season: '2025-26',
+    sourceUrl: 'https://sports.core.api.espn.com/v2/sports/basketball/leagues/mens-college-basketball/seasons/2026/types/2/athletes/5312035/statistics?lang=en&region=us',
+    retrievedAt: '2026-08-15T11:02:41.000Z',
+    leagueSlug: 'mens-college-basketball' as const,
+    teamId: 2509,
+    athleteId: 5312035,
+    seasonYear: 2026,
+  }
+  const roster = {
+    team: { id: '2509', displayName: 'Purdue Boilermakers' },
+    athletes: [{ id: '5312035', displayName: 'Omer Mayer' }],
+  }
+  const statistics = {
+    $ref: 'http://sports.core.api.espn.com/v2/sports/basketball/leagues/mens-college-basketball/seasons/2026/types/2/athletes/5312035/statistics/0',
+    athlete: { $ref: 'http://sports.core.api.espn.com/v2/sports/basketball/leagues/mens-college-basketball/seasons/2026/athletes/5312035' },
+    season: { $ref: 'http://sports.core.api.espn.com/v2/sports/basketball/leagues/mens-college-basketball/seasons/2026' },
+    seasonType: { $ref: 'http://sports.core.api.espn.com/v2/sports/basketball/leagues/mens-college-basketball/seasons/2026/types/2' },
+    splits: {
+      categories: [{ stats: [
+        { name: 'gamesPlayed', value: 35, displayValue: '35' },
+        { name: 'avgPoints', value: 5.6857142, displayValue: '5.7' },
+        { name: 'avgRebounds', value: 1.0571429, displayValue: '1.1' },
+        { name: 'avgAssists', value: 1.2, displayValue: '1.2' },
+      ] }],
+    },
+  }
+
+  it('maps completed season totals and validates the current roster identity', () => {
+    const result = parseEspnNcaaBasketballFixture({ roster, statistics }, options)
+    expect(result).toMatchObject({
+      athleteId: 'omer-mayer',
+      sport: 'basketball',
+      competition: 'NCAA Division I',
+      season: '2025-26',
+      state: 'final',
+      stats: { kind: 'basketball', games: 35, pointsPerGame: 5.7, reboundsPerGame: 1.1, assistsPerGame: 1.2 },
+    })
+  })
+
+  it('parses and rejects malformed composite bindings', () => {
+    expect(parseEspnNcaaBasketballExternalId('mens-college-basketball|2509|5312035|2026')).toEqual({
+      leagueSlug: 'mens-college-basketball', teamId: 2509, athleteId: 5312035, seasonYear: 2026,
+    })
+    expect(() => parseEspnNcaaBasketballExternalId('mens-college-basketball|2509|5312035')).toThrow(/league-slug/i)
+    expect(() => parseEspnNcaaBasketballExternalId('mens-college-basketball|2509|5312035|20x6')).toThrow()
+  })
+
+  it('rejects a mismatched athlete or season context', () => {
+    expect(() => parseEspnNcaaBasketballFixture({
+      roster: { ...roster, athletes: [{ id: '999', displayName: 'Other Player' }] },
+      statistics,
+    }, options)).toThrow(/missing|identity/i)
+    expect(() => parseEspnNcaaBasketballFixture({
+      roster,
+      statistics: { ...statistics, season: { $ref: 'http://sports.core.api.espn.com/v2/sports/basketball/leagues/mens-college-basketball/seasons/2025' } },
+    }, options)).toThrow(/context/i)
   })
 })
 

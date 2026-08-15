@@ -121,8 +121,10 @@ describe('rankings', () => {
     )
     expect(rankAthletes(snapshot.athletes.filter((athlete) => athlete.sport === 'basketball')).map((athlete) => athlete.id)).toEqual([
       'deni-avdija',
+      'gal-raviv',
       'danny-wolf',
       'ben-saraf',
+      'omer-mayer',
     ])
   })
 

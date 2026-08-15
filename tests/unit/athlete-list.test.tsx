@@ -77,7 +77,7 @@ describe('verified athlete list', () => {
     expect(screen.getByText('37 verified athletes')).toBeInTheDocument()
     expect(screen.getByText(`Snapshot generated ${generatedDate}`)).toBeInTheDocument()
     expect(screen.queryByText(/^live$/i)).not.toBeInTheDocument()
-    expect(screen.getAllByText(/source checked/i)).toHaveLength(11)
+    expect(screen.getAllByText(/source checked/i)).toHaveLength(13)
     expect(screen.getAllByText(messages.en.notIntegrated)).not.toHaveLength(0)
     vi.useRealTimers()
   })
@@ -95,7 +95,7 @@ describe('verified athlete list', () => {
       ['Tennis', '8'],
       ['Women', '7'],
       ['Circuit', '8'],
-      ['Stats', '11'],
+      ['Stats', '13'],
       ['Mapped', '3'],
     ] as const) {
       const row = within(board).getByText(label).closest('div')

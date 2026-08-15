@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { parseCuratedRecord } from './curated'
 import { parseApiFootballExternalId, parseApiFootballFixture } from './api-football'
 import { parseNbaFixture, parseNbaSeasonEndingYear } from './nba'
+import { parseEspnNcaaBasketballExternalId, parseEspnNcaaBasketballFixture } from './ncaa-basketball'
 import { parseNhlFixture } from './nhl'
 import { parseEspnSoccerExternalId, parseEspnSoccerFixture } from './espn-soccer'
 import { parseSportradarSoccerExternalId, parseSportradarSoccerFixture } from './soccer'
@@ -65,6 +66,42 @@ const nhlAdapter: ProviderAdapter = async ({ entry, fetcher, now }) => {
     season: binding.season,
     sourceUrl,
     retrievedAt,
+  })
+}
+
+const espnNcaaBasketballAdapter: ProviderAdapter = async ({ entry, fetcher, now }) => {
+  const binding = entry.binding
+  if (binding === undefined || binding.provider !== 'espn-ncaa-basketball') {
+    throw new Error(`ESPN NCAA basketball binding required for ${entry.id}`)
+  }
+
+  const { leagueSlug, teamId, athleteId, seasonYear } = parseEspnNcaaBasketballExternalId(binding.externalId)
+  const retrievedAt = now.toISOString()
+  const rosterUrl = `https://site.api.espn.com/apis/site/v2/sports/basketball/${leagueSlug}/teams/${teamId}/roster`
+  const statsUrl = `https://sports.core.api.espn.com/v2/sports/basketball/leagues/${leagueSlug}/seasons/${seasonYear}/types/2/athletes/${athleteId}/statistics?lang=en&region=us`
+  const rosterResponse = await fetcher(rosterUrl, { headers: { accept: 'application/json' } })
+  if (!rosterResponse.ok) {
+    throw new Error(`ESPN NCAA basketball roster returned HTTP ${rosterResponse.status} for ${entry.id}`)
+  }
+  const statsResponse = await fetcher(statsUrl, { headers: { accept: 'application/json' } })
+  if (!statsResponse.ok) {
+    throw new Error(`ESPN NCAA basketball statistics returned HTTP ${statsResponse.status} for ${entry.id}`)
+  }
+
+  return parseEspnNcaaBasketballFixture({
+    roster: await rosterResponse.json(),
+    statistics: await statsResponse.json(),
+  }, {
+    athleteIdInternal: entry.id,
+    expectedName: entry.name.en,
+    competition: binding.competition,
+    season: binding.season,
+    sourceUrl: statsUrl,
+    retrievedAt,
+    leagueSlug,
+    teamId,
+    athleteId,
+    seasonYear,
   })
 }
 
@@ -169,6 +206,7 @@ export const defaultProviderAdapters: ProviderAdapterMap = {
   curated: curatedAdapter,
   'api-football': apiFootballAdapter,
   'espn-nba': espnNbaAdapter,
+  'espn-ncaa-basketball': espnNcaaBasketballAdapter,
   'espn-soccer': espnSoccerAdapter,
   nhl: nhlAdapter,
   'sportradar-soccer': sportradarSoccerAdapter,

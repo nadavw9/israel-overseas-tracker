@@ -168,6 +168,35 @@ async function checkEspnSoccer(): Promise<ProviderCheck> {
   }
 }
 
+async function checkEspnNcaaBasketball(): Promise<ProviderCheck> {
+  const rosterUrl = 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams/2509/roster'
+  const statsUrl = 'https://sports.core.api.espn.com/v2/sports/basketball/leagues/mens-college-basketball/seasons/2026/types/2/athletes/5312035/statistics?lang=en&region=us'
+  try {
+    const [rosterResponse, statsResponse] = await Promise.all([
+      fetchWithTimeout(rosterUrl),
+      fetchWithTimeout(statsUrl),
+    ])
+    const roster = await rosterResponse.json() as {
+      team?: { id?: string | number }
+      athletes?: Array<{ id?: string | number }>
+    }
+    const stats = await statsResponse.json() as { splits?: { categories?: unknown[] } }
+    const hasBoundAthlete = roster.athletes?.some((athlete) => String(athlete.id) === '5312035') ?? false
+    const ready = rosterResponse.ok && statsResponse.ok && String(roster.team?.id) === '2509' && hasBoundAthlete && (stats.splits?.categories?.length ?? 0) > 0
+    return {
+      provider: 'espn-ncaa-basketball',
+      status: ready ? 'ready' : 'failed',
+      detail: ready
+        ? 'Current Purdue roster identity and completed 2025-26 player totals responded'
+        : `Roster/stat probe did not match (roster HTTP ${rosterResponse.status}, stats HTTP ${statsResponse.status})`,
+      httpStatus: ready ? 200 : rosterResponse.status !== 200 ? rosterResponse.status : statsResponse.status,
+      capabilities: { completedSeasonPlayerStats: ready ? 'available' : 'unknown' },
+    }
+  } catch (error) {
+    return { provider: 'espn-ncaa-basketball', status: 'failed', detail: error instanceof Error ? error.message : String(error) }
+  }
+}
+
 async function checkTheSportsDb(): Promise<ProviderCheck> {
   const key = process.env.THESPORTSDB_API_KEY ?? '123'
   try {
@@ -192,6 +221,7 @@ export async function checkProviders(): Promise<ProviderCheck[]> {
     checkApiNba(),
     checkTheSportsDb(),
     checkEspnSoccer(),
+    checkEspnNcaaBasketball(),
     checkPublicEndpoint(
       'espn-nba',
       'https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2026/types/2/athletes/4683021/statistics?lang=en&region=us',
