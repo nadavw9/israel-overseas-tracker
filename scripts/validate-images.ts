@@ -64,13 +64,16 @@ export async function validateImages(
 ): Promise<number> {
   const manifest = parseManifest(input)
   const seen = new Set<string>()
+  const entries = Object.entries(manifest)
 
-  for (const [athleteId, image] of Object.entries(manifest)) {
+  for (const [athleteId, image] of entries) {
     if (seen.has(image.url)) {
       throw new Error(`Duplicate image URL for ${athleteId}`)
     }
     seen.add(image.url)
+  }
 
+  async function validateImage([athleteId, image]: (typeof entries)[number]) {
     const controller = new AbortController()
     let timeout: ReturnType<typeof setTimeout> | undefined
     let response: Response | undefined
@@ -107,7 +110,7 @@ export async function validateImages(
       }
       if (response.status === 429) {
         console.warn(`Image check rate-limited for ${athleteId}; schema and rights metadata remain validated`)
-        continue
+        return
       }
       if (response.url && !httpsUrlSchema.safeParse(response.url).success) {
         throw new Error(`Image check failed for ${athleteId}: final URL must be HTTPS`)
@@ -122,6 +125,11 @@ export async function validateImages(
       if (timeout !== undefined) clearTimeout(timeout)
       cancelResponseBody(response)
     }
+  }
+
+  const batchSize = 4
+  for (let index = 0; index < entries.length; index += batchSize) {
+    await Promise.all(entries.slice(index, index + batchSize).map(validateImage))
   }
 
   return seen.size

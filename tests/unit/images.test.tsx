@@ -210,6 +210,26 @@ describe('athlete imagery', () => {
     expect(fetched).toBe(2)
   })
 
+  it('starts a bounded batch of approved image checks before awaiting slow responses', async () => {
+    let started = 0
+    let releaseBatch: (() => void) | undefined
+    const batchStarted = new Promise<void>((resolve) => {
+      releaseBatch = resolve
+    })
+    const fetcher = async () => {
+      started += 1
+      if (started === 2) releaseBatch?.()
+      await batchStarted
+      return response()
+    }
+
+    await expect(validateImages({
+      first: approvedImage(),
+      second: { ...approvedImage(), url: 'https://images.example.com/second.png' },
+    }, fetcher, { timeoutMs: 50 })).resolves.toBe(2)
+    expect(started).toBe(2)
+  })
+
   it.each([
     ['missing license', { ...approvedImage(), license: undefined }, /license/i],
     ['missing rights holder', { ...approvedImage(), rightsHolder: undefined }, /rights holder/i],
