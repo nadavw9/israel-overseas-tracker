@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-08-15T11:59:36.161Z",
-  "snapshotGeneratedAt": "2026-08-15T11:59:36.161Z",
-  "durationMs": 1086,
+  "generatedAt": "2026-08-15T13:43:48.653Z",
+  "snapshotGeneratedAt": "2026-08-15T13:43:48.653Z",
+  "durationMs": 544,
   "unboundSkipped": 24,
   "providers": [
     {
@@ -10,7 +10,7 @@
       "succeeded": 3,
       "failed": 0,
       "skipped": 0,
-      "durationMs": 757
+      "durationMs": 328
     },
     {
       "provider": "espn-ncaa-basketball",
@@ -18,7 +18,7 @@
       "succeeded": 2,
       "failed": 0,
       "skipped": 0,
-      "durationMs": 1032
+      "durationMs": 390
     },
     {
       "provider": "espn-soccer",
@@ -26,7 +26,7 @@
       "succeeded": 8,
       "failed": 0,
       "skipped": 0,
-      "durationMs": 912
+      "durationMs": 398
     }
   ]
 }
