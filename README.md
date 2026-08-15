@@ -42,6 +42,8 @@ The college-basketball integration uses the same public ESPN identity boundary f
 
 The current provider comparison and free-tier decisions are recorded in [`docs/provider-research.md`](docs/provider-research.md).
 
+The MLB lead is intentionally review-only: `data/review/mlb-coverage-audit.json` records Dean Kremer and the official stats probe, but no MLB totals are published until data-reuse permission is cleared.
+
 For local testing, create `.env.local` in the repository root and add one line: `API_FOOTBALL_KEY=your_key_here`. This file is ignored by Git. Run `pnpm refresh:performance` after saving it; never paste the key into `src/`, `public/`, or the browser.
 
 ## Trust and scope

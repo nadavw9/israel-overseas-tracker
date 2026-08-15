@@ -1,0 +1,35 @@
+{
+  "checkedAt": "2026-08-15T11:56:53.000Z",
+  "provider": "MLB Stats API",
+  "scope": "Israeli athletes in MLB",
+  "rightsDecision": "manual-review-required",
+  "rightsNote": "The public MLB terms prohibit automated scripts interacting with MLB digital properties. Do not schedule or publish MLB statistics until MLB or its licensed data partner grants written permission for the intended fields, polling, caching, and display.",
+  "records": [
+    {
+      "athleteName": "Dean Kremer",
+      "athleteId": "dean-kremer",
+      "status": "candidate",
+      "eligibilitySource": "https://www.mlb.com/world-baseball-classic/news/dean-kremer-commits-to-team-israel-for-2026-world-baseball-classic",
+      "currentTeamSource": "https://statsapi.mlb.com/api/v1/people/665152?hydrate=currentTeam",
+      "providerIdentity": {
+        "mlbPersonId": 665152,
+        "currentTeam": "Minnesota Twins",
+        "competition": "MLB",
+        "season": "2026"
+      },
+      "statsProbe": {
+        "url": "https://statsapi.mlb.com/api/v1/people/665152/stats?stats=season&group=pitching&season=2026",
+        "responded": true,
+        "fieldsObserved": ["gamesPlayed", "gamesStarted", "era", "inningsPitched", "strikeOuts", "whip"],
+        "published": false,
+        "reason": "Provider terms not cleared for automated public reuse."
+      },
+      "imageCandidate": {
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Dean_Kremer_pitching_for_the_Twins_in_August_2026_in_a_game_at_Kauffman_Stadium_against_the_Kansas_City_Royals.jpg",
+        "license": "CC BY-SA 4.0",
+        "artist": "Gatorfan252525",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Dean_Kremer_pitching_for_the_Twins_in_August_2026_in_a_game_at_Kauffman_Stadium_against_the_Kansas_City_Royals.jpg/960px-Dean_Kremer_pitching_for_the_Twins_in_August_2026_in_a_game_at_Kauffman_Stadium_against_the_Kansas_City_Royals.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+      }
+    }
+  ]
+}
