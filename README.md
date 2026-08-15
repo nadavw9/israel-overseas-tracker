@@ -27,6 +27,8 @@ pnpm test:e2e
 
 The free-first football integration path is prepared for API-Football. Add the free-plan key as `API_FOOTBALL_KEY` in the deployment secret store; do not put it in source control. A binding is added only after the provider's current coverage and terms are checked for the target competition. Sportradar Soccer remains an optional higher-coverage adapter.
 
+The current provider comparison and free-tier decisions are recorded in [`docs/provider-research.md`](docs/provider-research.md).
+
 ## Trust and scope
 
 - The public snapshot is separate from the private review registry. Candidates and review notes never appear in public counts, filters, rankings, map locations, or browser artifacts.
