@@ -2,6 +2,10 @@
 
 `README.md`, the inclusion policy, data-source register, and executable validators are the local sources of truth. Keep this file concise; do not duplicate those documents here.
 
+## Global workflow pointer
+
+When available, retrieve only task-relevant topics from `/AI-Knowledge/AI_WORKFLOW_KNOWLEDGE.md`, especially Deterministic verification, Independent review, UI & browser verification, Debugging & evidence preservation, and Definition of Done. Do not copy the whole knowledge base into this repo. Local policy and executable validators override generic guidance.
+
 ## Product contract
 
 This is a source-backed tracker. Trustworthiness beats apparent completeness. Never invent totals, silently substitute identities, promote review-only candidates, or blur the boundary between verified public data and private/review data.
