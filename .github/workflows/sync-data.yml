@@ -1,9 +1,7 @@
 name: Sync verified sports data
 
 on:
-  schedule:
-    # 20:17 UTC = 22:17 Israel in winter / 23:17 Israel in summer.
-    - cron: '17 20 * * *'
+  # Automatic refresh retired at the owner's request on 2026-10-10.
   workflow_dispatch:
 
 concurrency:
