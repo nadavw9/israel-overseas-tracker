@@ -1,9 +1,7 @@
 name: Refresh athlete performance
 
 on:
-  schedule:
-    # 20:30 UTC = 22:30 Israel in winter / 23:30 Israel in summer.
-    - cron: '30 20 * * *'
+  # Automatic refresh retired at the owner's request on 2026-10-10.
   workflow_dispatch:
 
 concurrency:
